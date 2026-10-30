@@ -28,8 +28,10 @@ Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf de
 | **3BFP2/1** (Frau Lohner) | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-ab1.html | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-ab2.html |
 | **3BFP2/2** (Herr Klawitter) | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-ab1.html | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-ab2.html |
 
-- Je Übung eine Spalte: „17 von 22 fertig“, Balken und **alle Namen mit ihrem Stand**
-  (✓ = fertig, 6/12 = dabei, – = noch nicht begonnen). ⚠ = fertig, aber beim ersten Versuch zu oft falsch (durchgeklickt?).
+- Je Übung eine Spalte: „17 von 22 fertig“, Balken und **alle Namen mit ihrem Stand**:
+  **✓ 9/12** = fertig, 9 von 12 Karten beim ersten Versuch richtig · **⚠ 5/12** = fertig, aber zu wenige beim ersten
+  Versuch richtig (durchgeklickt?) · **6/12** = dabei · **–** = noch nicht begonnen · **↺** = musste wegen zu schneller
+  Fehler neu starten (↺2 = zweimal). Fährt man mit der Maus über einen Namen, erscheint eine kurze Erklärung.
 - **„Oft falsch beim ersten Versuch“**: die drei Karten, die Sie besprechen sollten. Antippen → die Karte erscheint groß,
   mit der Zahl der zuerst gewählten falschen Antworten (ohne Namen); **Auflösen** zeigt Lösung und Erklärung.
 - Bei der **Selbstkontrolle** (AB 2, Übung 2) heißt die Liste **„Oft nicht erfüllt“**: die Punkte des Erwartungshorizonts,
@@ -48,7 +50,13 @@ Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf de
 - Karten mit Aussagen, darunter die Antwortknöpfe. **Richtig:** grün mit ✓ und Erklärung. **Falsch:** orange mit ✗ und
   Tipp – die Lösung wird nie verraten. Manche Karten haben zwei richtige Antworten (wie im Erwartungshorizont der KA).
 - Erst wenn alle Karten gelöst sind, erscheint **„Übung abgeschlossen!“** mit dem Hinweis auf die nächste Aufgabe
-  auf dem Arbeitsblatt und „Das Wichtigste in Kürze“. Wer durchklickt, bekommt „Hey, nicht einfach durchklicken!“.
+  auf dem Arbeitsblatt und „Das Wichtigste in Kürze“. Wer durchklickt, bekommt „Hey, nicht einfach durchklicken!“
+  (ohne den Hinweis auf die nächste Aufgabe).
+- **Schutz gegen Durchklicken:** Nach einer falschen Antwort ist die Karte **5 Sekunden gesperrt** („Lesen Sie den
+  Tipp – weiter in 3 s“). Wer **3 falsche Antworten innerhalb von 10 Sekunden** gibt, sieht „Zu schnell geklickt!“ und
+  die Übung **beginnt von vorn**; die Lehrerseite zeigt dann ↺ beim Namen. Die Werte stehen in
+  `docs/einstellungen.js` (`sperreNachFehlerSekunden`, `zuSchnell: { fehler, sekunden }`); `0` schaltet die
+  jeweilige Funktion aus. Die Selbstkontrolle (AB 2, Übung 2) ist davon nicht betroffen.
 - **Selbstkontrolle:** kein Richtig/Falsch – die SuS markieren je Punkt des Erwartungshorizonts „erfüllt“ oder
   „fehlt / zu knapp“ und können sich umentscheiden.
 
@@ -74,8 +82,8 @@ nur die Lehrerseite zeigt dann „Keine Verbindung zum Server“.
 ## Datenschutz
 
 - Übertragen werden nur: der eingegebene Name („Lena K.“), die Klasse, eine zufällige Geräte-Kennung, die Übung,
-  die Zahl der gelösten Karten und die Nummern der Karten, die beim ersten Versuch falsch waren (bzw. bei der
-  Selbstkontrolle als „fehlt“ markiert wurden). Keine Anmeldung, keine Cookies, keine Analyse, keine fremden Skripte.
+  die Zahl der gelösten Karten, die Zahl der Neustarts und die Nummern der Karten, die beim ersten Versuch falsch
+  waren (bzw. bei der Selbstkontrolle als „fehlt“ markiert wurden). Keine Anmeldung, keine Cookies, keine Analyse, keine fremden Skripte.
 - Die Lehrerseite zeigt Fehler nur zusammengefasst für die Klasse, nicht je Person.
 - Gelöscht wird automatisch nach 12 Stunden ohne Aktivität oder sofort mit „Liste leeren“.
 - Die Daten liegen bei Cloudflare (Durable Object). Bitte im Zweifel mit der/dem Datenschutzbeauftragten der Schule abstimmen.
@@ -107,7 +115,7 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
 ```
 docs/                    ← alles, was GitHub Pages veröffentlicht
   inhalte.js             ← ALLE Texte der Übungen
-  einstellungen.js       ← Adresse des Workers, Klassen, Aktualisierungstakt, Sperrwörter für Namen
+  einstellungen.js       ← Adresse des Workers, Klassen, Aktualisierungstakt, Wartezeit/Neustart, Sperrwörter
   app.js, style.css      ← Übungen (Handy)
   lehrer.js, lehrer.css  ← Lehrerseiten (Beamer)
   index.html             ← Startseite (nur Hinweis auf den QR-Code)

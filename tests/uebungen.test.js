@@ -3,7 +3,9 @@
  * Teil A: Übungen ohne Fortschrittsanzeige (serverAdresse leer) – Tipp, Zusammenfassung,
  *         Durchklicken, Zurücksetzen, kein waagerechtes Scrollen, keine fremden Anfragen.
  * Teil B: mit Fortschrittsanzeige – Namenseingabe mit Klassenwahl, Senden des Fortschritts (nachgebildeter Server).
- * Teil C: Lehrerseiten je Klasse – Anzeige der Namen und Zahlen, Besprechen, Selbstkontrolle, Entfernen, Leeren. */
+ * Teil C: Lehrerseiten je Klasse – Anzeige der Namen und Zahlen, Besprechen, Selbstkontrolle, Entfernen, Leeren.
+ * Teil D: Schutz gegen Durchklicken – Sperre nach Fehler, Neustart bei zu schnellen Fehlern, ↺ auf der Lehrerseite.
+ * In Teil A–C sind Sperre und Neustart ausgeschaltet (sonst würden die schnellen Testklicks sie auslösen). */
 const { chromium } = require('playwright');
 const http = require('http');
 const fs = require('fs');
@@ -13,6 +15,16 @@ const DOCS = path.join(__dirname, '..', 'docs');
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png' };
 const SERVER = 'https://fortschritt.test';
 const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2b', 'ab2c'];
+
+// einstellungen.js für die Tests anpassen: Serveradresse und (optional) Schutz gegen Durchklicken ausschalten
+function einstellungen(text, server, schutz) {
+  text = text.replace(/serverAdresse: '[^']*'/, `serverAdresse: '${server}'`);
+  if (!schutz) {
+    text = text.replace(/sperreNachFehlerSekunden: \d+/, 'sperreNachFehlerSekunden: 0')
+      .replace(/zuSchnell: \{ fehler: \d+/, 'zuSchnell: { fehler: 0');
+  }
+  return text;
+}
 
 function webserver() {
   return new Promise(ok => {
@@ -44,7 +56,7 @@ function fortschrittsServer() {
         const r = raeume[d.raum] = raeume[d.raum] || {};
         const p = r[d.geraet] = r[d.geraet] || { id: 'id' + (++nr), uebungen: {} };
         p.name = d.name; p.t = Date.now();
-        p.uebungen[d.uebung] = { geloest: d.geloest, gesamt: d.gesamt, erster: d.erster, falsch: d.falsch, t: Date.now() };
+        p.uebungen[d.uebung] = { geloest: d.geloest, gesamt: d.gesamt, erster: d.erster, neu: d.neu || 0, falsch: d.falsch, t: Date.now() };
         return route.fulfill({ status: 204, headers: kopf });
       }
       if (req.method() === 'GET' && url.pathname === '/stand') {
@@ -83,7 +95,7 @@ function fortschrittsServer() {
     // Teil A prüft die Übungen ohne Server – die eingetragene Adresse wird hier geleert.
     await ctx.route('**/einstellungen.js', async route => {
       const antwort = await route.fetch();
-      const text = (await antwort.text()).replace(/serverAdresse: '[^']*'/, "serverAdresse: ''");
+      const text = einstellungen(await antwort.text(), '', false);
       await route.fulfill({ response: antwort, body: text });
     });
     const page = await ctx.newPage();
@@ -189,11 +201,11 @@ function fortschrittsServer() {
 
   /* ---------------- Teil B: Namenseingabe mit Klassenwahl und Fortschritt senden ---------------- */
   const fs1 = fortschrittsServer();
-  async function kontextMitServer(optionen) {
+  async function kontextMitServer(optionen, schutz) {
     const ctx = await browser.newContext(optionen);
     await ctx.route('**/einstellungen.js', async route => {
       const antwort = await route.fetch();
-      const text = (await antwort.text()).replace(/serverAdresse: '[^']*'/, `serverAdresse: '${SERVER}/'`);
+      const text = einstellungen(await antwort.text(), SERVER + '/', !!schutz);
       await route.fulfill({ response: antwort, body: text });
     });
     await ctx.route(SERVER + '/**', r => fs1.route(r));
@@ -298,6 +310,7 @@ function fortschrittsServer() {
     pruefe(/^2 von 4 fertig · 2 dabei/.test(zahl), 'C: „2 von 4 fertig · 2 dabei“ bei ab1a: ' + zahl);
     const pillen = await a.locator('.l-pille').allInnerTexts();
     pruefe(pillen.length === 4 && pillen.join(' ').includes('Mia S.') && pillen.join(' ').includes('3/12'), 'C: alle Namen mit Fortschritt: ' + pillen.join(' | '));
+    pruefe(pillen.some(p => p.includes('Tim B.') && p.includes('✓ 12/12')) && pillen.some(p => p.includes('Jonas W.') && p.includes('⚠ 6/12')), 'C: fertig mit Zahl der beim ersten Versuch richtigen Karten: ' + pillen.join(' | '));
     pruefe(await a.locator('.l-klick').count() === 1, 'C: Durchklicken (Jonas W.) wird markiert');
     const oft = await a.locator('.l-oft li').allInnerTexts();
     pruefe(oft.length === 3 && oft[0].startsWith('Karte 2 · 3×'), 'C: häufigster Fehler Karte 2: ' + oft.join(' | '));
@@ -350,6 +363,58 @@ function fortschrittsServer() {
     pruefe(breit, 'C: kein waagerechtes Scrollen');
     pruefe(fehler.length === 0, 'Teil C: keine Konsolenfehler / fremden Anfragen: ' + fehler.join(' | '));
     await ctx.close();
+  }
+
+  /* ---------------- Teil D: Schutz gegen Durchklicken ---------------- */
+  {
+    const ctx = await kontextMitServer({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true }, true);
+    const page = await ctx.newPage();
+    const fehler = [];
+    beobachte(page, fehler, SERVER);
+    await page.goto(basis + 'ab1b.html');
+    await anmelden(page, 'Ben D.', 'k2');
+    const U = I.ab1b;
+    const karten = page.locator('.karte');
+    const falschK = i => U.knoepfe.map(b => b.kuerzel).find(k => ![].concat(U.karten[i].richtig).includes(k));
+    const richtigK = i => [].concat(U.karten[i].richtig)[0];
+    // Sperre nach einer falschen Antwort
+    await karten.nth(0).locator(`button[data-kuerzel="${falschK(0)}"]`).click();
+    const r0 = karten.nth(0).locator(`button[data-kuerzel="${richtigK(0)}"]`);
+    pruefe(await r0.isDisabled(), 'D: nach falscher Antwort sind die Knöpfe gesperrt');
+    pruefe((await karten.nth(0).locator('.sperre').innerText()).includes('weiter in'), 'D: Countdown „weiter in … s“ sichtbar');
+    await page.screenshot({ path: path.join(__dirname, 'handy-sperre.png') });
+    await page.waitForTimeout(5400);
+    pruefe(await r0.isEnabled() && await karten.nth(0).locator('.sperre').count() === 0, 'D: nach 5 s wieder freigegeben');
+    // Zwei weitere schnelle Fehler (insgesamt 3 in 10 s) → Neustart
+    await karten.nth(1).locator(`button[data-kuerzel="${falschK(1)}"]`).click();
+    await karten.nth(2).locator(`button[data-kuerzel="${falschK(2)}"]`).click();
+    await page.waitForTimeout(300);
+    pruefe(await page.locator('#zu-schnell').isVisible() && (await page.locator('#zu-schnell').innerText()).includes('Zu schnell'), 'D: Hinweis „Zu schnell geklickt!“');
+    pruefe((await page.locator('#fortschritt-text').innerText()).startsWith('0 von') && await page.locator('.ist-falsch').count() === 0, 'D: Übung beginnt von vorn');
+    await page.screenshot({ path: path.join(__dirname, 'handy-zu-schnell.png') });
+    const letzter = fs1.posts[fs1.posts.length - 1];
+    pruefe(letzter.neu === 1 && letzter.geloest === 0 && letzter.name === 'Ben D.', 'D: Neustart wird gesendet (neu = 1)');
+    // Eine richtige Antwort blendet den Hinweis aus; der Zähler bleibt
+    await karten.nth(0).locator(`button[data-kuerzel="${richtigK(0)}"]`).click();
+    pruefe(await page.locator('#zu-schnell').isHidden(), 'D: Hinweis verschwindet nach richtiger Antwort');
+    await page.reload();
+    await karten.nth(1).locator(`button[data-kuerzel="${richtigK(1)}"]`).click();
+    await page.waitForTimeout(200);
+    pruefe(fs1.posts[fs1.posts.length - 1].neu === 1, 'D: Zähler bleibt nach Neuladen erhalten');
+    // Ein einzelner Fehler mit Pause löst keinen Neustart aus
+    await karten.nth(2).locator(`button[data-kuerzel="${falschK(2)}"]`).click();
+    pruefe(await page.locator('#zu-schnell').isHidden() && (await page.locator('#fortschritt-text').innerText()).startsWith('2 von'), 'D: einzelner Fehler → kein Neustart');
+    pruefe(fehler.length === 0, 'Teil D: keine Konsolenfehler: ' + fehler.join(' | '));
+    await ctx.close();
+    // Lehrerseite zeigt ↺
+    const c2 = await kontextMitServer({ viewport: { width: 1280, height: 720 } });
+    const p2 = await c2.newPage();
+    await p2.goto(basis + 'lehrer-3bfp2-2-ab1.html');
+    await p2.waitForSelector('.l-karte[data-uebung="ab1b"] .l-pille');
+    const ben = p2.locator('.l-karte[data-uebung="ab1b"] .l-pille', { hasText: 'Ben D.' });
+    pruefe((await ben.innerText()).includes('↺') && (await ben.getAttribute('title')).includes('neu gestartet'), 'D: Lehrerseite zeigt ↺ beim Namen: ' + (await ben.innerText()) + ' / ' + (await ben.getAttribute('title')));
+    await p2.screenshot({ path: path.join(__dirname, 'lehrer-neustart.png') });
+    await c2.close();
   }
 
   await browser.close();

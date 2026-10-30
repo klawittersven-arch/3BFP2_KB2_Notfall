@@ -16,6 +16,13 @@
   var GERAET = PRAEFIX + 'geraet';
   var SERVER = String(E.serverAdresse || '').replace(/\/+$/, '');
   var KLASSEN = E.klassen || [];
+  // Gegen Durchklicken (Werte in einstellungen.js)
+  var SPERRE_MS = 1000 * (typeof E.sperreNachFehlerSekunden === 'number' ? Math.max(0, E.sperreNachFehlerSekunden) : 5);
+  var ZS = E.zuSchnell || { fehler: 3, sekunden: 10 };
+  var ZS_ANZAHL = typeof ZS.fehler === 'number' ? ZS.fehler : 3;
+  var ZS_MS = 1000 * (typeof ZS.sekunden === 'number' ? ZS.sekunden : 10);
+  var NEUSTARTS = PRAEFIX + id + '-neustarts';
+  var FEHLERZEITEN = SPEICHER + '-fehlerzeiten';
 
   // ---------- Hilfsfunktionen ----------
   function esc(s) {
@@ -80,7 +87,7 @@
     if (!SERVER || !name || !klasse || !U.raum) return;
     var daten = {
       raum: klasse + '-' + U.raum, uebung: id, geraet: geraetId(), name: name,
-      geloest: anzahlGeloest(), gesamt: U.karten.length, erster: anzahlErsterVersuch(),
+      geloest: anzahlGeloest(), gesamt: U.karten.length, erster: anzahlErsterVersuch(), neu: neustarts,
       // je Karte die zuerst gewählte falsche Antwort, z. B. "2-D" (für die Besprechung am Beamer);
       // bei der Selbstkontrolle: die Punkte, die als „fehlt“ markiert wurden, z. B. "5-NEIN"
       falsch: zustand.map(function (z, i) {
@@ -107,6 +114,9 @@
   }
   var zustand = lade(SPEICHER);
   if (!zustand || zustand.length !== U.karten.length) zustand = leererZustand();
+  var fehlerZeiten = lade(FEHLERZEITEN) || [];
+  var neustarts = Math.min(99, Math.max(0, Number(gespeichert(NEUSTARTS)) || 0));
+  function gesperrt(z) { return !z.geloest && z.sperreBis && Date.now() < z.sperreBis; }
 
   // ---------- Seite aufbauen ----------
   document.title = U.titel + ' – ' + A.kopfzeile;
@@ -115,6 +125,12 @@
   document.getElementById('anweisung').innerHTML = fmt(U.anweisung);
   document.getElementById('noch-einmal').textContent = CHECK ? A.nochEinmalCheck : A.nochEinmal;
   var nameBereich = document.getElementById('name-bereich');
+  var zuSchnellEl = document.createElement('div');
+  zuSchnellEl.id = 'zu-schnell';
+  zuSchnellEl.className = 'zu-schnell';
+  zuSchnellEl.setAttribute('role', 'alert');
+  zuSchnellEl.hidden = true;
+  document.getElementById('uebung-teil').insertBefore(zuSchnellEl, document.getElementById('anweisung'));
   var nameZeile = document.getElementById('name-zeile');
   var uebungTeil = document.getElementById('uebung-teil');
 
@@ -169,19 +185,52 @@
       z.geloest = true;
       z.gewaehlt = kuerzel;
     } else {
-      if (z.geloest || z.falsch.indexOf(kuerzel) >= 0) return;
+      if (z.geloest || z.falsch.indexOf(kuerzel) >= 0 || gesperrt(z)) return;
       if (richtigeListe(U.karten[i]).indexOf(kuerzel) >= 0) {
         z.geloest = true;
         z.gewaehlt = kuerzel;
+        z.sperreBis = 0;
       } else {
         z.falsch.push(kuerzel);
+        if (SPERRE_MS) z.sperreBis = Date.now() + SPERRE_MS;
+        if (zuSchnell()) return;
       }
     }
     speichere(SPEICHER, zustand);
+    if (zustand[i].geloest) document.getElementById('zu-schnell').hidden = true;
     zeichneKarte(i, true);
     aktualisiere(true);
     sende();
   }
+
+  // Zu viele falsche Antworten in kurzer Zeit: Übung beginnt von vorn (die Lehrerseite zeigt ↺)
+  function zuSchnell() {
+    if (!ZS_ANZAHL) return false;
+    var jetzt = Date.now();
+    fehlerZeiten = fehlerZeiten.filter(function (t) { return jetzt - t < ZS_MS; });
+    fehlerZeiten.push(jetzt);
+    speichere(FEHLERZEITEN, fehlerZeiten);
+    if (fehlerZeiten.length < ZS_ANZAHL) return false;
+    fehlerZeiten = [];
+    speichere(FEHLERZEITEN, fehlerZeiten);
+    neustarts = Math.min(99, neustarts + 1);
+    var l = lokal();
+    try { if (l) l.setItem(NEUSTARTS, String(neustarts)); } catch (e) { /* egal */ }
+    zuruecksetzen();
+    var h = document.getElementById('zu-schnell');
+    h.innerHTML = '<h2>' + esc(A.zuSchnellTitel) + '</h2><p>' + esc(A.zuSchnellText) + '</p>';
+    h.hidden = false;
+    return true;
+  }
+
+  // Gesperrte Karten: Countdown anzeigen und nach Ablauf wieder freigeben
+  setInterval(function () {
+    zustand.forEach(function (z, i) {
+      if (!z.sperreBis || z.geloest) return;
+      if (Date.now() >= z.sperreBis) { z.sperreBis = 0; speichere(SPEICHER, zustand); }
+      zeichneKarte(i, false);
+    });
+  }, 500);
 
   function zeichneKarte(i, frisch) {
     var k = U.karten[i], z = zustand[i], el = kartenEl[i];
@@ -199,6 +248,7 @@
         return;
       }
       if (z.falsch.indexOf(ku) >= 0) { btn.classList.add('ist-falsch'); btn.disabled = true; sym.textContent = '✗'; }
+      if (gesperrt(z)) btn.disabled = true;
       if (z.geloest) {
         btn.disabled = true;
         if (ku === z.gewaehlt) { btn.classList.add('ist-richtig'); sym.textContent = '✓'; }
@@ -220,7 +270,8 @@
       rm.innerHTML = '<p class="rm-kopf"><span aria-hidden="true">✓</span> ' + esc(A.richtigText) + '</p><p>' + fmt(erklaerungFuer(k, z.gewaehlt)) + '</p>';
     } else if (z.falsch.length) {
       rm.className = 'rueckmeldung falsch';
-      rm.innerHTML = '<p class="rm-kopf"><span aria-hidden="true">✗</span> ' + esc(A.falschText) + '</p><p><strong>' + esc(A.tippVorwort) + '</strong> ' + fmt(k.tipp) + '</p>';
+      rm.innerHTML = '<p class="rm-kopf"><span aria-hidden="true">✗</span> ' + esc(A.falschText) + '</p><p><strong>' + esc(A.tippVorwort) + '</strong> ' + fmt(k.tipp) + '</p>' +
+        (gesperrt(z) ? '<p class="sperre">' + esc(ersetze(A.sperreText, { x: Math.ceil((z.sperreBis - Date.now()) / 1000) })) + '</p>' : '');
     } else {
       rm.className = 'rueckmeldung';
       rm.innerHTML = '';
@@ -274,6 +325,7 @@
   }
 
   function zuruecksetzen() {
+    document.getElementById('zu-schnell').hidden = true;
     zustand = leererZustand();
     speichere(SPEICHER, zustand);
     var l = lokal();

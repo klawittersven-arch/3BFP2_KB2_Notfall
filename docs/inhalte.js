@@ -72,6 +72,11 @@ var INHALTE = {
     durchklickenTitel: 'Hey, nicht einfach durchklicken!',
     durchklickenText: 'Beim ersten Versuch richtig: {x} von {y} – nötig sind mindestens {z}. Lesen Sie jede Karte genau und überlegen Sie, bevor Sie antworten.',
     durchklickenKnopf: 'Übung neu starten',
+    // Sperre nach einer falschen Antwort ({x} = Sekunden)
+    sperreText: 'Lesen Sie den Tipp – weiter in {x} s',
+    // Neustart, wenn in kurzer Zeit zu viele falsche Antworten kommen
+    zuSchnellTitel: 'Zu schnell geklickt!',
+    zuSchnellText: 'Sie haben in kurzer Zeit mehrere falsche Antworten gegeben. Lesen Sie jede Karte in Ruhe – die Übung beginnt von vorn.',
     fertigTitel: 'Übung abgeschlossen!',
 
     // Namenseingabe (nur wenn die Fortschrittsanzeige eingerichtet ist, siehe einstellungen.js)

@@ -62,6 +62,16 @@ for (const [t, d] of ungueltig) {
   pruefe(r.status === 400, 'abgelehnt: ' + t + ' (' + r.status + ')');
 }
 
+// Neustarts (wegen zu schneller Fehler) werden gespeichert und geprüft
+r = await post(env, '/fortschritt', eintrag({ geraet: 'd'.repeat(32), name: 'Ben D.', raum: 'k2-ab2', uebung: 'ab2a', neu: 2 }));
+pruefe(r.status === 204, 'Neustarts angenommen');
+r = await post(env, '/fortschritt', eintrag({ neu: 150 }));
+pruefe(r.status === 400, 'zu viele Neustarts abgelehnt');
+r = await post(env, '/fortschritt', eintrag({ neu: 'x' }));
+pruefe(r.status === 400, 'Neustarts als Text abgelehnt');
+let sn = await (await get(env, '/stand?raum=k2-ab2')).json();
+pruefe(sn.eintraege.find((e) => e.name === 'Ben D.').uebungen.ab2a.neu === 2, 'Neustarts im Stand');
+
 // Stand abrufen (ohne Kennwort)
 r = await get(env, '/stand?raum=k2-ab1');
 let s = await r.json();
@@ -87,7 +97,7 @@ pruefe(s.eintraege.some((e) => e.name === 'Lena M.') && !s.eintraege.some((e) =>
 
 // Arbeitsblätter getrennt
 s = await (await get(env, '/stand?raum=k2-ab2')).json();
-pruefe(s.eintraege.length === 1 && JSON.stringify(s.eintraege[0].uebungen.ab2b.falsch) === '["5-NEIN","6-NEIN"]', 'AB 2 getrennt, Selbstkontrolle gespeichert');
+pruefe(s.eintraege.length === 2 && JSON.stringify(s.eintraege.find((e) => e.uebungen.ab2b).uebungen.ab2b.falsch) === '["5-NEIN","6-NEIN"]', 'AB 2 getrennt, Selbstkontrolle gespeichert');
 
 // Entfernen
 r = await post(env, '/entfernen', { raum: 'k2-ab1', id: 'ungültig!' });

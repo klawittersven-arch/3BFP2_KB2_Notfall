@@ -79,3 +79,6 @@ code { background: var(--hellblau); padding: 1px 5px; border-radius: 4px; }
   background: var(--gruen-hell); border-left: 8px solid var(--gruen); margin: 0 0 22px; }
 .l-b-leiste { display: flex; flex-wrap: wrap; gap: 12px; }
 .l-b-leiste .l-knopf { font-size: 22px; min-height: 56px; padding: 10px 22px; }
+
+/* ↺ = wegen zu schneller Fehler neu gestartet */
+.l-neu .l-stand { color: #7A4300; }

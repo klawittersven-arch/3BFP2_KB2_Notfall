@@ -30,12 +30,14 @@ export function pruefeEintrag(d) {
   if (!ganzzahl(d.gesamt, 1, 100) || !ganzzahl(d.geloest, 0, d.gesamt) || !ganzzahl(d.erster, 0, d.gesamt)) {
     return { fehler: 'zahlen' };
   }
+  const neu = d.neu === undefined ? 0 : d.neu; // Neustarts wegen zu schneller Fehler
+  if (!ganzzahl(neu, 0, 99)) return { fehler: 'neu' };
   const falsch = Array.isArray(d.falsch) ? d.falsch : [];
   if (falsch.length > 50 || !falsch.every((x) => typeof x === 'string' && FALSCH.test(x))) return { fehler: 'falsch' };
   return {
     eintrag: {
       raum: d.raum, uebung: d.uebung, geraet: d.geraet, name,
-      geloest: d.geloest, gesamt: d.gesamt, erster: d.erster, falsch: [...new Set(falsch)]
+      geloest: d.geloest, gesamt: d.gesamt, erster: d.erster, neu, falsch: [...new Set(falsch)]
     }
   };
 }
@@ -59,7 +61,7 @@ export function eintragen(daten, e, jetzt, kurzId) {
   if (!p.uebungen[e.uebung] && Object.keys(p.uebungen).length >= MAX_UEBUNGEN) return false;
   p.name = e.name;
   p.t = jetzt;
-  p.uebungen[e.uebung] = { geloest: e.geloest, gesamt: e.gesamt, erster: e.erster, falsch: e.falsch, t: jetzt };
+  p.uebungen[e.uebung] = { geloest: e.geloest, gesamt: e.gesamt, erster: e.erster, neu: e.neu || 0, falsch: e.falsch, t: jetzt };
   return true;
 }
 

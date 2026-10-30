@@ -24,6 +24,14 @@ var EINSTELLUNGEN = {
   // So oft (in Sekunden) holt die Lehrerseite den neuen Stand.
   aktualisierenSekunden: 5,
 
+  // Gegen Durchklicken:
+  // Nach einer falschen Antwort sind die Knöpfe dieser Karte so viele Sekunden gesperrt
+  // (der Tipp soll gelesen werden). 0 = keine Sperre.
+  sperreNachFehlerSekunden: 5,
+  // Wer so viele falsche Antworten innerhalb so vieler Sekunden gibt, muss die Übung neu beginnen.
+  // Die Lehrerseite zeigt das als ↺ beim Namen. fehler: 0 = ausgeschaltet.
+  zuSchnell: { fehler: 3, sekunden: 10 },
+
   // Namen mit diesen Wortteilen werden abgelehnt (nur Kleinbuchstaben).
   sperrwoerter: [
     'arsch', 'fick', 'fotze', 'hure', 'nutte', 'wichs', 'schlampe', 'bitch',

@@ -169,3 +169,9 @@ a { color: var(--petrol); }
 .art-check .antwort.ist-fehlt { border-color: var(--bernstein-rand); background: var(--bernstein-hell); color: var(--bernstein); }
 .karte-erfuellt { border-color: var(--gruen); background: #F4FAF6; }
 .karte-fehlt { border-color: var(--bernstein-rand); }
+
+/* ---------- Gegen Durchklicken ---------- */
+.rueckmeldung .sperre { margin: 6px 0 0; font-weight: 700; color: var(--bernstein); }
+.zu-schnell { margin: 0 0 16px; padding: 14px 16px; border-radius: 12px; background: var(--bernstein-hell); border: 3px solid var(--bernstein-rand); }
+.zu-schnell h2 { margin: 0 0 6px; font-size: 20px; color: var(--bernstein); }
+.zu-schnell p { margin: 0; }

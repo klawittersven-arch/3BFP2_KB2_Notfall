@@ -80,9 +80,16 @@
       var pillen = zeilen.map(function (z) {
         var anteil = z.g > 0 ? Math.round(100 * z.g / n) : 0;
         var art = z.fertig ? (z.klick ? 'l-pille l-klick' : 'l-pille l-fertig') : (z.g > 0 ? 'l-pille l-dabei' : 'l-pille l-offen');
-        var stand = z.fertig ? (z.klick ? '⚠' : '✓') : (z.g >= 0 ? z.g + '/' + n : '–');
-        var titel = z.klick ? 'fertig, aber beim ersten Versuch nur ' + z.u.erster + ' von ' + n + ' richtig' : '';
-        return '<li class="' + art + '" style="--anteil:' + anteil + '%"' + (titel ? ' title="' + esc(titel) + '"' : '') + '>' +
+        var check = U.art === 'check';
+        var erster = z.u ? Math.min(z.u.erster, n) : 0;
+        var neu = z.u && z.u.neu ? z.u.neu : 0;
+        // fertig: ✓ bzw. ⚠ mit der Zahl der Karten, die beim ERSTEN Versuch richtig waren; sonst: gelöst/gesamt
+        var stand = z.fertig ? (check ? '✓' : (z.klick ? '⚠ ' : '✓ ') + erster + '/' + n) : (z.g >= 0 ? z.g + '/' + n : '–');
+        if (neu) stand += ' ↺' + (neu > 1 ? neu : '');
+        var titel = (z.fertig ? (check ? 'fertig' : 'fertig – beim ersten Versuch richtig: ' + erster + ' von ' + n) :
+          (z.g >= 0 ? 'dabei – gelöst: ' + z.g + ' von ' + n : 'noch nicht begonnen')) +
+          (neu ? ' · ' + neu + '× wegen zu schneller Fehler neu gestartet' : '');
+        return '<li class="' + art + (neu ? ' l-neu' : '') + '" style="--anteil:' + anteil + '%"' + (titel ? ' title="' + esc(titel) + '"' : '') + '>' +
           '<span class="l-name">' + esc(z.p.name) + '</span><span class="l-stand">' + stand + '</span>' +
           '<button type="button" class="l-weg" data-id="' + esc(z.p.id) + '" data-name="' + esc(z.p.name) + '" aria-label="' + esc(z.p.name) + ' entfernen">×</button></li>';
       }).join('');
@@ -227,8 +234,9 @@
 
   function zeichneFuss() {
     fuss.innerHTML = '<button type="button" class="l-knopf l-zweit" id="l-leeren">Liste leeren (neue Stunde)</button>' +
-      '<p class="l-hinweis">Namen und Fortschritt werden nach spätestens 12 Stunden automatisch gelöscht. ' +
-      '⚠ = fertig, aber beim ersten Versuch zu oft falsch (durchgeklickt?).</p>';
+      '<p class="l-hinweis">✓ 9/12 = fertig, 9 von 12 Karten beim ersten Versuch richtig · ⚠ = fertig, aber zu wenige beim ' +
+      'ersten Versuch richtig (durchgeklickt?) · 6/12 = dabei · ↺ = wegen zu schneller Fehler neu gestartet. ' +
+      'Namen und Fortschritt werden nach spätestens 12 Stunden automatisch gelöscht.</p>';
     document.getElementById('l-leeren').addEventListener('click', function () {
       if (!window.confirm('Alle Namen und Fortschritte dieser Klasse für dieses Arbeitsblatt löschen?')) return;
       sende('/leeren').then(hole, hole);

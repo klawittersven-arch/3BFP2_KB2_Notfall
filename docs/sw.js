@@ -3,7 +3,7 @@
  * sonst die gespeicherte Fassung – Textänderungen kommen so sofort an.
  * Nach größeren Änderungen VERSION erhöhen ('v2', 'v3' …). */
 'use strict';
-var VERSION = 'v1';
+var VERSION = 'v2';
 var CACHE = 'kb2-notfall-' + VERSION;
 var ZEITLIMIT_MS = 4000;
 var DATEIEN = ['./', 'index.html', 'inhalte.js', 'einstellungen.js', 'app.js', 'style.css',
