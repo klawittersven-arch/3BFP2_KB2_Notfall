@@ -273,7 +273,7 @@ var INHALTE = {
         '**Hoffnung:** ehrliche, realistische Zuversicht – keine leeren Versprechen'
       ]
     },
-    mindestens: 9,
+    mindestens: 10,
     karten: [
       { nummer: 1,
         text: 'Sie bitten die Mitbewohnerinnen, den Raum zu verlassen, und ziehen den Vorhang zu.',
@@ -346,7 +346,17 @@ var INHALTE = {
           VERB: '**Verbundenheit:** Gemeinsam darüber sprechen zeigt: Ich bin damit nicht allein. (Kollektive Wirksamkeit passt auch.)',
           WIRK: '**Kollektive Wirksamkeit** passt: Das Team stärkt sich gemeinsam. Meist wird das Gespräch der **Verbundenheit** zugeordnet.'
         },
-        tipp: 'Was erlebt jede und jeder Einzelne in diesem Gespräch?' }
+        tipp: 'Was erlebt jede und jeder Einzelne in diesem Gespräch?' },
+      { nummer: 13,
+        text: 'Ein Bewohner ist gestürzt und blutet stark am Unterarm. Sie drücken fest auf die Wunde.',
+        richtig: 'SICH',
+        erklaerung: '**Sicherheit:** Auch Ihre medizinischen Maßnahmen lassen sich zuordnen – die Blutstillung wendet eine Gefahr ab. Sagen Sie dabei, was Sie tun („Ich drücke auf die Wunde, damit die Blutung aufhört.“). Das beruhigt zusätzlich.',
+        tipp: 'Auch medizinische Maßnahmen gehören dazu. Was wird hier abgewendet?' },
+      { nummer: 14,
+        text: 'Sie versorgen einen gestürzten Bewohner und bitten ihn: „Halten Sie bitte mit Ihrer freien Hand die Kompresse fest.“',
+        richtig: 'WIRK',
+        erklaerung: '**Selbstwirksamkeit:** Auch der Verletzte selbst kann eine kleine, machbare Aufgabe bekommen. Er erlebt: „Ich kann etwas tun.“ Das gibt ihm ein Stück Kontrolle zurück.',
+        tipp: 'Wer wird hier selbst aktiv?' }
     ],
     merksatz: 'Psychologische Erste Hilfe soll **Sicherheit geben, Stress verringern und Kontrolle zurückgeben**. Sie ersetzt keine Therapie. Die fünf Wirkprinzipien nach Hobfoll et al.: **Sicherheit** (Gefahr beseitigen, abschirmen, nicht allein lassen) · **Beruhigung** (ruhig sprechen, Reize verringern) · **Selbst- und kollektive Wirksamkeit** (kleine, klare Aufgaben, eine Wahl lassen) · **Verbundenheit** (vertraute Menschen einbeziehen) · **Hoffnung** (ehrliche, realistische Zuversicht).',
     danach: 'Bearbeiten Sie jetzt **Aufgabe 1 „Was hätte geholfen?“** auf dem Arbeitsblatt!'
