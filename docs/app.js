@@ -1,4 +1,4 @@
-/* Programmlogik der Übungen (Zuordnen mit sofortiger Rückmeldung; Selbstkontrolle).
+/* Programmlogik der Übungen (Zuordnen mit sofortiger Rückmeldung).
  * Alle Texte stehen in inhalte.js – hier muss für Textänderungen nichts angepasst werden. */
 (function () {
   'use strict';
@@ -7,7 +7,6 @@
   var E = window.EINSTELLUNGEN || {};
   var id = document.body.getAttribute('data-uebung');
   var U = INHALTE[id];
-  var CHECK = U.art === 'check';
   var PRAEFIX = 'kb2-notfall-';
   var SPEICHER = PRAEFIX + id;
   var GELOEST = PRAEFIX + 'geloest';
@@ -88,10 +87,8 @@
     var daten = {
       raum: klasse + '-' + U.raum, uebung: id, geraet: geraetId(), name: name,
       geloest: anzahlGeloest(), gesamt: U.karten.length, erster: anzahlErsterVersuch(), neu: neustarts,
-      // je Karte die zuerst gewählte falsche Antwort, z. B. "2-D" (für die Besprechung am Beamer);
-      // bei der Selbstkontrolle: die Punkte, die als „fehlt“ markiert wurden, z. B. "5-NEIN"
+      // je Karte die zuerst gewählte falsche Antwort, z. B. "2-D" (für die Besprechung am Beamer)
       falsch: zustand.map(function (z, i) {
-        if (CHECK) return z.gewaehlt === U.fehlt ? U.karten[i].nummer + '-' + U.fehlt : '';
         return z.falsch.length ? U.karten[i].nummer + '-' + z.falsch[0] : '';
       }).filter(function (x) { return x; })
     };
@@ -123,7 +120,7 @@
   document.getElementById('kopfzeile').textContent = A.kopfzeile + ' · ' + U.ab;
   document.getElementById('titel').textContent = U.titel;
   document.getElementById('anweisung').innerHTML = fmt(U.anweisung);
-  document.getElementById('noch-einmal').textContent = CHECK ? A.nochEinmalCheck : A.nochEinmal;
+  document.getElementById('noch-einmal').textContent = A.nochEinmal;
   var nameBereich = document.getElementById('name-bereich');
   var zuSchnellEl = document.createElement('div');
   zuSchnellEl.id = 'zu-schnell';
@@ -147,7 +144,6 @@
       U.hilfe.punkte.map(function (p) { return '<li>' + fmt(p) + '</li>'; }).join('') + '</ul>';
     document.getElementById('hilfe-platz').appendChild(d);
   }
-  if (CHECK) document.body.classList.add('art-check');
 
   // Lange Beschriftungen: Knöpfe auf schmalen Handys untereinander statt nebeneinander
   var laengste = Math.max.apply(null, U.knoepfe.map(function (b) { return b.text.length; }));
@@ -180,21 +176,15 @@
   // ---------- Antworten ----------
   function antworte(i, kuerzel) {
     var z = zustand[i];
-    if (CHECK) { // Selbstkontrolle: jede Antwort zählt, umentscheiden ist erlaubt
-      if (z.gewaehlt === kuerzel) return;
+    if (z.geloest || z.falsch.indexOf(kuerzel) >= 0 || gesperrt(z)) return;
+    if (richtigeListe(U.karten[i]).indexOf(kuerzel) >= 0) {
       z.geloest = true;
       z.gewaehlt = kuerzel;
+      z.sperreBis = 0;
     } else {
-      if (z.geloest || z.falsch.indexOf(kuerzel) >= 0 || gesperrt(z)) return;
-      if (richtigeListe(U.karten[i]).indexOf(kuerzel) >= 0) {
-        z.geloest = true;
-        z.gewaehlt = kuerzel;
-        z.sperreBis = 0;
-      } else {
-        z.falsch.push(kuerzel);
-        if (SPERRE_MS) z.sperreBis = Date.now() + SPERRE_MS;
-        if (zuSchnell()) return;
-      }
+      z.falsch.push(kuerzel);
+      if (SPERRE_MS) z.sperreBis = Date.now() + SPERRE_MS;
+      if (zuSchnell()) return;
     }
     speichere(SPEICHER, zustand);
     if (zustand[i].geloest) document.getElementById('zu-schnell').hidden = true;
@@ -238,15 +228,9 @@
     Array.prototype.forEach.call(el.querySelectorAll('.antwort'), function (btn) {
       var ku = btn.getAttribute('data-kuerzel');
       var sym = btn.querySelector('.symbol');
-      btn.classList.remove('ist-richtig', 'ist-falsch', 'ist-gewaehlt', 'ist-fehlt');
+      btn.classList.remove('ist-richtig', 'ist-falsch');
       btn.disabled = false;
-      btn.removeAttribute('aria-pressed');
       sym.textContent = '';
-      if (CHECK) {
-        if (z.gewaehlt) btn.setAttribute('aria-pressed', ku === z.gewaehlt ? 'true' : 'false');
-        if (ku === z.gewaehlt) btn.classList.add(ku === U.fehlt ? 'ist-fehlt' : 'ist-gewaehlt');
-        return;
-      }
       if (z.falsch.indexOf(ku) >= 0) { btn.classList.add('ist-falsch'); btn.disabled = true; sym.textContent = '✗'; }
       if (gesperrt(z)) btn.disabled = true;
       if (z.geloest) {
@@ -254,15 +238,6 @@
         if (ku === z.gewaehlt) { btn.classList.add('ist-richtig'); sym.textContent = '✓'; }
       }
     });
-    if (CHECK) {
-      el.classList.toggle('karte-erfuellt', z.geloest && z.gewaehlt !== U.fehlt);
-      el.classList.toggle('karte-fehlt', z.geloest && z.gewaehlt === U.fehlt);
-      if (!z.geloest) { rm.className = 'rueckmeldung'; rm.innerHTML = ''; return; }
-      var fehlt = z.gewaehlt === U.fehlt;
-      rm.className = 'rueckmeldung ' + (fehlt ? 'falsch' : 'richtig');
-      rm.innerHTML = '<p>' + esc(fehlt ? A.checkNein : A.checkJa) + '</p>';
-      return;
-    }
     el.classList.toggle('karte-richtig', z.geloest);
     el.classList.toggle('karte-tipp', !z.geloest && z.falsch.length > 0);
     if (z.geloest) {
@@ -280,22 +255,20 @@
 
   function anzahlGeloest() { return zustand.filter(function (z) { return z.geloest; }).length; }
   function anzahlErsterVersuch() {
-    if (CHECK) return zustand.filter(function (z) { return z.geloest && z.gewaehlt !== U.fehlt; }).length;
     return zustand.filter(function (z) { return z.geloest && z.falsch.length === 0; }).length;
   }
 
   function aktualisiere(frisch) {
     var n = U.karten.length, g = anzahlGeloest();
-    document.getElementById('fortschritt-text').textContent = ersetze(CHECK ? A.fortschrittCheck : A.fortschritt, { x: g, y: n });
+    document.getElementById('fortschritt-text').textContent = ersetze(A.fortschritt, { x: g, y: n });
     document.getElementById('fortschritt-balken').style.width = (100 * g / n) + '%';
     var bereich = document.getElementById('merksatz-bereich');
-    var warSichtbar = !bereich.hidden;
     if (g < n) { bereich.hidden = true; bereich.innerHTML = ''; return; }
 
     var erster = anzahlErsterVersuch();
     var mind = U.mindestens || 0;
     bereich.hidden = false;
-    if (!CHECK && erster < mind) {
+    if (erster < mind) {
       bereich.className = 'durchklicken';
       bereich.innerHTML = '<h2>' + esc(A.durchklickenTitel) + '</h2><p>' +
         esc(ersetze(A.durchklickenText, { x: erster, y: n, z: mind })) + '</p>' +
@@ -308,7 +281,7 @@
         (U.danach ? '<p class="weiter-text">' + fmt(U.danach) + '</p>' : '') + '</div>' +
         '<div class="merksatz"><h2><span aria-hidden="true">📝</span> ' + esc(A.merksatzUeberschrift) + '</h2>' +
         '<p class="merksatz-text">' + fmt(U.merksatz) + '</p>' +
-        '<p class="erster-versuch">' + esc(ersetze(CHECK ? A.checkErgebnis : A.ersterVersuch, { x: erster, y: n })) + '</p></div>';
+        '<p class="erster-versuch">' + esc(ersetze(A.ersterVersuch, { x: erster, y: n })) + '</p></div>';
       var l = lokal();
       if (l) {
         var geloest = lade(GELOEST, l) || {};
@@ -316,8 +289,7 @@
         speichere(GELOEST, geloest, l);
       }
     }
-    // Bei der Selbstkontrolle nur beim ersten Erscheinen hinunterscrollen (Umentscheiden soll nicht springen)
-    if (frisch && !(CHECK && warSichtbar)) {
+    if (frisch) {
       setTimeout(function () {
         try { bereich.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { bereich.scrollIntoView(); }
       }, 150);

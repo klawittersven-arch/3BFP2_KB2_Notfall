@@ -149,7 +149,7 @@ a { color: var(--petrol); }
 .weiter-text { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4; }
 .weiter-text strong { color: var(--dunkelpetrol); }
 
-/* ---------- KB II: Vorspann, Klassenwahl, Selbstkontrolle ---------- */
+/* ---------- KB II: Vorspann, Klassenwahl ---------- */
 .vorspann {
   margin: 0 0 16px; padding: 10px 12px; border-left: 6px solid var(--petrol);
   background: #F4F6F7; font-size: 16px; font-style: italic;
@@ -165,10 +165,6 @@ a { color: var(--petrol); }
 .name-bereich .klasse-wahl input { display: inline-block; width: 22px; height: 22px; min-height: 0; margin: 0; padding: 0; accent-color: var(--petrol); }
 .klasse-wahl:has(input:checked) { background: var(--hellblau); }
 .karte-text em { font-style: italic; color: #34474C; }
-.art-check .antwort.ist-gewaehlt { border-color: var(--gruen); background: var(--gruen-hell); color: var(--gruen); }
-.art-check .antwort.ist-fehlt { border-color: var(--bernstein-rand); background: var(--bernstein-hell); color: var(--bernstein); }
-.karte-erfuellt { border-color: var(--gruen); background: #F4FAF6; }
-.karte-fehlt { border-color: var(--bernstein-rand); }
 
 /* ---------- Gegen Durchklicken ---------- */
 .rueckmeldung .sperre { margin: 6px 0 0; font-weight: 700; color: var(--bernstein); }

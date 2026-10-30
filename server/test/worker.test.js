@@ -45,8 +45,8 @@ pruefe(r.status === 204 && r.headers.get('Access-Control-Allow-Origin') === '*',
 r = await post(env, '/fortschritt', eintrag({ geraet: 'b'.repeat(32), name: 'Tim B.', geloest: 12, erster: 11, falsch: ['3-K'] }));
 r = await post(env, '/fortschritt', eintrag({ geraet: 'b'.repeat(32), name: 'Tim B.', uebung: 'ab1b', geloest: 4, gesamt: 10, erster: 4, falsch: [] }));
 pruefe(r.status === 204, 'zweite Übung desselben Geräts');
-r = await post(env, '/fortschritt', eintrag({ raum: 'k2-ab2', uebung: 'ab2b', geloest: 8, gesamt: 8, erster: 6, falsch: ['5-NEIN', '6-NEIN'] }));
-pruefe(r.status === 204, 'Selbstkontrolle (5-NEIN) angenommen');
+r = await post(env, '/fortschritt', eintrag({ raum: 'k2-ab2', uebung: 'ab2c', geloest: 8, gesamt: 8, erster: 6, falsch: ['5-OK', '6-KNAPP'] }));
+pruefe(r.status === 204, 'AB 2 (Antwort-Check) angenommen');
 
 // Ungültige Daten
 const ungueltig = [
@@ -97,7 +97,7 @@ pruefe(s.eintraege.some((e) => e.name === 'Lena M.') && !s.eintraege.some((e) =>
 
 // Arbeitsblätter getrennt
 s = await (await get(env, '/stand?raum=k2-ab2')).json();
-pruefe(s.eintraege.length === 2 && JSON.stringify(s.eintraege.find((e) => e.uebungen.ab2b).uebungen.ab2b.falsch) === '["5-NEIN","6-NEIN"]', 'AB 2 getrennt, Selbstkontrolle gespeichert');
+pruefe(s.eintraege.length === 2 && JSON.stringify(s.eintraege.find((e) => e.uebungen.ab2c).uebungen.ab2c.falsch) === '["5-OK","6-KNAPP"]', 'AB 2 getrennt gespeichert');
 
 // Entfernen
 r = await post(env, '/entfernen', { raum: 'k2-ab1', id: 'ungültig!' });

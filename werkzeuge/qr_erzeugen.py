@@ -5,7 +5,7 @@ Benötigt: segno  ODER  opencv-python (cv2) – je nachdem, was installiert ist.
 from pathlib import Path
 
 BASIS = "https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/"
-IDS = ["ab1a", "ab1b", "ab2a", "ab2b", "ab2c"]
+IDS = ["ab1a", "ab1b", "ab2a", "ab2c"]
 QR = Path(__file__).resolve().parent.parent / "qr"
 QR.mkdir(exist_ok=True)
 

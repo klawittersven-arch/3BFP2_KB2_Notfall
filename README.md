@@ -16,8 +16,7 @@ Die SuS gelangen **nur über die QR-Codes** zu den Übungen. Die Startseite
 | AB 1 – Menschen im Notfall | Übung 1: Körper, Denken oder Gefühl? → Aufgabe 3 | `…/ab1a.html` |
 | | Übung 2: Normal – oder ein Warnzeichen? → Aufgabe 4 | `…/ab1b.html` |
 | AB 2 – Psychologische Erste Hilfe | Übung 1: Welches Wirkprinzip? → Aufgabe 1 | `…/ab2a.html` |
-| | Übung 2: Selbstkontrolle zu Aufgabe 2 (Erwartungshorizont wie im Examen) | `…/ab2b.html` |
-| | Übung 3 (für die Schnellen): Antwort-Check – was fehlt? | `…/ab2c.html` |
+| | Übung 2 (für die Schnellen): Antwort-Check – was fehlt? | `…/ab2c.html` |
 
 ## Lehrerseiten für den Beamer (ohne Kennwort)
 
@@ -34,8 +33,6 @@ Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf de
   Fehler neu starten (↺2 = zweimal). Fährt man mit der Maus über einen Namen, erscheint eine kurze Erklärung.
 - **„Oft falsch beim ersten Versuch“**: die drei Karten, die Sie besprechen sollten. Antippen → die Karte erscheint groß,
   mit der Zahl der zuerst gewählten falschen Antworten (ohne Namen); **Auflösen** zeigt Lösung und Erklärung.
-- Bei der **Selbstkontrolle** (AB 2, Übung 2) heißt die Liste **„Oft nicht erfüllt“**: die Punkte des Erwartungshorizonts,
-  die in der Klasse am häufigsten fehlen. Antippen → der Punkt erscheint groß zum Besprechen.
 - Einen unpassenden Namen entfernen: mit der Maus über den Namen → **×**.
 - **Liste leeren (neue Stunde)** löscht nur die Namen Ihrer Klasse für dieses Arbeitsblatt. Ohne Leeren wird nach
   12 Stunden ohne Aktivität automatisch gelöscht.
@@ -49,16 +46,14 @@ Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf de
   für alle Übungen; „ändern“ ist jederzeit möglich.
 - Karten mit Aussagen, darunter die Antwortknöpfe. **Richtig:** grün mit ✓ und Erklärung. **Falsch:** orange mit ✗ und
   Tipp – die Lösung wird nie verraten. Manche Karten haben zwei richtige Antworten (wie im Erwartungshorizont der KA).
-- Erst wenn alle Karten gelöst sind, erscheint **„Übung abgeschlossen!“** mit dem Hinweis auf die nächste Aufgabe
+- Erst wenn alle Karten gelöst sind, erscheint z. B. **„Übung 1 abgeschlossen!“** mit dem Hinweis auf die nächste Aufgabe
   auf dem Arbeitsblatt und „Das Wichtigste in Kürze“. Wer durchklickt, bekommt „Hey, nicht einfach durchklicken!“
   (ohne den Hinweis auf die nächste Aufgabe).
 - **Schutz gegen Durchklicken:** Nach einer falschen Antwort ist die Karte **5 Sekunden gesperrt** („Lesen Sie den
   Tipp – weiter in 3 s“). Wer **3 falsche Antworten innerhalb von 10 Sekunden** gibt, sieht „Zu schnell geklickt!“ und
   die Übung **beginnt von vorn**; die Lehrerseite zeigt dann ↺ beim Namen. Die Werte stehen in
   `docs/einstellungen.js` (`sperreNachFehlerSekunden`, `zuSchnell: { fehler, sekunden }`); `0` schaltet die
-  jeweilige Funktion aus. Die Selbstkontrolle (AB 2, Übung 2) ist davon nicht betroffen.
-- **Selbstkontrolle:** kein Richtig/Falsch – die SuS markieren je Punkt des Erwartungshorizonts „erfüllt“ oder
-  „fehlt / zu knapp“ und können sich umentscheiden.
+  jeweilige Funktion aus.
 
 ## Einrichten (einmalig, ca. 10 Minuten)
 
@@ -83,7 +78,7 @@ nur die Lehrerseite zeigt dann „Keine Verbindung zum Server“.
 
 - Übertragen werden nur: der eingegebene Name („Lena K.“), die Klasse, eine zufällige Geräte-Kennung, die Übung,
   die Zahl der gelösten Karten, die Zahl der Neustarts und die Nummern der Karten, die beim ersten Versuch falsch
-  waren (bzw. bei der Selbstkontrolle als „fehlt“ markiert wurden). Keine Anmeldung, keine Cookies, keine Analyse, keine fremden Skripte.
+  waren. Keine Anmeldung, keine Cookies, keine Analyse, keine fremden Skripte.
 - Die Lehrerseite zeigt Fehler nur zusammengefasst für die Klasse, nicht je Person.
 - Gelöscht wird automatisch nach 12 Stunden ohne Aktivität oder sofort mit „Liste leeren“.
 - Die Daten liegen bei Cloudflare (Durable Object). Bitte im Zweifel mit der/dem Datenschutzbeauftragten der Schule abstimmen.
@@ -106,7 +101,7 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
 ## Tests
 
 - `node tests/uebungen.test.js` prüft mit Playwright alle Übungen in Handygröße (360 px), Namenseingabe mit
-  Klassenwahl, Senden des Fortschritts, Selbstkontrolle und die Lehrerseiten je Klasse (mit nachgebildetem Server).
+  Klassenwahl, Senden des Fortschritts, Schutz gegen Durchklicken und die Lehrerseiten je Klasse (mit nachgebildetem Server).
 - `cd server && node test/worker.test.js` prüft den Worker (Eingabeprüfung, Klassen-Räume, Entfernen, Leeren,
   Löschen nach 12 Stunden, Obergrenzen).
 

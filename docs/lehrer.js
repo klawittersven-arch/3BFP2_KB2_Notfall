@@ -62,7 +62,7 @@
     inhalt.innerHTML = UEBUNGEN.map(function (uid) {
       var U = INHALTE[uid];
       var n = U.karten.length;
-      var mind = U.art === 'check' ? 0 : (U.mindestens || 0);
+      var mind = U.mindestens || 0;
       var zeilen = leute.map(function (p) {
         var u = (p.uebungen || {})[uid];
         var g = u ? Math.min(u.geloest, n) : -1;
@@ -80,13 +80,12 @@
       var pillen = zeilen.map(function (z) {
         var anteil = z.g > 0 ? Math.round(100 * z.g / n) : 0;
         var art = z.fertig ? (z.klick ? 'l-pille l-klick' : 'l-pille l-fertig') : (z.g > 0 ? 'l-pille l-dabei' : 'l-pille l-offen');
-        var check = U.art === 'check';
         var erster = z.u ? Math.min(z.u.erster, n) : 0;
         var neu = z.u && z.u.neu ? z.u.neu : 0;
         // fertig: ✓ bzw. ⚠ mit der Zahl der Karten, die beim ERSTEN Versuch richtig waren; sonst: gelöst/gesamt
-        var stand = z.fertig ? (check ? '✓' : (z.klick ? '⚠ ' : '✓ ') + erster + '/' + n) : (z.g >= 0 ? z.g + '/' + n : '–');
+        var stand = z.fertig ? (z.klick ? '⚠ ' : '✓ ') + erster + '/' + n : (z.g >= 0 ? z.g + '/' + n : '–');
         if (neu) stand += ' ↺' + (neu > 1 ? neu : '');
-        var titel = (z.fertig ? (check ? 'fertig' : 'fertig – beim ersten Versuch richtig: ' + erster + ' von ' + n) :
+        var titel = (z.fertig ? 'fertig – beim ersten Versuch richtig: ' + erster + ' von ' + n :
           (z.g >= 0 ? 'dabei – gelöst: ' + z.g + ' von ' + n : 'noch nicht begonnen')) +
           (neu ? ' · ' + neu + '× wegen zu schneller Fehler neu gestartet' : '');
         return '<li class="' + art + (neu ? ' l-neu' : '') + '" style="--anteil:' + anteil + '%"' + (titel ? ' title="' + esc(titel) + '"' : '') + '>' +
@@ -109,12 +108,11 @@
       var liste = Object.keys(zaehler).map(function (nr) { return zaehler[nr]; })
         .sort(function (a, b) { return b.anzahl - a.anzahl || a.nr - b.nr; });
       fehlerJeUebung[uid] = liste;
-      var oftTitel = U.art === 'check' ? 'Oft nicht erfüllt' : 'Oft falsch beim ersten Versuch';
-      var oftHtml = liste.length ? '<h3>' + oftTitel + ' <span class="l-klein">– antippen zum Besprechen</span></h3><ol class="l-oft">' +
+      var oftHtml = liste.length ? '<h3>Oft falsch beim ersten Versuch <span class="l-klein">– antippen zum Besprechen</span></h3><ol class="l-oft">' +
         liste.slice(0, 3).map(function (o, i) {
           var karte = U.karten.filter(function (k) { return k.nummer === o.nr; })[0];
           return '<li><button type="button" class="l-oft-knopf" data-uebung="' + uid + '" data-index="' + i + '">' +
-            '<strong>' + (U.art === 'check' ? 'Punkt ' : 'Karte ') + o.nr + ' · ' + o.anzahl + '×</strong> ' + esc(kurz(karte ? karte.text : '', 90)) + '</button></li>';
+            '<strong>Karte ' + o.nr + ' · ' + o.anzahl + '×</strong> ' + esc(kurz(karte ? karte.text : '', 90)) + '</button></li>';
         }).join('') + '</ol>' : '';
       var proz = function (x) { return gesamt ? (100 * x / gesamt) : 0; };
       return '<section class="l-karte" data-uebung="' + uid + '">' +
@@ -163,23 +161,6 @@
     }
     ansicht.setAttribute('data-uebung', uid);
     ansicht.setAttribute('data-index', index);
-    if (U.art === 'check') {
-      // Selbstkontrolle: Punkt des Erwartungshorizonts groß zeigen – es gibt nichts aufzulösen
-      ansicht.innerHTML = '<div class="l-b-kopf"><span>' + esc(U.titel) + ' · Punkt ' + o.nr + ' · ' +
-        o.anzahl + '× nicht erfüllt</span><button type="button" class="l-knopf l-zweit" id="l-b-zu">Schließen</button></div>' +
-        '<p class="l-b-aussage">' + fmt(k.text) + '</p>' +
-        '<p class="l-b-frage">Woran erkennt man, dass dieser Punkt erfüllt ist? Wer findet ein eigenes Beispiel zum Fall?</p>' +
-        '<div class="l-b-leiste">' +
-        (index > 0 ? '<button type="button" class="l-knopf l-zweit" id="l-b-zurueck">← Vorheriger Punkt</button>' : '') +
-        (index < liste.length - 1 ? '<button type="button" class="l-knopf l-zweit" id="l-b-weiter">Nächster Punkt →</button>' : '') +
-        '</div>';
-      document.getElementById('l-b-zu').addEventListener('click', schliesse);
-      var zc = document.getElementById('l-b-zurueck'), wc = document.getElementById('l-b-weiter');
-      if (zc) zc.addEventListener('click', function () { besprechen(uid, index - 1); });
-      if (wc) wc.addEventListener('click', function () { besprechen(uid, index + 1); });
-      document.getElementById('l-b-zu').focus();
-      return;
-    }
     var knoepfe = U.knoepfe.map(function (b) {
       var n = o.wahl[b.kuerzel] || 0;
       var istRichtig = richtige.indexOf(b.kuerzel) >= 0;

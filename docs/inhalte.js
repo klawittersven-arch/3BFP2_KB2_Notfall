@@ -42,11 +42,6 @@
                    (bei mehreren richtigen Antworten auch je Antwort: { SICH: '…', BER: '…' })
      tipp        – erscheint nach einer falschen Antwort (die Lösung wird nie verraten)
 
-   Sonderfall Selbstkontrolle (art: 'check'):
-     Hier gibt es kein Richtig oder Falsch. Die SuS tippen bei jedem Punkt des
-     Erwartungshorizonts an, ob ihre Lösung ihn erfüllt. Die Lehrerseite zeigt,
-     welche Punkte in der Klasse oft fehlen (ohne Namen).
-     fehlt       – Kürzel des Knopfs „fehlt“ (z. B. 'NEIN')
    ========================================================================== */
 
 var INHALTE = {
@@ -59,16 +54,11 @@ var INHALTE = {
     merksatzUeberschrift: 'Das Wichtigste in Kürze',
     // {x} und {y} werden automatisch durch Zahlen ersetzt.
     fortschritt: '{x} von {y} richtig',
-    fortschrittCheck: '{x} von {y} geprüft',
     ersterVersuch: 'Beim ersten Versuch richtig: {x} von {y}',
-    checkErgebnis: 'Ihre Lösung erfüllt {x} von {y} Lösungspunkten.',
     nochEinmal: 'Noch einmal üben',
-    nochEinmalCheck: 'Neu beginnen',
     richtigText: 'Richtig!',
     falschText: 'Noch nicht richtig – versuchen Sie es noch einmal.',
     tippVorwort: 'Tipp:',
-    checkJa: 'Gut – dieser Punkt ist erfüllt.',
-    checkNein: 'Ergänzen Sie diesen Punkt mit einer anderen Farbe auf dem Arbeitsblatt.',
     // {x} = beim ersten Versuch richtig, {y} = Anzahl Karten, {z} = nötige Mindestzahl
     durchklickenTitel: 'Hey, nicht einfach durchklicken!',
     durchklickenText: 'Beim ersten Versuch richtig: {x} von {y} – nötig sind mindestens {z}. Lesen Sie jede Karte genau und überlegen Sie, bevor Sie antworten.',
@@ -362,46 +352,10 @@ var INHALTE = {
     danach: 'Bearbeiten Sie jetzt **Aufgabe 1 „Was hätte geholfen?“** auf dem Arbeitsblatt!'
   },
 
-  ab2b: {
-    ab: 'Psychologische Erste Hilfe',
-    raum: 'ab2',
-    art: 'check',
-    fehlt: 'NEIN',
-    titel: 'Übung 2: Selbstkontrolle zu Aufgabe 2',
-    anweisung: 'Vergleichen Sie Ihre Lösung von **Aufgabe 2** mit den folgenden Lösungspunkten. Tippen Sie bei jedem Punkt an, ob Ihre Lösung ihn **erfüllt**. Andere, aber zutreffende Antworten zählen ebenfalls.',
-    knoepfe: [
-      { kuerzel: 'JA', text: '✓ erfüllt' },
-      { kuerzel: 'NEIN', text: '✗ fehlt / zu knapp' }
-    ],
-    mindestens: 0,
-    karten: [
-      { nummer: 1,
-        text: '**a) Vier Beteiligte** identifiziert – nicht nur Herr Albers. *z. B.:* Herr Albers · Frau Kern · Ben · die Bewohnerinnen und Bewohner am Nachbartisch (Zuschauende) · die Kollegin bzw. Pflegefachkraft (Helfende).' },
-      { nummer: 2,
-        text: '**a) Zu jeder Person ein passendes Bedürfnis** beschrieben. *z. B.:* Herr Albers: Sicherheit, nicht allein sein · Frau Kern: ehrliche Information, etwas tun können · Ben: Schutz und eine kindgerechte Erklärung · Zuschauende: Abstand, Beruhigung, kurze Information.' },
-      { nummer: 3,
-        text: '**b) Eine Belastung** von Frau Kern beschrieben – mit Bezug zum Fall, nicht nur ein Stichwort. *z. B.:* Todesangst um ihren Vater, der plötzlich keine Luft bekommt · Hilflosigkeit, weil sie selbst nichts tun kann („Tut doch was!“) · Sorge um Ben, der alles mit ansieht und weint.' },
-      { nummer: 4,
-        text: '**c) Maßnahme 1** konkret beschrieben: Wer? Was? Wie? – gern in wörtlicher Rede. *z. B.:* Ich bleibe bei Herrn Albers, nenne meinen Namen und sage ruhig in kurzen Sätzen: „Ich bin bei Ihnen. Der Notarzt ist unterwegs.“' },
-      { nummer: 5,
-        text: '**c) Maßnahme 2** konkret beschrieben. *z. B.:* Ich bitte eine Kollegin, die Bewohnerinnen und Bewohner vom Nachbartisch in einen anderen Raum zu begleiten, oder stelle einen Sichtschutz auf.' },
-      { nummer: 6,
-        text: '**c) Maßnahme 3** konkret beschrieben. *z. B.:* Ich gebe Frau Kern eine Aufgabe: „Frau Kern, bitte halten Sie die Hand Ihres Vaters und sprechen Sie mit ihm.“ · Eine Kollegin kümmert sich um Ben, bleibt in der Nähe der Mutter und erklärt ihm kindgerecht, was passiert.' },
-      { nummer: 7,
-        text: '**c) Mehrere Beteiligte** einbezogen – nicht nur Herr Albers, sondern auch Frau Kern, Ben oder die Mitbewohnerinnen und Mitbewohner.' },
-      { nummer: 8,
-        text: '**d) Erste Zuordnung** passend: eigene Maßnahme → Wirkprinzip. *z. B.:* Zuschauende bitten zu gehen → Sicherheit · ruhig sprechen → Beruhigung · Aufgabe für Frau Kern → Selbstwirksamkeit · Ben bleibt bei seiner Mutter → Verbundenheit · „Der Notarzt ist unterwegs.“ → Hoffnung.' },
-      { nummer: 9,
-        text: '**d) Zweite Zuordnung** passend – und zu einer **anderen** Maßnahme als die erste.' }
-    ],
-    merksatz: 'So lösen Sie solche Aufgaben vollständig: **Anzahl** genau einhalten · **beschreiben** heißt konkret (Wer? Was? Wie?) – ein Stichwort reicht nicht · **Fallbezug** herstellen (Namen, Situation) · bei Gesprächen gern **wörtliche Rede**.',
-    danach: 'Ergänzen Sie jetzt in **Aufgabe 2** alle fehlenden Punkte mit einer anderen Farbe! Noch Zeit? Dann bearbeiten Sie **Übung 3 „Antwort-Check“**.'
-  },
-
   ab2c: {
     ab: 'Psychologische Erste Hilfe',
     raum: 'ab2',
-    titel: 'Übung 3: Antwort-Check – was fehlt?',
+    titel: 'Übung 2: Antwort-Check – was fehlt?',
     anweisung: 'Prüfen Sie diese Antworten: Passt die Antwort zum **Operator** und ist sie **in Ordnung** – oder fehlt etwas?',
     knoepfe: [
       { kuerzel: 'OK', text: '✓ in Ordnung' },

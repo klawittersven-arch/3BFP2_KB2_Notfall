@@ -3,7 +3,7 @@
  * Teil A: Übungen ohne Fortschrittsanzeige (serverAdresse leer) – Tipp, Zusammenfassung,
  *         Durchklicken, Zurücksetzen, kein waagerechtes Scrollen, keine fremden Anfragen.
  * Teil B: mit Fortschrittsanzeige – Namenseingabe mit Klassenwahl, Senden des Fortschritts (nachgebildeter Server).
- * Teil C: Lehrerseiten je Klasse – Anzeige der Namen und Zahlen, Besprechen, Selbstkontrolle, Entfernen, Leeren.
+ * Teil C: Lehrerseiten je Klasse – Anzeige der Namen und Zahlen, Besprechen, Entfernen, Leeren.
  * Teil D: Schutz gegen Durchklicken – Sperre nach Fehler, Neustart bei zu schnellen Fehlern, ↺ auf der Lehrerseite.
  * In Teil A–C sind Sperre und Neustart ausgeschaltet (sonst würden die schnellen Testklicks sie auslösen). */
 const { chromium } = require('playwright');
@@ -14,7 +14,7 @@ const path = require('path');
 const DOCS = path.join(__dirname, '..', 'docs');
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png' };
 const SERVER = 'https://fortschritt.test';
-const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2b', 'ab2c'];
+const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2c'];
 
 // einstellungen.js für die Tests anpassen: Serveradresse und (optional) Schutz gegen Durchklicken ausschalten
 function einstellungen(text, server, schutz) {
@@ -103,7 +103,6 @@ function fortschrittsServer() {
     beobachte(page, fehler);
     for (const id of IDS) {
       const U = I[id];
-      const check = U.art === 'check';
       await page.goto(basis + id + '.html');
       await page.evaluate(() => sessionStorage.clear());
       await page.reload();
@@ -115,67 +114,52 @@ function fortschrittsServer() {
       pruefe(!(await page.locator('.karte-text').first().innerText()).includes('*'), `${id}: keine Sternchen im Kartentext (fett/kursiv umgesetzt)`);
       const bereich = page.locator('#merksatz-bereich');
 
-      if (check) {
-        // Selbstkontrolle: alles „erfüllt“, dann einen Punkt umentscheiden
-        for (let i = 0; i < U.karten.length; i++) await karten.nth(i).locator('button[data-kuerzel="JA"]').click();
-        pruefe(await bereich.isVisible() && (await bereich.innerText()).includes(`${U.karten.length} von ${U.karten.length}`), `${id}: Ergebnis „alle erfüllt“`);
-        await karten.nth(4).locator(`button[data-kuerzel="${U.fehlt}"]`).click();
-        pruefe((await bereich.innerText()).includes(`${U.karten.length - 1} von ${U.karten.length}`), `${id}: Umentscheiden ändert das Ergebnis`);
-        pruefe(await karten.nth(4).locator('.ist-fehlt').count() === 1 && await karten.nth(4).locator('button[aria-pressed="true"]').count() === 1, `${id}: „fehlt“ ist markiert`);
-        pruefe(!(await bereich.innerText()).includes('durchklicken'), `${id}: keine Durchklick-Warnung bei der Selbstkontrolle`);
-        pruefe((await page.locator('.karte-text em').count()) > 0, `${id}: „z. B.“ kursiv`);
-        await page.reload();
-        pruefe((await page.locator('#fortschritt-text').innerText()).startsWith(`${U.karten.length} von`), `${id}: Stand nach Neuladen erhalten`);
-        await page.click('#noch-einmal');
-        pruefe((await page.locator('#fortschritt-text').innerText()).startsWith('0 von'), `${id}: Zurücksetzen`);
-      } else {
-        const k0 = U.karten[0];
-        const falsch0 = U.knoepfe.map(b => b.kuerzel).find(k => ![].concat(k0.richtig).includes(k));
-        await karten.nth(0).locator(`button[data-kuerzel="${falsch0}"]`).click();
-        pruefe((await karten.nth(0).locator('.rueckmeldung').innerText()).includes('Tipp'), `${id}: Tipp nach falscher Antwort`);
+      const k0 = U.karten[0];
+      const falsch0 = U.knoepfe.map(b => b.kuerzel).find(k => ![].concat(k0.richtig).includes(k));
+      await karten.nth(0).locator(`button[data-kuerzel="${falsch0}"]`).click();
+      pruefe((await karten.nth(0).locator('.rueckmeldung').innerText()).includes('Tipp'), `${id}: Tipp nach falscher Antwort`);
 
-        for (let i = 0; i < U.karten.length; i++) {
-          const r = [].concat(U.karten[i].richtig)[0];
-          await karten.nth(i).locator(`button[data-kuerzel="${r}"]`).click();
-        }
-        pruefe(await bereich.isVisible(), `${id}: Zusammenfassung sichtbar`);
-        pruefe((await bereich.innerText()).includes('Das Wichtigste in Kürze'), `${id}: Zusammenfassung erscheint (bei 1 Fehler)`);
-        pruefe((await bereich.innerText()).includes(U.danach.replace(/\*\*/g, '').slice(0, 25)), `${id}: Hinweis, wie es weitergeht`);
-        const nr = U.titel.split(':')[0];
-        pruefe(await page.locator('.weiter').first().isVisible() && (await page.locator('.weiter').innerText()).includes(nr + ' abgeschlossen!'), `${id}: Kasten „${nr} abgeschlossen!“ steht oben`);
-        const vorMerksatz = await page.evaluate(() => { const w = document.querySelector('.weiter'), m = document.querySelector('.abschluss .merksatz'); return !!(w && m && (w.compareDocumentPosition(m) & Node.DOCUMENT_POSITION_FOLLOWING)); });
-        pruefe(vorMerksatz, `${id}: Weiter-Hinweis steht vor der Zusammenfassung`);
-
-        // Zweite richtige Antwort (wo vorhanden) wird ebenfalls akzeptiert
-        const mehrfach = U.karten.findIndex(k => Array.isArray(k.richtig) && k.richtig.length > 1);
-        if (mehrfach >= 0) {
-          await page.click('#noch-einmal');
-          const zweite = U.karten[mehrfach].richtig[1];
-          await karten.nth(mehrfach).locator(`button[data-kuerzel="${zweite}"]`).click();
-          pruefe(await karten.nth(mehrfach).locator('.ist-richtig').count() === 1 &&
-            (await karten.nth(mehrfach).locator('.rueckmeldung').innerText()).includes(U.karten[mehrfach].erklaerung[zweite].replace(/\*\*/g, '').slice(0, 20)),
-            `${id}: zweite richtige Antwort bei Karte ${U.karten[mehrfach].nummer} mit eigener Erklärung`);
-          for (let i = 0; i < U.karten.length; i++) {
-            if (i === mehrfach) continue;
-            await karten.nth(i).locator(`button[data-kuerzel="${[].concat(U.karten[i].richtig)[0]}"]`).click();
-          }
-        }
-        await page.reload();
-        pruefe((await page.locator('#fortschritt-text').innerText()).startsWith(`${U.karten.length} von`), `${id}: Stand nach Neuladen erhalten`);
-        await page.click('#noch-einmal');
-        pruefe((await page.locator('#fortschritt-text').innerText()).startsWith('0 von'), `${id}: Zurücksetzen`);
-
-        for (let i = 0; i < U.karten.length; i++) {
-          const richtige = [].concat(U.karten[i].richtig);
-          for (const b of U.knoepfe.map(x => x.kuerzel)) {
-            if (richtige.includes(b)) continue;
-            const btn = karten.nth(i).locator(`button[data-kuerzel="${b}"]`);
-            if (await btn.isEnabled()) await btn.click();
-          }
-          await karten.nth(i).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
-        }
-        pruefe((await bereich.innerText()).includes('nicht einfach durchklicken'), `${id}: Durchklicken erkannt`);
+      for (let i = 0; i < U.karten.length; i++) {
+        const r = [].concat(U.karten[i].richtig)[0];
+        await karten.nth(i).locator(`button[data-kuerzel="${r}"]`).click();
       }
+      pruefe(await bereich.isVisible(), `${id}: Zusammenfassung sichtbar`);
+      pruefe((await bereich.innerText()).includes('Das Wichtigste in Kürze'), `${id}: Zusammenfassung erscheint (bei 1 Fehler)`);
+      pruefe((await bereich.innerText()).includes(U.danach.replace(/\*\*/g, '').slice(0, 25)), `${id}: Hinweis, wie es weitergeht`);
+      const nr = U.titel.split(':')[0];
+      pruefe(await page.locator('.weiter').first().isVisible() && (await page.locator('.weiter').innerText()).includes(nr + ' abgeschlossen!'), `${id}: Kasten „${nr} abgeschlossen!“ steht oben`);
+      const vorMerksatz = await page.evaluate(() => { const w = document.querySelector('.weiter'), m = document.querySelector('.abschluss .merksatz'); return !!(w && m && (w.compareDocumentPosition(m) & Node.DOCUMENT_POSITION_FOLLOWING)); });
+      pruefe(vorMerksatz, `${id}: Weiter-Hinweis steht vor der Zusammenfassung`);
+
+      // Zweite richtige Antwort (wo vorhanden) wird ebenfalls akzeptiert
+      const mehrfach = U.karten.findIndex(k => Array.isArray(k.richtig) && k.richtig.length > 1);
+      if (mehrfach >= 0) {
+        await page.click('#noch-einmal');
+        const zweite = U.karten[mehrfach].richtig[1];
+        await karten.nth(mehrfach).locator(`button[data-kuerzel="${zweite}"]`).click();
+        pruefe(await karten.nth(mehrfach).locator('.ist-richtig').count() === 1 &&
+          (await karten.nth(mehrfach).locator('.rueckmeldung').innerText()).includes(U.karten[mehrfach].erklaerung[zweite].replace(/\*\*/g, '').slice(0, 20)),
+          `${id}: zweite richtige Antwort bei Karte ${U.karten[mehrfach].nummer} mit eigener Erklärung`);
+        for (let i = 0; i < U.karten.length; i++) {
+          if (i === mehrfach) continue;
+          await karten.nth(i).locator(`button[data-kuerzel="${[].concat(U.karten[i].richtig)[0]}"]`).click();
+        }
+      }
+      await page.reload();
+      pruefe((await page.locator('#fortschritt-text').innerText()).startsWith(`${U.karten.length} von`), `${id}: Stand nach Neuladen erhalten`);
+      await page.click('#noch-einmal');
+      pruefe((await page.locator('#fortschritt-text').innerText()).startsWith('0 von'), `${id}: Zurücksetzen`);
+
+      for (let i = 0; i < U.karten.length; i++) {
+        const richtige = [].concat(U.karten[i].richtig);
+        for (const b of U.knoepfe.map(x => x.kuerzel)) {
+          if (richtige.includes(b)) continue;
+          const btn = karten.nth(i).locator(`button[data-kuerzel="${b}"]`);
+          if (await btn.isEnabled()) await btn.click();
+        }
+        await karten.nth(i).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
+      }
+      pruefe((await bereich.innerText()).includes('nicht einfach durchklicken'), `${id}: Durchklicken erkannt`);
       pruefe(await page.locator('a[href]').count() === 0, `${id}: keine Links zu anderen Seiten`);
       const breit = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
       pruefe(breit, `${id}: kein waagerechtes Scrollen bei 360 px`);
@@ -250,14 +234,14 @@ function fortschrittsServer() {
     pruefe(JSON.stringify(letzter.falsch) === JSON.stringify(['2-' + falsch0]) && letzter.erster === 5, 'B: Fehler beim ersten Versuch (Karte 2, gewählte Antwort) gesendet: ' + JSON.stringify(letzter.falsch));
     pruefe(/^[a-f0-9]{32}$/.test(letzter.geraet), 'B: zufällige Geräte-Kennung');
     // Andere Übung: kein erneutes Fragen nach dem Namen
-    await page.goto(basis + 'ab2b.html');
+    await page.goto(basis + 'ab2c.html');
     pruefe(await page.locator('#name-bereich').isHidden() && (await page.locator('#name-zeile').innerText()).includes('Lena K.'), 'B: Name und Klasse bleiben gespeichert');
-    for (let i = 0; i < I.ab2b.karten.length; i++) {
-      await page.locator('.karte').nth(i).locator(`button[data-kuerzel="${i === 4 || i === 5 ? 'NEIN' : 'JA'}"]`).click();
+    for (let i = 0; i < I.ab2c.karten.length; i++) {
+      await page.locator('.karte').nth(i).locator(`button[data-kuerzel="${[].concat(I.ab2c.karten[i].richtig)[0]}"]`).click();
     }
     await page.waitForTimeout(200);
-    const check = fs1.posts[fs1.posts.length - 1];
-    pruefe(check.raum === 'k2-ab2' && check.geloest === I.ab2b.karten.length && JSON.stringify(check.falsch) === '["5-NEIN","6-NEIN"]' && check.erster === I.ab2b.karten.length - 2, 'B: Selbstkontrolle sendet „fehlt“-Punkte: ' + JSON.stringify(check));
+    const ab2 = fs1.posts[fs1.posts.length - 1];
+    pruefe(ab2.raum === 'k2-ab2' && ab2.uebung === 'ab2c' && ab2.geloest === I.ab2c.karten.length && ab2.erster === I.ab2c.karten.length, 'B: AB 2 an eigenen Raum gesendet: ' + JSON.stringify(ab2));
     // Name und Klasse ändern
     await page.goto(basis + 'ab1b.html');
     await page.click('#name-aendern');
@@ -342,17 +326,14 @@ function fortschrittsServer() {
     await page.waitForSelector('.l-karte');
     const k1 = (await page.locator('#l-inhalt').innerText());
     pruefe(k1.includes('Anna-Lena K.') && !k1.includes('Mia S.') && !k1.includes('Tim B.'), 'C: 3BFP2/1 sieht nur ihre eigenen Namen');
-    // AB 2 mit Selbstkontrolle: „Oft nicht erfüllt“
+    // AB 2: zwei Übungen, keine Selbstkontrolle mehr
     await page.goto(basis + 'lehrer-3bfp2-2-ab2.html');
-    await page.waitForSelector('.l-karte[data-uebung="ab2b"]');
-    pruefe(await page.locator('.l-karte').count() === 3, 'C: drei Übungen für AB 2');
-    const c2 = page.locator('.l-karte[data-uebung="ab2b"]');
-    pruefe((await c2.innerText()).includes('Oft nicht erfüllt') && (await c2.locator('.l-oft li').first().innerText()).startsWith('Punkt 5 · 1×'), 'C: Selbstkontrolle zeigt „Oft nicht erfüllt“');
-    pruefe(await c2.locator('.l-klick').count() === 0, 'C: bei der Selbstkontrolle keine Durchklick-Warnung');
-    await c2.locator('.l-oft-knopf').first().click();
-    pruefe(await page.locator('.l-besprechen').isVisible() && (await page.locator('.l-b-aussage').innerText()).includes('Maßnahme 2') && await page.locator('#l-b-auf').count() === 0, 'C: Punkt der Selbstkontrolle groß, ohne „Auflösen“');
-    await page.screenshot({ path: path.join(__dirname, 'lehrer-check.png') });
-    await page.keyboard.press('Escape');
+    await page.waitForSelector('.l-karte[data-uebung="ab2c"]');
+    pruefe(await page.locator('.l-karte').count() === 2, 'C: zwei Übungen für AB 2');
+    const c2 = page.locator('.l-karte[data-uebung="ab2c"]');
+    pruefe((await c2.innerText()).includes('Übung 2: Antwort-Check') && (await c2.innerText()).includes('Lena K.'), 'C: AB 2 zeigt „Übung 2: Antwort-Check“ mit Namen');
+    pruefe(!(await page.locator('#l-inhalt').innerText()).includes('Selbstkontrolle'), 'C: keine Selbstkontrolle auf der Lehrerseite');
+    await page.screenshot({ path: path.join(__dirname, 'lehrer-ab2.png') });
     // Leeren
     await page.goto(basis + 'lehrer-3bfp2-2-ab1.html');
     await page.waitForSelector('.l-pille');
