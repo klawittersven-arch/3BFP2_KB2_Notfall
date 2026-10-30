@@ -336,7 +336,7 @@ function fortschrittsServer() {
     pruefe((await c2.innerText()).includes('Oft nicht erfüllt') && (await c2.locator('.l-oft li').first().innerText()).startsWith('Punkt 5 · 1×'), 'C: Selbstkontrolle zeigt „Oft nicht erfüllt“');
     pruefe(await c2.locator('.l-klick').count() === 0, 'C: bei der Selbstkontrolle keine Durchklick-Warnung');
     await c2.locator('.l-oft-knopf').first().click();
-    pruefe(await page.locator('.l-besprechen').isVisible() && (await page.locator('.l-b-aussage').innerText()).includes('Maßnahme 3') && await page.locator('#l-b-auf').count() === 0, 'C: Punkt der Selbstkontrolle groß, ohne „Auflösen“');
+    pruefe(await page.locator('.l-besprechen').isVisible() && (await page.locator('.l-b-aussage').innerText()).includes('Maßnahme 2') && await page.locator('#l-b-auf').count() === 0, 'C: Punkt der Selbstkontrolle groß, ohne „Auflösen“');
     await page.screenshot({ path: path.join(__dirname, 'lehrer-check.png') });
     await page.keyboard.press('Escape');
     // Leeren
