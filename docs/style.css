@@ -1,0 +1,171 @@
+/* Gestaltung der Übungsseiten – Farben passend zu den Arbeitsblättern */
+:root {
+  --dunkelpetrol: #25434B;
+  --petrol: #3F6C72;
+  --hellblau: #EAF2F4;
+  --text: #16262A;
+  --gruen: #1B6E35;
+  --gruen-hell: #E2F3E7;
+  --bernstein: #7A4300;
+  --bernstein-rand: #D98B00;
+  --bernstein-hell: #FFF2D9;
+  --rand: #C5D8DC;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text);
+  background: #fff;
+}
+a { color: var(--petrol); }
+
+/* ---------- Kopf ---------- */
+.kopf { background: var(--dunkelpetrol); color: #fff; padding: 16px 16px 18px; }
+.kopfzeile { margin: 0 0 4px; font-size: 17px; opacity: .92; }
+.kopf h1 { margin: 0; font-size: 23px; line-height: 1.3; }
+
+/* ---------- Fortschritt ---------- */
+.fortschritt {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; background: #fff;
+  border-bottom: 1px solid var(--rand);
+  font-size: 17px; font-weight: 600;
+}
+.fortschritt-spur { flex: 1; height: 10px; border-radius: 5px; background: var(--hellblau); overflow: hidden; border: 1px solid var(--rand); }
+.fortschritt-balken { display: block; height: 100%; width: 0; background: var(--petrol); transition: width .3s; }
+
+/* ---------- Inhalt ---------- */
+.inhalt { max-width: 720px; margin: 0 auto; padding: 16px 16px 40px; }
+.anweisung { margin: 4px 0 16px; }
+
+.hilfe { margin: 0 0 18px; border: 2px solid var(--petrol); border-radius: 10px; background: #fff; }
+.hilfe summary { cursor: pointer; padding: 12px 14px; min-height: 48px; font-weight: 700; color: var(--dunkelpetrol); }
+.hilfe[open] summary { border-bottom: 1px solid var(--rand); }
+.hilfe ul { margin: 10px 14px 12px 34px; padding: 0; }
+.hilfe li { margin: 4px 0; }
+
+/* ---------- Karten ---------- */
+.karte {
+  background: var(--hellblau);
+  border: 2px solid var(--rand);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  margin: 0 0 16px;
+}
+.karte-richtig { border-color: var(--gruen); background: #F4FAF6; }
+.karte-tipp { border-color: var(--bernstein-rand); }
+.karte-text { margin: 0 0 12px; font-size: 18px; }
+.nummer {
+  display: inline-block; min-width: 30px; height: 30px; line-height: 30px;
+  margin-right: 8px; border-radius: 15px; text-align: center;
+  background: var(--dunkelpetrol); color: #fff; font-weight: 700; font-size: 16px;
+}
+.knoepfe { display: grid; gap: 8px; grid-template-columns: 1fr 1fr; }
+.knoepfe-3 { grid-template-columns: 1fr 1fr 1fr; }
+.knoepfe-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media (max-width: 560px) {
+  .knoepfe-lang { grid-template-columns: 1fr; }
+  .knoepfe-2x2 { grid-template-columns: 1fr 1fr; }
+}
+.antwort {
+  min-height: 52px; padding: 8px 6px;
+  border: 2px solid var(--petrol); border-radius: 10px;
+  background: #fff; color: var(--dunkelpetrol);
+  font: inherit; font-size: 17px; font-weight: 700; line-height: 1.2;
+  cursor: pointer; touch-action: manipulation;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  min-width: 0; overflow-wrap: anywhere;
+}
+.antwort:hover:not(:disabled) { background: var(--hellblau); }
+.antwort:focus-visible { outline: 3px solid #0B5CAD; outline-offset: 2px; }
+.antwort:disabled { cursor: default; }
+.antwort.ist-falsch { border-color: var(--bernstein-rand); background: var(--bernstein-hell); color: var(--bernstein); text-decoration: line-through; }
+.antwort.ist-richtig { border-color: var(--gruen); background: var(--gruen-hell); color: var(--gruen); }
+.karte-richtig .antwort:not(.ist-richtig) { opacity: .45; }
+.symbol { font-size: 20px; }
+
+.rueckmeldung:empty { display: none; }
+.rueckmeldung { margin-top: 12px; padding: 10px 12px; border-radius: 8px; font-size: 17px; }
+.rueckmeldung p { margin: 0 0 4px; }
+.rueckmeldung .rm-kopf { font-weight: 700; }
+.rueckmeldung.richtig { background: var(--gruen-hell); border-left: 6px solid var(--gruen); }
+.rueckmeldung.richtig .rm-kopf { color: var(--gruen); }
+.rueckmeldung.falsch { background: var(--bernstein-hell); border-left: 6px solid var(--bernstein-rand); }
+.rueckmeldung.falsch .rm-kopf { color: var(--bernstein); }
+
+/* ---------- Merksatz / Durchklicken ---------- */
+.abschluss { margin: 24px 0 18px; scroll-margin-top: 60px; }
+.abschluss .merksatz { margin: 14px 0 0; }
+.merksatz, .durchklicken {
+  margin: 24px 0 18px; padding: 16px; border-radius: 12px; scroll-margin-top: 60px;
+}
+.merksatz { background: #fff; border: 4px solid var(--petrol); box-shadow: 0 2px 0 var(--rand); }
+.merksatz h2, .durchklicken h2 { margin: 0 0 8px; font-size: 21px; color: var(--dunkelpetrol); }
+.merksatz-text { font-size: 19px; font-weight: 600; margin: 0 0 10px; }
+.merksatz-hinweis { margin: 0 0 6px; color: var(--dunkelpetrol); }
+.erster-versuch { margin: 0 0 14px; font-size: 16px; color: #3D5257; }
+.durchklicken { background: var(--bernstein-hell); border: 3px solid var(--bernstein-rand); }
+
+.knopf {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 50px; padding: 10px 18px; border-radius: 10px;
+  border: 2px solid var(--petrol); background: var(--petrol); color: #fff;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.knopf-zweit { background: #fff; color: var(--petrol); width: 100%; margin-top: 8px; }
+.fuss { text-align: center; margin-top: 18px; }
+
+/* ---------- Übersicht ---------- */
+.ab-liste { list-style: none; margin: 0; padding: 0; }
+.ab { border: 2px solid var(--rand); border-radius: 12px; margin: 0 0 16px; overflow: hidden; }
+.ab h2 { margin: 0; padding: 10px 14px; font-size: 19px; background: var(--hellblau); color: var(--dunkelpetrol); }
+.ab a { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 52px; padding: 10px 14px; border-top: 1px solid var(--rand); text-decoration: none; font-weight: 600; }
+.ab a:first-of-type { border-top: 0; }
+.haken { color: var(--gruen); font-weight: 700; white-space: nowrap; }
+.hinweis-klein { font-size: 15px; color: #3D5257; }
+.start-hinweis { font-size: 20px; padding: 16px; border-radius: 12px; background: var(--hellblau); border: 2px solid var(--petrol); }
+
+/* ---------- Name für die Fortschrittsanzeige ---------- */
+.name-bereich { background: var(--hellblau); border: 2px solid var(--petrol); border-radius: 12px; padding: 16px; margin: 4px 0 18px; }
+.name-bereich h2 { margin: 0 0 8px; font-size: 21px; color: var(--dunkelpetrol); }
+.name-bereich input {
+  display: block; width: 100%; min-height: 52px; margin: 8px 0 10px; padding: 10px 12px;
+  border: 2px solid var(--petrol); border-radius: 10px; font: inherit; font-size: 20px; background: #fff; color: var(--text);
+}
+.name-bereich .knopf { width: 100%; }
+.name-fehler { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; background: var(--bernstein-hell); color: var(--bernstein); font-weight: 600; }
+.name-zeile { margin: 0 0 8px; font-size: 15px; color: #3D5257; }
+.link-knopf { border: 0; background: none; padding: 4px 2px; font: inherit; color: var(--petrol); text-decoration: underline; cursor: pointer; min-height: 32px; }
+.unsichtbar { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Hinweis nach dem Lösen: welche Aufgabe auf dem Arbeitsblatt jetzt dran ist */
+.weiter { padding: 16px; border-radius: 12px; background: var(--gruen-hell); border: 4px solid var(--gruen); color: var(--text); }
+.weiter-titel { margin: 0 0 6px; font-size: 22px; font-weight: 800; color: var(--gruen); }
+.weiter-text { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4; }
+.weiter-text strong { color: var(--dunkelpetrol); }
+
+/* ---------- KB II: Vorspann, Klassenwahl, Selbstkontrolle ---------- */
+.vorspann {
+  margin: 0 0 16px; padding: 10px 12px; border-left: 6px solid var(--petrol);
+  background: #F4F6F7; font-size: 16px; font-style: italic;
+}
+.klassen { border: 0; margin: 14px 0 6px; padding: 0; }
+.klassen legend { font-weight: 700; margin-bottom: 6px; padding: 0; }
+.klasse-wahl {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; margin: 0 10px 8px 0; padding: 6px 14px;
+  border: 2px solid var(--petrol); border-radius: 10px; background: #fff;
+  font-weight: 700; color: var(--dunkelpetrol); cursor: pointer;
+}
+.name-bereich .klasse-wahl input { display: inline-block; width: 22px; height: 22px; min-height: 0; margin: 0; padding: 0; accent-color: var(--petrol); }
+.klasse-wahl:has(input:checked) { background: var(--hellblau); }
+.karte-text em { font-style: italic; color: #34474C; }
+.art-check .antwort.ist-gewaehlt { border-color: var(--gruen); background: var(--gruen-hell); color: var(--gruen); }
+.art-check .antwort.ist-fehlt { border-color: var(--bernstein-rand); background: var(--bernstein-hell); color: var(--bernstein); }
+.karte-erfuellt { border-color: var(--gruen); background: #F4FAF6; }
+.karte-fehlt { border-color: var(--bernstein-rand); }

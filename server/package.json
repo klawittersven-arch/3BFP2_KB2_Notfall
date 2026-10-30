@@ -1,0 +1,8 @@
+{
+  "name": "kb2-notfall-fortschritt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test/worker.test.js"
+  }
+}

@@ -1,0 +1,81 @@
+/* Lehrerseite für den Beamer – große Schrift, hoher Kontrast */
+:root {
+  --dunkelpetrol: #25434B;
+  --petrol: #3F6C72;
+  --hellblau: #EAF2F4;
+  --text: #16262A;
+  --gruen: #1B6E35;
+  --gruen-hell: #DCEFE2;
+  --bernstein: #7A4300;
+  --bernstein-hell: #FFF2D9;
+  --grau: #E6EBEC;
+  --rand: #C5D8DC;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #fff; color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 20px; line-height: 1.35;
+}
+.l-kopf { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px;
+  background: var(--dunkelpetrol); color: #fff; padding: 14px 24px; }
+.l-kopf h1 { margin: 0; font-size: 28px; }
+.l-status { margin: 0; font-size: 18px; opacity: .95; }
+.l-warnung { background: var(--bernstein-hell); color: var(--bernstein); padding: 4px 10px; border-radius: 6px; opacity: 1; font-weight: 700; }
+.l-inhalt { display: grid; gap: 18px; padding: 18px 24px; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); align-items: start; }
+.l-karte { border: 3px solid var(--rand); border-radius: 14px; padding: 14px 16px; background: #fff; }
+.l-schmal { max-width: 640px; }
+.l-karte h2 { margin: 0 0 6px; font-size: 24px; color: var(--dunkelpetrol); }
+.l-karte h3 { margin: 14px 0 6px; font-size: 18px; color: var(--dunkelpetrol); }
+.l-zahl { margin: 0 0 8px; font-size: 22px; }
+.l-zahl strong { font-size: 40px; color: var(--gruen); }
+.l-dabei-text { color: var(--petrol); }
+.l-balken { display: flex; height: 22px; border-radius: 11px; overflow: hidden; background: var(--grau); margin: 0 0 12px; }
+.l-b-fertig { background: var(--gruen); transition: width .5s; }
+.l-b-dabei { background: var(--petrol); opacity: .55; transition: width .5s; }
+.l-pillen { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.l-pille { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 12px;
+  border-radius: 18px; border: 2px solid var(--rand); font-size: 19px; overflow: hidden;
+  background: linear-gradient(90deg, var(--hellblau) var(--anteil), #fff var(--anteil)); }
+.l-fertig { background: var(--gruen-hell); border-color: var(--gruen); }
+.l-klick { background: var(--bernstein-hell); border-color: var(--bernstein); }
+.l-offen { color: #5B6B6F; border-style: dashed; }
+.l-stand { font-weight: 700; color: var(--dunkelpetrol); }
+.l-fertig .l-stand { color: var(--gruen); }
+.l-klick .l-stand { color: var(--bernstein); }
+.l-weg { border: 0; background: none; color: #8A9A9E; font-size: 18px; line-height: 1; padding: 2px 4px; cursor: pointer; opacity: 0; }
+.l-pille:hover .l-weg, .l-weg:focus { opacity: 1; }
+.l-oft { margin: 0; padding-left: 22px; font-size: 18px; }
+.l-oft li { margin: 4px 0; }
+.l-leer { color: #5B6B6F; }
+.l-fuss { padding: 0 24px 24px; }
+.l-hinweis { font-size: 16px; color: #5B6B6F; }
+.l-knopf { min-height: 46px; padding: 8px 16px; border-radius: 10px; border: 2px solid var(--petrol);
+  background: var(--petrol); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.l-zweit { background: #fff; color: var(--petrol); }
+.l-fehler { background: var(--bernstein-hell); color: var(--bernstein); padding: 8px 10px; border-radius: 8px; font-weight: 700; }
+#l-form { display: flex; gap: 10px; flex-wrap: wrap; }
+#l-feld { flex: 1; min-width: 220px; min-height: 46px; padding: 8px 12px; font: inherit; border: 2px solid var(--petrol); border-radius: 10px; }
+code { background: var(--hellblau); padding: 1px 5px; border-radius: 4px; }
+.l-klein { font-weight: 400; font-size: 15px; color: #5B6B6F; }
+.l-oft-knopf { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 4px 6px; margin: 0 -6px;
+  font: inherit; color: inherit; border-radius: 8px; cursor: pointer; }
+.l-oft-knopf:hover, .l-oft-knopf:focus { background: var(--hellblau); }
+
+/* Besprechen: eine Karte groß */
+.l-besprechen { position: fixed; inset: 0; z-index: 50; background: #fff; overflow: auto; padding: 24px 6vw 40px; }
+.l-b-kopf { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 20px; color: #5B6B6F; }
+.l-b-aussage { font-size: clamp(28px, 3.2vw, 44px); line-height: 1.3; margin: 28px 0; padding: 22px 26px;
+  border: 3px solid var(--rand); border-radius: 16px; background: var(--hellblau); color: var(--text); }
+.l-b-knoepfe { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin: 0 0 22px; }
+.l-b-antwort { display: flex; flex-direction: column; gap: 4px; padding: 16px 20px; border: 3px solid var(--petrol);
+  border-radius: 14px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 700; color: var(--dunkelpetrol); }
+.l-b-zahl { font-size: clamp(18px, 1.6vw, 22px); font-weight: 600; min-height: 1.3em; }
+.l-b-gewaehlt { background: var(--bernstein-hell); border-color: var(--bernstein); color: var(--bernstein); }
+.l-aufgeloest .l-b-loesung { background: var(--gruen-hell); border-color: var(--gruen); color: var(--gruen); }
+.l-aufgeloest .l-b-loesung .l-b-text::before { content: "✓ "; }
+.l-b-frage { font-size: clamp(22px, 2vw, 28px); font-weight: 700; color: var(--dunkelpetrol); }
+.l-b-erklaerung { font-size: clamp(22px, 2vw, 28px); line-height: 1.4; padding: 16px 20px; border-radius: 14px;
+  background: var(--gruen-hell); border-left: 8px solid var(--gruen); margin: 0 0 22px; }
+.l-b-leiste { display: flex; flex-wrap: wrap; gap: 12px; }
+.l-b-leiste .l-knopf { font-size: 22px; min-height: 56px; padding: 10px 22px; }
