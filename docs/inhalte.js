@@ -30,7 +30,8 @@
                    sonst gibt es statt des Merksatzes „Nicht einfach durchklicken!“
      karten      – die Aussagen (siehe unten)
      merksatz    – erscheint erst, wenn alle Karten gelöst sind („Das Wichtigste in Kürze“)
-     danach      – Hinweis nach dem Lösen: welche Aufgabe auf dem Arbeitsblatt jetzt dran ist
+     danach      – Hinweis nach dem Lösen unter „Übung 1 abgeschlossen!“: welche Aufgabe auf dem
+                   Arbeitsblatt jetzt dran ist
 
    Aufbau einer Karte:
      nummer      – die Nummer auf der Karte
@@ -77,7 +78,8 @@ var INHALTE = {
     // Neustart, wenn in kurzer Zeit zu viele falsche Antworten kommen
     zuSchnellTitel: 'Zu schnell geklickt!',
     zuSchnellText: 'Sie haben in kurzer Zeit mehrere falsche Antworten gegeben. Lesen Sie jede Karte in Ruhe – die Übung beginnt von vorn.',
-    fertigTitel: 'Übung abgeschlossen!',
+    // Überschrift nach dem Lösen ({x} = „Übung 1“ usw. – der Teil des Titels vor dem Doppelpunkt)
+    fertigTitel: '{x} abgeschlossen!',
 
     // Namenseingabe (nur wenn die Fortschrittsanzeige eingerichtet ist, siehe einstellungen.js)
     nameTitel: 'Wer sind Sie?',
@@ -178,7 +180,7 @@ var INHALTE = {
         tipp: 'Was empfindet Christin?' }
     ],
     merksatz: 'Im Notfall schaltet der **Sympathikus** auf Alarm: Stresshormone (z. B. **Adrenalin**) bereiten den Körper auf **Kampf oder Flucht** vor. Das zeigt sich im **Körper** (Herzrasen, Zittern, Schwitzen), im **Denken** (Tunnelblick, Erstarren, Gedächtnislücken) und in **Gefühlen** (Angst, Hilflosigkeit, Wut, Schuld). Diese Reaktionen sind **normal** – auch bei erfahrenen Pflegenden.',
-    danach: 'Lösen Sie jetzt **Aufgabe 3 „Stressreaktionen erklären“** auf dem Arbeitsblatt.'
+    danach: 'Bearbeiten Sie jetzt **Aufgabe 3 „Stressreaktionen erklären“** auf dem Arbeitsblatt!'
   },
 
   ab1b: {
@@ -252,7 +254,7 @@ var INHALTE = {
         tipp: 'Wie viel Zeit ist vergangen?' }
     ],
     merksatz: 'In den **ersten Stunden und Tagen** sind starke Reaktionen **normal** (Zittern, schlechter Schlaf, Grübeln, Konzentrationsprobleme, Schuldgefühle). **Warnzeichen** sind: Beschwerden, die **über Wochen anhalten** oder zunehmen (z. B. Albträume, Wiedererleben), **Vermeiden** und **Rückzug**, **Arbeitsunfähigkeit**, **Alkohol oder Medikamente** zum Bewältigen. Dann: Unterstützung anbieten und **weitervermitteln**. Eine Diagnose (z. B. PTBS) stellen Fachleute.',
-    danach: 'Lösen Sie jetzt **Aufgabe 4 „Christin begleiten“** auf dem Arbeitsblatt.'
+    danach: 'Bearbeiten Sie jetzt **Aufgabe 4 „Christin begleiten“** auf dem Arbeitsblatt!'
   },
 
   /* ========================================================================
@@ -357,7 +359,7 @@ var INHALTE = {
         tipp: 'Was erlebt jede und jeder Einzelne in diesem Gespräch?' }
     ],
     merksatz: 'Psychologische Erste Hilfe soll **Sicherheit geben, Stress verringern und Kontrolle zurückgeben**. Sie ersetzt keine Therapie. Die fünf Wirkprinzipien nach Hobfoll et al.: **Sicherheit** (Gefahr beseitigen, abschirmen, nicht allein lassen) · **Beruhigung** (ruhig sprechen, Reize verringern) · **Selbst- und kollektive Wirksamkeit** (kleine, klare Aufgaben, eine Wahl lassen) · **Verbundenheit** (vertraute Menschen einbeziehen) · **Hoffnung** (ehrliche, realistische Zuversicht).',
-    danach: 'Lösen Sie jetzt **Aufgabe 1 „Was hätte geholfen?“** auf dem Arbeitsblatt.'
+    danach: 'Bearbeiten Sie jetzt **Aufgabe 1 „Was hätte geholfen?“** auf dem Arbeitsblatt!'
   },
 
   ab2b: {
@@ -393,7 +395,7 @@ var INHALTE = {
         text: '**d) Zweite Zuordnung** passend – und zu einer **anderen** Maßnahme als die erste.' }
     ],
     merksatz: 'So lösen Sie solche Aufgaben vollständig: **Anzahl** genau einhalten · **beschreiben** heißt konkret (Wer? Was? Wie?) – ein Stichwort reicht nicht · **Fallbezug** herstellen (Namen, Situation) · bei Gesprächen gern **wörtliche Rede**.',
-    danach: 'Füllen Sie jetzt die **Ich-kann-Ampel** auf dem Arbeitsblatt aus. Noch Zeit? Dann **Für die Schnellen**: Übung 3 „Antwort-Check“.'
+    danach: 'Ergänzen Sie jetzt in **Aufgabe 2** alle fehlenden Punkte mit einer anderen Farbe! Noch Zeit? Dann bearbeiten Sie **Übung 3 „Antwort-Check“**.'
   },
 
   ab2c: {
@@ -465,6 +467,6 @@ var INHALTE = {
         tipp: 'Gibt es ein Urteil, eine Begründung und einen Fallbezug?' }
     ],
     merksatz: '**nennen** = aufzählen · **beschreiben** = konkret darstellen (Wer? Was? Wie?) · **erklären** = Ursache → Wirkung · **analysieren** = Ursachen und Zusammenhänge herausarbeiten · **beurteilen** = prüfen und begründet urteilen. Fast immer verlangt: **Fallbezug**.',
-    danach: 'Prüfen Sie mit diesen Regeln jetzt noch einmal Ihre Antworten auf AB 1 und AB 2.'
+    danach: 'Prüfen Sie mit diesen Regeln jetzt noch einmal Ihre Antworten auf beiden Arbeitsblättern!'
   }
 };

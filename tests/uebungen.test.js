@@ -141,7 +141,8 @@ function fortschrittsServer() {
         pruefe(await bereich.isVisible(), `${id}: Zusammenfassung sichtbar`);
         pruefe((await bereich.innerText()).includes('Das Wichtigste in Kürze'), `${id}: Zusammenfassung erscheint (bei 1 Fehler)`);
         pruefe((await bereich.innerText()).includes(U.danach.replace(/\*\*/g, '').slice(0, 25)), `${id}: Hinweis, wie es weitergeht`);
-        pruefe(await page.locator('.weiter').first().isVisible() && (await page.locator('.weiter').innerText()).includes('Übung abgeschlossen!'), `${id}: Kasten „Übung abgeschlossen!“ steht oben`);
+        const nr = U.titel.split(':')[0];
+        pruefe(await page.locator('.weiter').first().isVisible() && (await page.locator('.weiter').innerText()).includes(nr + ' abgeschlossen!'), `${id}: Kasten „${nr} abgeschlossen!“ steht oben`);
         const vorMerksatz = await page.evaluate(() => { const w = document.querySelector('.weiter'), m = document.querySelector('.abschluss .merksatz'); return !!(w && m && (w.compareDocumentPosition(m) & Node.DOCUMENT_POSITION_FOLLOWING)); });
         pruefe(vorMerksatz, `${id}: Weiter-Hinweis steht vor der Zusammenfassung`);
 

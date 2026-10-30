@@ -304,7 +304,7 @@
     } else {
       bereich.className = 'abschluss';
       bereich.innerHTML =
-        '<div class="weiter" role="status"><p class="weiter-titel"><span aria-hidden="true">✓</span> ' + esc(A.fertigTitel) + '</p>' +
+        '<div class="weiter" role="status"><p class="weiter-titel"><span aria-hidden="true">✓</span> ' + esc(ersetze(A.fertigTitel, { x: U.titel.split(':')[0] })) + '</p>' +
         (U.danach ? '<p class="weiter-text">' + fmt(U.danach) + '</p>' : '') + '</div>' +
         '<div class="merksatz"><h2><span aria-hidden="true">📝</span> ' + esc(A.merksatzUeberschrift) + '</h2>' +
         '<p class="merksatz-text">' + fmt(U.merksatz) + '</p>' +
