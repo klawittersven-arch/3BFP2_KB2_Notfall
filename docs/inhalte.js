@@ -17,7 +17,7 @@
    - **fett** funktioniert in Karten, Erklärungen, Tipps und Merksätzen.
 
    Aufbau einer Übung:
-     ab          – Arbeitsblatt (erscheint in der Kopfzeile)
+     ab          – Titel des Arbeitsblatts (erscheint in der Kopfzeile; bewusst ohne „AB 1“/„AB 2“)
      raum        – zu welchem Arbeitsblatt die Übung gehört ('ab1' oder 'ab2');
                    danach richtet sich die Lehrerseite für den Beamer.
      titel       – Überschrift der Übung (genau wie auf dem Arbeitsblatt)
@@ -92,7 +92,7 @@ var INHALTE = {
      ======================================================================== */
 
   ab1a: {
-    ab: 'AB 1',
+    ab: 'Menschen im Notfall',
     raum: 'ab1',
     titel: 'Übung 1: Körper, Denken oder Gefühl?',
     anweisung: 'So reagieren Menschen in einem Notfall. Ordnen Sie jede Reaktion zu: **Körper**, **Denken** oder **Gefühl**. Sie brauchen die Erklärungen für Aufgabe 3.',
@@ -177,7 +177,7 @@ var INHALTE = {
   },
 
   ab1b: {
-    ab: 'AB 1',
+    ab: 'Menschen im Notfall',
     raum: 'ab1',
     titel: 'Übung 2: Normal – oder ein Warnzeichen?',
     anweisung: 'Wie geht es Pflegenden in den Tagen und Wochen nach einem Notfall? Entscheiden Sie: **normal** (klingt meist von selbst ab) oder **Warnzeichen** (Unterstützung anbieten und weitervermitteln). Sie brauchen die Erklärungen für Aufgabe 4.',
@@ -255,7 +255,7 @@ var INHALTE = {
      ======================================================================== */
 
   ab2a: {
-    ab: 'AB 2',
+    ab: 'Psychologische Erste Hilfe',
     raum: 'ab2',
     titel: 'Übung 1: Welches Wirkprinzip?',
     anweisung: 'Ordnen Sie jede Maßnahme einem der **fünf Wirkprinzipien nach Hobfoll et al.** zu. Manchmal passen zwei – dann ist beides richtig. Sie brauchen die Erklärungen für Aufgabe 1.',
@@ -356,7 +356,7 @@ var INHALTE = {
   },
 
   ab2b: {
-    ab: 'AB 2',
+    ab: 'Psychologische Erste Hilfe',
     raum: 'ab2',
     art: 'check',
     fehlt: 'NEIN',
@@ -392,7 +392,7 @@ var INHALTE = {
   },
 
   ab2c: {
-    ab: 'AB 2',
+    ab: 'Psychologische Erste Hilfe',
     raum: 'ab2',
     titel: 'Übung 3: Antwort-Check – was fehlt?',
     anweisung: 'Prüfen Sie diese Antworten: Passt die Antwort zum **Operator** und ist sie **in Ordnung** – oder fehlt etwas?',
