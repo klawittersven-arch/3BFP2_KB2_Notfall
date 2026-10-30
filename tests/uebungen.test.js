@@ -111,7 +111,6 @@ function fortschrittsServer() {
         pruefe((await bereich.innerText()).includes(`${U.karten.length - 1} von ${U.karten.length}`), `${id}: Umentscheiden ändert das Ergebnis`);
         pruefe(await karten.nth(4).locator('.ist-fehlt').count() === 1 && await karten.nth(4).locator('button[aria-pressed="true"]').count() === 1, `${id}: „fehlt“ ist markiert`);
         pruefe(!(await bereich.innerText()).includes('durchklicken'), `${id}: keine Durchklick-Warnung bei der Selbstkontrolle`);
-        pruefe((await page.locator('.vorspann').innerText()).includes('nicht bindend'), `${id}: Vorspann wie im Erwartungshorizont`);
         pruefe((await page.locator('.karte-text em').count()) > 0, `${id}: „z. B.“ kursiv`);
         await page.reload();
         pruefe((await page.locator('#fortschritt-text').innerText()).startsWith(`${U.karten.length} von`), `${id}: Stand nach Neuladen erhalten`);

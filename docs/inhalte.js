@@ -60,7 +60,7 @@ var INHALTE = {
     fortschritt: '{x} von {y} richtig',
     fortschrittCheck: '{x} von {y} geprüft',
     ersterVersuch: 'Beim ersten Versuch richtig: {x} von {y}',
-    checkErgebnis: 'Ihre Lösung erfüllt {x} von {y} Punkten des Erwartungshorizonts.',
+    checkErgebnis: 'Ihre Lösung erfüllt {x} von {y} Lösungspunkten.',
     nochEinmal: 'Noch einmal üben',
     nochEinmalCheck: 'Neu beginnen',
     richtigText: 'Richtig!',
@@ -95,7 +95,7 @@ var INHALTE = {
     ab: 'AB 1',
     raum: 'ab1',
     titel: 'Übung 1: Körper, Denken oder Gefühl?',
-    anweisung: 'So reagieren Menschen in einem Notfall. Ordnen Sie jede Reaktion zu: **Körper**, **Denken** oder **Gefühl**. Viele Beispiele stammen aus Christins Bericht. Sie brauchen die Erklärungen für Aufgabe 3.',
+    anweisung: 'So reagieren Menschen in einem Notfall. Ordnen Sie jede Reaktion zu: **Körper**, **Denken** oder **Gefühl**. Sie brauchen die Erklärungen für Aufgabe 3.',
     knoepfe: [
       { kuerzel: 'K', text: 'Körper' },
       { kuerzel: 'D', text: 'Denken' },
@@ -246,7 +246,7 @@ var INHALTE = {
         erklaerung: '**Normal:** Schuldgefühle sind in den ersten Tagen häufig. Ein Gespräch hilft, die Situation einzuordnen. Halten sie über Wochen an und belasten stark, werden sie zum Warnzeichen.',
         tipp: 'Wie viel Zeit ist vergangen?' }
     ],
-    merksatz: 'In den **ersten Stunden und Tagen** sind starke Reaktionen **normal** (Zittern, schlechter Schlaf, Grübeln, Konzentrationsprobleme, Schuldgefühle). **Warnzeichen** sind: Beschwerden, die **über Wochen anhalten** oder zunehmen (z. B. Albträume, Wiedererleben), **Vermeiden** und **Rückzug**, **Arbeitsunfähigkeit**, **Alkohol oder Medikamente** zum Bewältigen. Dann: Unterstützung anbieten und **weitervermitteln**. Eine Diagnose (z. B. PTBS) stellen Fachleute – Thema in KB III.',
+    merksatz: 'In den **ersten Stunden und Tagen** sind starke Reaktionen **normal** (Zittern, schlechter Schlaf, Grübeln, Konzentrationsprobleme, Schuldgefühle). **Warnzeichen** sind: Beschwerden, die **über Wochen anhalten** oder zunehmen (z. B. Albträume, Wiedererleben), **Vermeiden** und **Rückzug**, **Arbeitsunfähigkeit**, **Alkohol oder Medikamente** zum Bewältigen. Dann: Unterstützung anbieten und **weitervermitteln**. Eine Diagnose (z. B. PTBS) stellen Fachleute.',
     danach: 'Lösen Sie jetzt **Aufgabe 4 „Christin begleiten“** auf dem Arbeitsblatt.'
   },
 
@@ -361,8 +361,7 @@ var INHALTE = {
     art: 'check',
     fehlt: 'NEIN',
     titel: 'Übung 2: Selbstkontrolle zu Aufgabe 2',
-    anweisung: 'Vergleichen Sie Ihre Lösung von **Aufgabe 2** mit dem Erwartungshorizont – so wie im Examen. Tippen Sie bei jedem Punkt an, ob Ihre Lösung ihn **erfüllt**. Seien Sie ehrlich: Ihre Lehrkraft sieht nur, welche Punkte in der Klasse oft fehlen – nicht, bei wem.',
-    vorspann: 'Die Lösungsvorschläge sind im Wortlaut nicht bindend. Anderslautende, aber zutreffende Antworten sind ebenfalls als richtig zu werten. (So steht es in jedem Erwartungshorizont des Examens.)',
+    anweisung: 'Vergleichen Sie Ihre Lösung von **Aufgabe 2** mit den folgenden Lösungspunkten. Tippen Sie bei jedem Punkt an, ob Ihre Lösung ihn **erfüllt**. Andere, aber zutreffende Antworten zählen ebenfalls.',
     knoepfe: [
       { kuerzel: 'JA', text: '✓ erfüllt' },
       { kuerzel: 'NEIN', text: '✗ fehlt / zu knapp' }
@@ -386,7 +385,7 @@ var INHALTE = {
       { nummer: 8,
         text: '**c) Zweite Zuordnung** passend – und zu einer **anderen** Maßnahme als die erste.' }
     ],
-    merksatz: 'So überzeugen Sie im Examen: **Anzahl** genau einhalten · **beschreiben** heißt konkret (Wer? Was? Wie?) – ein Stichwort reicht nicht · **Fallbezug** herstellen (Namen, Situation) · bei Gesprächen gern **wörtliche Rede**.',
+    merksatz: 'So lösen Sie solche Aufgaben vollständig: **Anzahl** genau einhalten · **beschreiben** heißt konkret (Wer? Was? Wie?) – ein Stichwort reicht nicht · **Fallbezug** herstellen (Namen, Situation) · bei Gesprächen gern **wörtliche Rede**.',
     danach: 'Füllen Sie jetzt die **Ich-kann-Ampel** auf dem Arbeitsblatt aus. Noch Zeit? Dann **Für die Schnellen**: Übung 3 „Antwort-Check“.'
   },
 
@@ -394,7 +393,7 @@ var INHALTE = {
     ab: 'AB 2',
     raum: 'ab2',
     titel: 'Übung 3: Antwort-Check – was fehlt?',
-    anweisung: 'Im Examen kostet es Punkte, wenn eine Antwort nicht zum **Operator** passt. Prüfen Sie diese Antworten: Ist die Antwort **in Ordnung** – oder fehlt etwas?',
+    anweisung: 'Prüfen Sie diese Antworten: Passt die Antwort zum **Operator** und ist sie **in Ordnung** – oder fehlt etwas?',
     knoepfe: [
       { kuerzel: 'OK', text: '✓ in Ordnung' },
       { kuerzel: 'KNAPP', text: 'nur genannt – zu knapp' },
