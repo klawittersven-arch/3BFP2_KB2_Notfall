@@ -1,6 +1,7 @@
 /* ==========================================================================
-   INHALTE – KB II · Notfallsituationen (3BFP2, Themenblock 2) – Woche 1
-   AB 1 „Menschen im Notfall“ und AB 2 „Psychologische Erste Hilfe“
+   INHALTE – KB II · Notfallsituationen (3BFP2, Themenblock 2)
+   Woche 1: AB 1 „Menschen im Notfall“ und AB 2 „Psychologische Erste Hilfe“
+   Woche 4: AB „Informationen geben in Krisen“ (raum 'ab3')
    ==========================================================================
 
    In dieser Datei stehen ALLE Texte der Übungen.
@@ -18,7 +19,7 @@
 
    Aufbau einer Übung:
      ab          – Titel des Arbeitsblatts (erscheint in der Kopfzeile; bewusst ohne „AB 1“/„AB 2“)
-     raum        – zu welchem Arbeitsblatt die Übung gehört ('ab1' oder 'ab2');
+     raum        – zu welchem Arbeitsblatt die Übung gehört ('ab1', 'ab2' oder 'ab3');
                    danach richtet sich die Lehrerseite für den Beamer.
      titel       – Überschrift der Übung (genau wie auf dem Arbeitsblatt)
      anweisung   – Arbeitsanweisung über den Karten
@@ -432,5 +433,90 @@ var INHALTE = {
     ],
     merksatz: '**nennen** = aufzählen · **beschreiben** = konkret darstellen (Wer? Was? Wie?) · **erklären** = Ursache → Wirkung · **analysieren** = Ursachen und Zusammenhänge herausarbeiten · **beurteilen** = prüfen und begründet urteilen. Fast immer verlangt: **Fallbezug**.',
     danach: 'Prüfen Sie mit diesen Regeln jetzt noch einmal Ihre Antworten auf beiden Arbeitsblättern!'
+  },
+
+  /* ========================================================================
+     Woche 4 · AB „Informationen geben in Krisen“ (raum 'ab3')
+     ======================================================================== */
+
+  ab3a: {
+    ab: 'Informationen geben in Krisen',
+    raum: 'ab3',
+    titel: 'Übung: Hilfreich oder ungünstig?',
+    anweisung: 'Das sagen oder tun Pflegende bei Angehörigen in einer Krise. Ist das **hilfreich**? Oder gegen welche **Regel** verstößt es?',
+    knoepfe: [
+      { kuerzel: 'OK', text: 'hilfreich' },
+      { kuerzel: 'VIEL', text: 'zu viel auf einmal' },
+      { kuerzel: 'FACH', text: 'Fachbegriffe' },
+      { kuerzel: 'SCHW', text: 'Schweigen nicht ausgehalten' },
+      { kuerzel: 'FRAGE', text: 'geschlossene Frage' },
+      { kuerzel: 'EHRL', text: 'nicht ehrlich' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: die sechs Regeln',
+      punkte: [
+        '**1 Informationen dosieren:** kleine Einheiten, kurze Sätze, das Wichtigste zuerst',
+        '**2 Einfache Sprache:** keine Fachbegriffe, keine Abkürzungen',
+        '**3 Schweigen aushalten:** nach einer schweren Information eine Pause machen',
+        '**4 Verständnis prüfen:** offen fragen – nicht „Haben Sie das verstanden?“',
+        '**5 Ehrlich bleiben:** nichts versprechen, nicht spekulieren',
+        '**6 Wiederholen und aufschreiben:** Telefonnummer und Namen aufschreiben'
+      ]
+    },
+    mindestens: 7,
+    karten: [
+      { nummer: 1,
+        text: 'Zum Sohn: „Ihr Vater hatte eine Hypoglykämie mit Vigilanzminderung. Wir haben ihm i. v. Glukose gegeben.“',
+        richtig: 'FACH',
+        erklaerung: '**Fachbegriffe:** „Hypoglykämie“, „Vigilanzminderung“ und „i. v.“ versteht der Sohn wahrscheinlich nicht. Besser: „Ihr Vater hatte sehr wenig Zucker im Blut und war kaum wach. Wir haben ihm Zucker über die Vene gegeben.“',
+        tipp: 'Würde jemand ohne Pflegeausbildung jedes Wort verstehen?' },
+      { nummer: 2,
+        text: 'Zur Tochter: „Ich erzähle Ihnen jetzt Schritt für Schritt, was passiert ist.“',
+        richtig: 'OK',
+        erklaerung: '**Hilfreich (Regel 1):** Die Pflegekraft kündigt an, dass sie in kleinen Schritten erzählt. So kann sich die Tochter vorbereiten.',
+        tipp: 'Verstößt dieser Satz gegen eine Regel – oder hilft er beim Dosieren?' },
+      { nummer: 3,
+        text: 'Zur Ehefrau: „Ihr Mann wird ganz sicher wieder gesund. Machen Sie sich keine Sorgen.“',
+        richtig: 'EHRL',
+        erklaerung: '**Nicht ehrlich:** Das ist ein Versprechen, das niemand halten kann. Falsche Hoffnung zerstört später das Vertrauen.',
+        tipp: 'Kann die Pflegekraft das wirklich wissen?' },
+      { nummer: 4,
+        text: 'Die Pflegekraft hat eine schwere Nachricht überbracht. Die Tochter weint leise. Die Pflegekraft sagt sofort: „So, dann besprechen wir noch die Wäsche und die Besuchszeiten.“',
+        richtig: 'SCHW',
+        erklaerung: '**Schweigen nicht ausgehalten:** Nach einer schweren Nachricht braucht die Tochter Zeit. Besser: ruhig sitzen bleiben, warten – und dann: „Ich bin da. Nehmen Sie sich Zeit.“ Organisatorisches kommt später.',
+        tipp: 'Was braucht die Tochter in diesem Moment?' },
+      { nummer: 5,
+        text: 'Zum Sohn: „Was haben Sie bis jetzt verstanden?“',
+        richtig: 'OK',
+        erklaerung: '**Hilfreich (Regel 4):** Eine offene Frage. Der Sohn muss in eigenen Worten antworten – so merkt die Pflegekraft, was angekommen ist.',
+        tipp: 'Kann man auf diese Frage nur mit „Ja“ oder „Nein“ antworten?' },
+      { nummer: 6,
+        text: 'Zur Ehefrau: „Er ist gestürzt, die Hüfte ist wohl gebrochen, er wird heute noch operiert, danach kommt er auf die Intensivstation, bringen Sie bitte die Versichertenkarte mit, Besuchszeit ist von 14 bis 18 Uhr …“',
+        richtig: 'VIEL',
+        erklaerung: '**Zu viel auf einmal:** Im Schock kann die Ehefrau so viele Informationen nicht aufnehmen. Besser: kurze Sätze, das Wichtigste zuerst, dann eine Pause und das Verständnis prüfen.',
+        tipp: 'Wie viele Informationen stecken in diesem einen Satz?' },
+      { nummer: 7,
+        text: 'Zur Tochter: „Das weiß ich leider nicht. Die Ärztin kann Ihnen das heute Nachmittag sagen.“',
+        richtig: 'OK',
+        erklaerung: '**Hilfreich (Regel 5):** Die Pflegekraft ist ehrlich und sagt, wer die Antwort geben kann. Sie spekuliert nicht.',
+        tipp: 'Ist es schlimm, wenn eine Pflegekraft etwas nicht weiß?' },
+      { nummer: 8,
+        text: 'Zum Sohn: „Haben Sie alles verstanden? Gut, dann können Sie jetzt zu ihm.“',
+        richtig: 'FRAGE',
+        erklaerung: '**Geschlossene Frage:** Auf „Haben Sie alles verstanden?“ sagen fast alle „Ja“ – auch wenn sie wenig verstanden haben. Besser: „Was ist für Sie jetzt am wichtigsten?“',
+        tipp: 'Welche Antwort gibt fast jeder auf diese Frage?' },
+      { nummer: 9,
+        text: 'Zur Tochter: „Das war bestimmt ein Herzinfarkt. So etwas habe ich schon oft gesehen.“',
+        richtig: 'EHRL',
+        erklaerung: '**Nicht ehrlich (spekuliert):** Die Pflegekraft vermutet eine Diagnose. Die Diagnose stellt die Ärztin oder der Arzt. Eine falsche Vermutung kann später viel Unruhe und Misstrauen auslösen.',
+        tipp: 'Weiß die Pflegekraft das sicher – oder vermutet sie nur?' },
+      { nummer: 10,
+        text: 'Nach der schweren Nachricht bleibt die Pflegekraft ruhig sitzen und schaut den Ehemann an. Nach einer Weile sagt sie leise: „Ich bin da. Nehmen Sie sich Zeit.“',
+        richtig: 'OK',
+        erklaerung: '**Hilfreich (Regel 3):** Die Pflegekraft hält das Schweigen aus und bleibt zugewandt. Der Ehemann bekommt Zeit, die Nachricht zu verarbeiten.',
+        tipp: 'Was macht die Pflegekraft in der Pause?' }
+    ],
+    merksatz: 'Informationen geben in Krisen: **dosieren** · **einfache Sprache** · **Schweigen aushalten** · **Verständnis offen prüfen** · **ehrlich bleiben** · **Wichtiges wiederholen und aufschreiben**.',
+    danach: 'Prüfen Sie mit diesen Regeln noch einmal Ihre Reihenfolge in Aufgabe 2 auf dem Arbeitsblatt!'
   }
 };

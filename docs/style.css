@@ -72,6 +72,7 @@ a { color: var(--petrol); }
 @media (max-width: 560px) {
   .knoepfe-lang { grid-template-columns: 1fr; }
   .knoepfe-2x2 { grid-template-columns: 1fr 1fr; }
+  .knoepfe-6.knoepfe-lang { grid-template-columns: 1fr 1fr; } /* sechs Knöpfe: 3 Reihen à 2 */
 }
 .antwort {
   min-height: 52px; padding: 8px 6px;

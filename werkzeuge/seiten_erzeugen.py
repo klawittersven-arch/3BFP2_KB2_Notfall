@@ -3,8 +3,9 @@ Aufruf: python3 werkzeuge/seiten_erzeugen.py   (nur nötig, wenn eine Übung daz
 from pathlib import Path
 
 DOCS = Path(__file__).resolve().parent.parent / "docs"
-IDS = ["ab1a", "ab1b", "ab2a", "ab2c"]
-ABS = {"ab1": "AB 1 – Menschen im Notfall", "ab2": "AB 2 – Psychologische Erste Hilfe"}
+IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a"]
+ABS = {"ab1": "AB 1 – Menschen im Notfall", "ab2": "AB 2 – Psychologische Erste Hilfe",
+       "ab3": "Woche 4 – Informationen geben in Krisen"}
 KLASSEN = {"k1": ("3BFP2/1", "3bfp2-1"), "k2": ("3BFP2/2", "3bfp2-2")}
 
 VORLAGE = """<!DOCTYPE html>

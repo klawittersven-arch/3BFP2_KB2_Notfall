@@ -18,6 +18,12 @@ Die SuS gelangen **nur über die QR-Codes** zu den Übungen. Die Startseite
 | AB 2 – Psychologische Erste Hilfe | Übung 1: Welches Wirkprinzip? → Aufgabe 1 | `…/ab2a.html` |
 | | Übung 2 (für die Schnellen): Antwort-Check – was fehlt? | `…/ab2c.html` |
 
+## Übungen (Woche 4, SW 9)
+
+| Arbeitsblatt | Übung | Adresse (QR-Code in `qr/`) |
+|---|---|---|
+| Informationen geben in Krisen (raum `ab3`) | Übung (für die Schnellen): Hilfreich oder ungünstig? | `…/ab3a.html` |
+
 ## Lehrerseiten für den Beamer (ohne Kennwort)
 
 Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf dem Schul-Laptop speichern:
@@ -26,6 +32,10 @@ Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf de
 |---|---|---|
 | **3BFP2/1** (Frau Lohner) | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-ab1.html | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-ab2.html |
 | **3BFP2/2** (Herr Klawitter) | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-ab1.html | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-ab2.html |
+
+Woche 4 – Informationen geben in Krisen:
+**3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-ab3.html ·
+**3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-ab3.html
 
 - Je Übung eine Spalte: „17 von 22 fertig“, Balken und **alle Namen mit ihrem Stand**:
   **✓ 9/12** = fertig, 9 von 12 Karten beim ersten Versuch richtig · **⚠ 5/12** = fertig, aber zu wenige beim ersten
@@ -94,7 +104,7 @@ beide Skripte ausführen und `docs/sw.js` (`DATEIEN`, `VERSION`) anpassen. Der W
 
 ## QR-Codes
 
-`qr/qr_ab1a.png` … `qr/qr_ab2c.png` (Fehlerkorrektur M, Ruhezone 4 Module). Neu erzeugen:
+`qr/qr_ab1a.png` … `qr/qr_ab3a.png` (Fehlerkorrektur M, Ruhezone 4 Module). Neu erzeugen:
 `python3 werkzeuge/qr_erzeugen.py` (benötigt `segno` oder `opencv-python`).
 Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository, denn es ist öffentlich.
 
@@ -114,8 +124,8 @@ docs/                    ← alles, was GitHub Pages veröffentlicht
   app.js, style.css      ← Übungen (Handy)
   lehrer.js, lehrer.css  ← Lehrerseiten (Beamer)
   index.html             ← Startseite (nur Hinweis auf den QR-Code)
-  ab1a.html … ab2c.html  ← die Übungen         (erzeugt mit werkzeuge/seiten_erzeugen.py)
-  lehrer-3bfp2-1-ab1.html … lehrer-3bfp2-2-ab2.html   (ebenfalls erzeugt)
+  ab1a.html … ab3a.html  ← die Übungen         (erzeugt mit werkzeuge/seiten_erzeugen.py)
+  lehrer-3bfp2-1-ab1.html … lehrer-3bfp2-2-ab3.html   (ebenfalls erzeugt)
   sw.js                  ← Offline-Speicher (nach größeren Änderungen VERSION erhöhen)
 server/                  ← Cloudflare Worker für die Fortschrittsanzeige
 qr/                      ← QR-Codes
