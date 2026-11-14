@@ -238,6 +238,45 @@ function umgebung(Raum) {
   // Wörter im Falltext antippen → Begriffsparkplatz (der Text bleibt Zeichen für Zeichen gleich)
   const s1Absaetze = await h1.$$eval('#f-inhalt .f-falltext p', (ps) => ps.map((x) => x.textContent));
   pruefe(JSON.stringify(s1Absaetze) === JSON.stringify(absaetze.slice(0, 3)), 'Handy: Falltext mit antippbaren Wörtern unverändert');
+  const beamerAbsaetze = await lehrer.$$eval('.z-buehne .z-falltext p', (ps) => ps.map((x) => x.textContent));
+  pruefe(JSON.stringify(beamerAbsaetze) === JSON.stringify(absaetze.slice(0, 3)), 'Beamer: Falltext in Vorlese-Abschnitten unverändert');
+
+  // Vorlesen: zufällig eine angemeldete Person, Abschnitt markiert (Beamer und Handys)
+  pruefe((await lehrer.$$('.z-falltext .z-lese')).length === 5, 'Vorlesen: Station 1 hat 5 Abschnitte (2–3 Sätze)');
+  await lehrer.click('[data-lesen="weiter"]');   // 🎲 Wer liest vor?
+  await lehrer.waitForSelector('.z-lesen-an');
+  const leser1 = await lehrer.textContent('.z-lese-wer strong');
+  pruefe(['Lena K.', 'Tim B.'].includes(leser1) && (await lehrer.textContent('.z-lese-wer')).includes('Abschnitt 1 von 5'), 'Vorlesen: zufällige Person liest Abschnitt 1 von 5 (' + leser1 + ')');
+  pruefe((await lehrer.getAttribute('.z-lesen-an', 'data-lese')) === '0' && (await lehrer.textContent('.z-lesen-an')).startsWith('Frau Maler ist seit gestern'), 'Vorlesen: Beamer markiert den 1. Abschnitt');
+  pruefe((await lehrer.textContent('.z-leser-marke')).includes(leser1), 'Vorlesen: Name steht am Anfang des Abschnitts');
+  const [dran, nichtDran] = leser1 === 'Lena K.' ? [h1, h2] : [h2, h1];
+  await dran.waitForSelector('.f-lesen-an[data-lese="0"]', { timeout: 8000 });
+  await dran.waitForSelector('.f-lesen-ich:not([hidden])', { timeout: 8000 });
+  pruefe((await dran.textContent('.f-lesen-ich')).includes('Sie sind dran'), 'Vorlesen: Handy der Person zeigt „Sie sind dran“');
+  await nichtDran.waitForSelector('.f-lesen-an[data-lese="0"]', { timeout: 8000 });
+  pruefe(await nichtDran.isHidden('.f-lesen-ich'), 'Vorlesen: die anderen sehen die Markierung, aber nicht „Sie sind dran“');
+  await dran.screenshot({ path: path.join(__dirname, 'fall_h_vorlesen.png') });
+  await lehrer.click('[data-lesen="weiter"]');   // nächster Abschnitt
+  await lehrer.waitForSelector('.z-lesen-an[data-lese="1"]');
+  const leser2 = await lehrer.textContent('.z-lese-wer strong');
+  pruefe(leser2 !== leser1 && (await lehrer.$$('.z-lesen-vorbei')).length === 1, 'Vorlesen: nächster Abschnitt, andere Person, der erste ist „gelesen“');
+  await warte(900);   // sanftes Scrollen abwarten
+  const lage = await lehrer.evaluate(() => { const r = document.querySelector('.z-lesen-an').getBoundingClientRect(); return [r.top, r.bottom, window.innerHeight]; });
+  pruefe(lage[0] > 60 && lage[1] < lage[2] - 90, 'Vorlesen: markierter Abschnitt ist ganz zu sehen (' + lage.map(Math.round).join('/') + ')');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3a1_vorlesen.png') });
+  await lehrer.click('[data-lesen="anders"]');   // ↻ jemand anderes
+  await lehrer.waitForFunction((alt) => { const e = document.querySelector('.z-lese-wer strong'); return e && e.textContent !== alt; }, leser2);
+  pruefe((await lehrer.getAttribute('.z-lesen-an', 'data-lese')) === '1', 'Vorlesen: „Jemand anderes“ – gleicher Abschnitt, andere Person');
+  await lehrer.keyboard.press('v');   // Taste V = nächster Abschnitt
+  await lehrer.waitForSelector('.z-lesen-an[data-lese="2"]');
+  pruefe(true, 'Vorlesen: Taste V schaltet weiter');
+  await h1.waitForSelector('.f-lesen-an[data-lese="2"]', { timeout: 8000 });
+  pruefe((await h1.$$('.f-lesen-vorbei')).length === 2, 'Vorlesen: Handy folgt (Abschnitt 3, zwei schon gelesen)');
+  for (let i = 0; i < 3; i++) await lehrer.click('[data-lesen="weiter"]');   // bis zum Ende: „✓ Fertig“
+  await lehrer.waitForFunction(() => !document.querySelector('.z-lesen-an'));
+  pruefe((await lehrer.textContent('[data-lesen="weiter"]')).includes('Wer liest vor'), 'Vorlesen: nach „Fertig“ keine Markierung mehr');
+  for (const h of [h1, h2]) await h.waitForFunction(() => !document.querySelector('.f-lesen-an'), null, { timeout: 8000 });
+  pruefe(await h1.isHidden('.f-lesen-ich') && await h2.isHidden('.f-lesen-ich'), 'Vorlesen: Handys ohne Markierung und ohne „Sie sind dran“');
   const wort = (t) => h1.locator('#f-inhalt .f-wort', { hasText: new RegExp('^' + t + '$') }).first();
   await wort('Heparin-Spritze').click();
   await h1.waitForSelector('#f-parkleiste:not([hidden])');
@@ -365,6 +404,13 @@ function umgebung(Raum) {
   pruefe((await lehrer.textContent('.z-merksatz')).includes('Prüfen – Rufen – Drücken'), 'Beamer: Merksatz Prüfen – Rufen – Drücken');
   pruefe((await lehrer.textContent('.z-grundliste')).includes('Den Puls fühlen'), 'Beamer: gewählte unpassende Aktion mit Grund');
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_3b_station5.png'), fullPage: true });
+  // Vorlesen auch bei „Christin erzählt weiter“ (langer Text: 5 Abschnitte zu 3 Sätzen)
+  await lehrer.click('.z-aufloesung [data-lesen="weiter"]');
+  await lehrer.waitForSelector('.z-aufloesung .z-lesen-an[data-lese="0"]');
+  pruefe((await lehrer.textContent('.z-aufloesung .z-lese-wer')).includes('Abschnitt 1 von 5') && (await lehrer.textContent('.z-aufloesung .z-lesen-an')).startsWith('Ich habe daraufhin sofort'), 'Vorlesen: auch die Auflösung (Abschnitt 1 von 5)');
+  await h1.waitForSelector('.f-aufloesung .f-lesen-an[data-lese="0"]', { timeout: 8000 });
+  pruefe(!(await h1.$('#f-inhalt > .f-falltext .f-lesen-an')), 'Vorlesen: Handy markiert nur in der Auflösung');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3b1_vorlesen_aufl.png') });
   await h1.waitForSelector('.f-folge-ok', { timeout: 8000 });
   pruefe((await h1.$$('.f-folge-ok')).length === 3, 'Handy: richtige Wahl – alle 3 mit ✓');
   await h2.waitForSelector('.f-folge-falsch', { timeout: 8000 });

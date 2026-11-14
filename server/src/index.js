@@ -13,7 +13,7 @@
 //   GET  /fall/stand?raum=k2-fall        (Lehrerseite)
 //   POST /fall/antwort  {raum, geraet, name, frage, wert}            (Handy)
 //   POST /fall/text     {raum, geraet, name, art, person, a, b}      (Handy: Perspektive oder Begriff)
-//   POST /fall/steuern  {raum, schritt, stufe, durchgang}            (Lehrerseite: Weiter/Zurück)
+//   POST /fall/steuern  {raum, schritt, stufe, durchgang, lesen}     (Lehrerseite: Weiter/Zurück, Vorlesen {abschnitt, person})
 //   POST /fall/text-weg {raum, id} · /fall/kb {raum, id, kb} · /fall/entfernen {raum, id}
 //   POST /fall/leeren {raum} · /fall/sichern {raum} · /fall/archiv-loeschen {raum, durchgang}
 //   POST /fall/gruppen  {raum, zuordnung: {kurzId: gruppe}, ersetzen?}  (Lehrerseite: Perspektiven-Gruppen)
