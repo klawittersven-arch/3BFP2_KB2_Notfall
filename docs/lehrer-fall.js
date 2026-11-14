@@ -211,10 +211,9 @@
   // Auftrag fürs Smartphone: groß auf dem Beamer, solange abgestimmt wird
   function handyText(q) {
     if (q.handyAuftrag) return q.handyAuftrag;
-    var senden = ' Tippen Sie dann auf „Senden“.';
-    if (q.reihenfolge) return 'Tippen Sie ' + (q.anzahl ? 'die ' + q.anzahl + ' wichtigsten Antworten' : 'alle Antworten') + ' in der richtigen Reihenfolge an.' + senden;
-    if (q.waehlen) return 'Wählen Sie genau ' + q.waehlen + ' Antworten aus.' + senden;
-    if (q.mehrfach) return 'Wählen Sie alles, was passt.' + senden;
+    if (q.reihenfolge) return 'Tippen Sie ' + (q.anzahl ? 'die ' + q.anzahl + ' wichtigsten Antworten' : 'alle Antworten') + ' in der richtigen Reihenfolge an.';
+    if (q.waehlen) return 'Wählen Sie genau ' + q.waehlen + ' Antworten aus.';
+    if (q.mehrfach) return 'Wählen Sie alles, was passt.';
     if (q.ampel) return 'Wählen Sie eine Farbe: 🟢 🟡 🔴';
     return 'Wählen Sie eine Antwort.';
   }

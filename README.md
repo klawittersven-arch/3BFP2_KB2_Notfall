@@ -112,9 +112,16 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
 7. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
 
 **Jetzt am Smartphone:** Solange abgestimmt oder geschrieben wird, steht auf dem Beamer ein dunkler Balken mit 📱 und
-dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus. Tippen Sie dann auf „Senden“.“). Bei langen Abschnitten bleibt er
-beim Vorlesen unten sichtbar. Nach *Ergebnis zeigen* verschwindet er. Die Sätze stehen in `fall-inhalte.js` bei
-`handyAuftrag`.
+dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus.“). Bei langen Abschnitten bleibt er beim Vorlesen unten
+sichtbar. Nach *Ergebnis zeigen* verschwindet er. Die Sätze stehen in `fall-inhalte.js` bei `handyAuftrag`.
+
+**Automatisch senden:** Antworten brauchen keinen „Senden“-Knopf. Einzelwahl und Ampel zählen beim Tippen,
+Mehrfachauswahl kurz nach dem letzten Tippen. Bei „genau 3 wählen“ und bei der Reihenfolge wird gesendet, sobald die
+Auswahl vollständig ist („Noch 1 wählen – dann wird Ihre Antwort automatisch gesendet.“); wird sie wieder
+unvollständig, wird die Antwort zurückgezogen (der ✓ beim Namen verschwindet). Schaltet die Lehrkraft weiter, schicken
+die Handys noch Ausstehendes mit. Nur die Perspektiven-Texte haben weiter „Senden“ (halbe Sätze sollen nicht auf dem
+Beamer erscheinen); steht dort noch ungesendeter Text, zeigt das Handy „Noch nicht gesendet“, und beim Weiterschalten
+wird er automatisch mitgeschickt.
 
 **Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;
 ein Tipp auf das Wort daneben nimmt es dazu (z. B. „lebensverlängernden Maßnahmen“, höchstens 4 Wörter), noch einmal

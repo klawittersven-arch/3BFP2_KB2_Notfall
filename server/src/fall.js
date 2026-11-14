@@ -126,11 +126,14 @@ function anmelden(f, e, jetzt, kurzId) {
   return p;
 }
 
+// Eine leere Liste zieht die Antwort zurück (die Handys senden automatisch; wird eine Auswahl wieder
+// unvollständig, z. B. nur 2 von 3, zählt sie nicht mehr).
 export function antwortEintragen(f, e, jetzt, kurzId) {
   const a = f.antworten[e.geraet] || {};
-  if (a[e.frage] === undefined && Object.keys(a).length >= MAX_FRAGEN_JE_GERAET) return false;
+  const zurueck = Array.isArray(e.wert) && e.wert.length === 0;
+  if (!zurueck && a[e.frage] === undefined && Object.keys(a).length >= MAX_FRAGEN_JE_GERAET) return false;
   if (!anmelden(f, e, jetzt, kurzId)) return false;
-  a[e.frage] = e.wert;
+  if (zurueck) delete a[e.frage]; else a[e.frage] = e.wert;
   f.antworten[e.geraet] = a;
   return true;
 }

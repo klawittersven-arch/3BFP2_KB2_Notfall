@@ -151,7 +151,7 @@ var FALL = {
     { id: 's1', art: 'station', nummer: 1, kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
       frage: { id: 's1', mehrfach: true,
-        handyAuftrag: 'Wählen Sie alle Risiken, die Sie im Text finden. Tippen Sie dann auf „Senden“.',
+        handyAuftrag: 'Wählen Sie alle Risiken, die Sie im Text finden.',
         text: 'Welche Risiken hat Frau Maler?',
         hilfe: 'Wählen Sie nur, was zum Text passt. Mehrere Antworten sind möglich.',
         optionen: [
@@ -186,7 +186,7 @@ var FALL = {
       // Die ersten 3 Antworten sind die richtigen (in der richtigen Reihenfolge), die übrigen passen nicht.
       // Die Handys zeigen alle gemischt. Kürzel höchstens 4 Zeichen.
       frage: { id: 's5', reihenfolge: true, anzahl: 3,
-        handyAuftrag: 'Tippen Sie die 3 wichtigsten Schritte in der richtigen Reihenfolge an. Tippen Sie dann auf „Senden“.',
+        handyAuftrag: 'Tippen Sie die 3 wichtigsten Schritte in der richtigen Reihenfolge an.',
         text: 'Was sind die 3 wichtigsten Schritte? Tippen Sie sie in der richtigen Reihenfolge an.',
         hilfe: 'Tippen Sie zuerst Schritt 1, dann Schritt 2, dann Schritt 3. Noch einmal tippen nimmt einen Schritt wieder heraus.',
         merksatz: 'Prüfen – Rufen – Drücken',
@@ -218,7 +218,7 @@ var FALL = {
       // 3 helfen nicht (passt: false). Welche 3 am wichtigsten sind, ist Gesprächsanlass (hinweis bei der Auflösung).
       frage: { id: 's7', mehrfach: true, waehlen: 3,
         text: 'Welche 3 Dinge würden Christin jetzt am meisten helfen?',
-        handyAuftrag: 'Wählen Sie genau 3 Dinge aus. Tippen Sie dann auf „Senden“.',
+        handyAuftrag: 'Wählen Sie genau 3 Dinge aus.',
         hilfe: 'Wählen Sie genau 3.',
         hinweis: 'Alle grünen Antworten können helfen. Welche zuerst? Das hängt von Christin ab – darüber lohnt sich das Gespräch.',
         optionen: [
@@ -253,7 +253,7 @@ var FALL = {
       // Die Beamer-Seite teilt alle Angemeldeten automatisch und gleichmäßig auf die Personen auf (eine Gruppe je Person).
       auftrag: 'Besprechen Sie in Ihrer Gruppe: Was hätte diese Person gebraucht? Jede und jeder schickt **mindestens einen Eintrag** – mit einer Lernfrage: Was müssen wir dafür lernen?',
       beamerAuftrag: 'Jede Gruppe bearbeitet eine Person.',
-      handyAuftrag: 'Schreiben Sie: Was hätte Ihre Person gebraucht? Dazu eine Lernfrage. Jede und jeder schickt mindestens einen Eintrag.',
+      handyAuftrag: 'Schreiben Sie: Was hätte Ihre Person gebraucht? Dazu eine Lernfrage. Tippen Sie dann auf „Senden“ – jede und jeder mindestens einmal.',
       gruppeTitel: 'Ihre Gruppe bearbeitet:',
       gruppeMit: 'In Ihrer Gruppe:',
       gruppeWarten: 'Ihre Lehrkraft teilt gleich die Gruppen ein …',
@@ -268,7 +268,8 @@ var FALL = {
       feldABeispiel: 'Stichworte genügen',
       feldB: 'Das müssen wir dafür lernen (Lernfrage):',
       satzanfaenge: ['Wie …?', 'Woran erkenne ich …?', 'Was muss ich tun, wenn …?', 'Warum …?', 'Wer darf …?'],
-      gesendet: 'Gesendet! Sie können noch mehr schreiben.' },
+      gesendet: 'Gesendet! Sie können noch mehr schreiben.',
+      nochNichtGesendet: 'Noch nicht gesendet – tippen Sie auf „Senden“.' },
 
     { id: 'ende', art: 'ende', kurz: 'Ausblick',
       titel: 'Wie geht es weiter?',
@@ -296,6 +297,11 @@ var FALL = {
     ihreReihenfolge: 'Ihre Reihenfolge:',
     richtigeReihenfolge: 'Richtige Reihenfolge:',
     gesendet: 'Gesendet. Sie können Ihre Antwort noch ändern.',
+    // Mehrfachauswahl und Reihenfolge werden automatisch gesendet (kein „Senden“-Knopf)
+    automatisch: 'Tippen genügt – Ihre Antwort wird automatisch gesendet.',
+    wirdGesendet: 'Wird gesendet …',
+    nochWaehlen: 'Noch {x} wählen – dann wird Ihre Antwort automatisch gesendet.',
+    nochTippen: 'Noch {x} antippen – dann wird Ihre Reihenfolge automatisch gesendet.',
     gesperrt: 'Die Abstimmung ist beendet.',
     ihreAntwort: 'Ihre Antwort:',
     keineAntwort: 'Sie haben nicht abgestimmt.',

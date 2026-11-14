@@ -120,13 +120,53 @@
     }).then(function (r) { if (!r.ok && r.status !== 429) throw new Error('Status ' + r.status); return r; });
   }
   function sendeAntwort(frage, wert) {
-    meine.antworten[frage] = wert;
+    if (Array.isArray(wert) && !wert.length) delete meine.antworten[frage];   // leere Liste = Antwort zurückziehen
+    else meine.antworten[frage] = wert;
     speichereMeine();
     ausstehend[frage] = wert;
     post('/fall/antwort', { raum: raum(), geraet: geraetId(), name: name, frage: frage, wert: wert })
       .then(function () { if (ausstehend[frage] === wert) delete ausstehend[frage]; zeigeLeiste(); })
       .catch(function () { setTimeout(function () { if (ausstehend[frage] === wert) sendeAntwort(frage, wert); }, 5000); zeigeLeiste(); });
   }
+  // ---------- Automatisch senden (Mehrfachauswahl und Reihenfolge) ----------
+  // Kein „Senden“-Knopf: Kurz nach dem letzten Tippen wird die Auswahl gesendet. Bei „genau 3 wählen“ und bei der
+  // Reihenfolge erst, wenn sie vollständig ist; wird sie danach wieder unvollständig, wird die Antwort zurückgezogen.
+  var AUTO_MS = 500;
+  var sendeTimer = {};
+  function zielWert(q) {
+    if (q.reihenfolge) {
+      var l = folge[q.id] || [];
+      return l.length === folgeAnzahl(q) ? folgeAlsWert(q, l) : [];
+    }
+    var a = auswahl[q.id] || [];
+    return (q.waehlen ? a.length === q.waehlen : a.length > 0) ? a.slice() : [];
+  }
+  function sendeAuswahl(q) {
+    var ziel = zielWert(q), bisher = meine.antworten[q.id];
+    if (!ziel.length && bisher === undefined) return false;                          // nichts gesendet, nichts zurückzuziehen
+    if (bisher !== undefined && JSON.stringify(bisher) === JSON.stringify(ziel)) return false;
+    sendeAntwort(q.id, ziel);
+    return true;
+  }
+  function planeSenden(q) {
+    clearTimeout(sendeTimer[q.id]);
+    sendeTimer[q.id] = setTimeout(function () {
+      delete sendeTimer[q.id];
+      if (abgestimmt()) return;
+      if (sendeAuswahl(q)) { var y = window.scrollY; neuZeichnen(); window.scrollTo(0, y); }
+    }, AUTO_MS);
+  }
+  function sendeGeplante() {          // z. B. wenn die Lehrkraft weiterschaltet oder das Handy gesperrt wird
+    Object.keys(sendeTimer).forEach(function (id) {
+      clearTimeout(sendeTimer[id]);
+      delete sendeTimer[id];
+      var q = sucheFrage(id);
+      if (q) sendeAuswahl(q);
+    });
+  }
+  document.addEventListener('visibilitychange', function () { if (document.hidden && meine) sendeGeplante(); });
+  window.addEventListener('pagehide', function () { if (meine) sendeGeplante(); });
+
   function frage() {
     if (!SERVER || !name || !klasse) return;
     fetch(SERVER + '/fall/zustand?raum=' + encodeURIComponent(raum()) + '&geraet=' + geraetId(), { cache: 'no-store' })
@@ -134,6 +174,7 @@
       .then(function (z) {
         verbunden = true;
         var neueSitzung = !stand || stand.sitzung !== z.sitzung;
+        if (!neueSitzung && (stand.schritt !== z.schritt || stand.stufe !== z.stufe)) sendeGeplante();
         stand = z;
         if (neueSitzung) { ladeMeine(); auswahl = {}; folge = {}; }
         zeichne();
@@ -180,6 +221,7 @@
     var schluessel = stand.sitzung + '|' + stand.schritt + '|' + stand.stufe + '|' + (stand.gruppe || '');
     zeigeMitglieder();
     if (schluessel === gezeichnet && !erzwingen) return;   // nichts Neues – Eingaben nicht zerstören
+    if (schluessel !== gezeichnet) sendeEntwurf();         // weitergeschaltet: vergessenen Text nicht verlieren
     var gleicherSchritt = gezeichnet.split('|').slice(0, 2).join('|') === stand.sitzung + '|' + stand.schritt;
     gezeichnet = schluessel;
     if (!gleicherSchritt) { person = null; }
@@ -213,7 +255,7 @@
     return '<h2 class="f-titel">' + esc(s.titel) + '</h2>' +
       (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
       s.personen.map(function (p) {
-        return '<div class="f-person"><p class="f-person-name">' + esc(p.name) + '</p><p>' + esc(p.text) + '</p></div>';
+        return '<div class="f-vorstellung"><p class="f-vorstellung-name">' + esc(p.name) + '</p><p>' + esc(p.text) + '</p></div>';
       }).join('') +
       '<p class="f-gross">' + esc(s.handy) + '</p>';
   }
@@ -290,12 +332,11 @@
     }
     var status = '';
     if (gesperrt && !aufgeloest) status = '<p class="f-status">' + esc(H.gesperrt) + (gesendet.length ? '' : ' ' + esc(H.keineAntwort)) + '</p>';
-    else if (!gesperrt && gesendet.length && gesendet.join() === liste.join()) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
+    else if (!gesperrt && liste.length < n) status = '<p class="f-status f-auto">' + esc(ersetze(H.nochTippen, { x: n - liste.length })) + '</p>';
+    else if (!gesperrt && gesendet.join() === liste.join()) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
+    else if (!gesperrt) status = '<p class="f-status">' + esc(H.wirdGesendet) + '</p>';
     return '<section class="f-frage" data-frage="' + esc(q.id) + '"><h3>' + esc(q.text) + '</h3>' +
       (q.hilfe && !gesperrt ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') + html +
-      (!gesperrt ? '<button type="button" class="knopf f-senden" data-senden-folge="' + esc(q.id) + '"' +
-        (liste.length === n ? '' : ' disabled') + '>' + esc(H.senden) +
-        (liste.length < n ? ' (' + liste.length + ' von ' + n + ')' : '') + '</button>' : '') +
       status + '</section>';
   }
 
@@ -322,13 +363,13 @@
     var status = '';
     if (gesperrt) status = '<p class="f-status">' + esc(H.gesperrt) + (liste.length ? '' : ' ' + esc(H.keineAntwort)) + '</p>';
     else if (liste.length && !q.mehrfach) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
-    else if (liste.length && q.mehrfach && gleicheListe(liste, aktiv)) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
+    else if (q.mehrfach && q.waehlen && aktiv.length < q.waehlen) status = '<p class="f-status f-auto">' + esc(ersetze(H.nochWaehlen, { x: q.waehlen - aktiv.length })) + '</p>';
+    else if (q.mehrfach && liste.length && gleicheListe(liste, aktiv)) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
+    else if (q.mehrfach && aktiv.length) status = '<p class="f-status">' + esc(H.wirdGesendet) + '</p>';
+    else if (q.mehrfach) status = '<p class="f-status f-auto">' + esc(H.automatisch) + '</p>';
     return '<section class="f-frage" data-frage="' + esc(q.id) + '"><h3>' + esc(q.text) + '</h3>' +
       (q.hilfe ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') +
       '<div class="' + art + '" role="group" aria-label="' + esc(q.text) + '">' + knoepfe + '</div>' +
-      (q.mehrfach && !gesperrt ? '<button type="button" class="knopf f-senden" data-senden="' + esc(q.id) + '"' +
-        ((q.waehlen ? aktiv.length === q.waehlen : aktiv.length) ? '' : ' disabled') + '>' + esc(H.senden) +
-        (q.waehlen && aktiv.length < q.waehlen ? ' (' + aktiv.length + ' von ' + q.waehlen + ')' : '') + '</button>' : '') +
       status + '</section>';
   }
   function gleicheListe(a, b) { return a.length === b.length && a.every(function (x) { return b.indexOf(x) >= 0; }); }
@@ -351,6 +392,7 @@
           var a = auswahl[q.id];
           var i = a.indexOf(k);
           if (i >= 0) a.splice(i, 1); else if (!q.waehlen || a.length < q.waehlen) a.push(k);
+          planeSenden(q);
         } else {
           sendeAntwort(q.id, k);
         }
@@ -366,27 +408,7 @@
         var a = folge[id], i = a.indexOf(k), q = sucheFrage(id);
         if (i >= 0) a.splice(i, 1);                     // noch einmal tippen = herausnehmen, die anderen rücken nach
         else if (a.length < folgeAnzahl(q)) a.push(k);
-        var y = window.scrollY;
-        neuZeichnen();
-        window.scrollTo(0, y);
-      });
-    });
-    Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden-folge]'), function (b) {
-      b.addEventListener('click', function () {
-        var id = b.getAttribute('data-senden-folge'), q = sucheFrage(id);
-        if (!q || folge[id].length !== folgeAnzahl(q)) return;
-        sendeAntwort(id, folgeAlsWert(q, folge[id]));
-        var y = window.scrollY;
-        neuZeichnen();
-        window.scrollTo(0, y);
-      });
-    });
-    Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden]'), function (b) {
-      b.addEventListener('click', function () {
-        var id = b.getAttribute('data-senden');
-        var qs = sucheFrage(id);
-        if (!auswahl[id] || !auswahl[id].length || (qs && qs.waehlen && auswahl[id].length !== qs.waehlen)) return;
-        sendeAntwort(id, auswahl[id].slice());
+        planeSenden(q);
         var y = window.scrollY;
         neuZeichnen();
         window.scrollTo(0, y);
@@ -422,6 +444,7 @@
         }).join('') + '</div>' +
         '<textarea id="f-b" maxlength="200" rows="3"></textarea>' +
         '<p class="name-fehler" id="f-persp-fehler" role="alert" hidden></p>' +
+        '<p class="f-status f-noch-offen" id="f-persp-offen" hidden>' + esc(s.nochNichtGesendet) + '</p>' +
         '<button type="submit" class="knopf f-senden">' + esc(H.senden) + '</button></form>';
     }
     var eigene = meine.texte.filter(function (t) { return t.art === 'persp'; });
@@ -431,6 +454,23 @@
     }).join('') + '</ul>' : '';
     return '<h2 class="f-titel">' + esc(s.titel) + '</h2>' + gruppe + '<p>' + fmt(s.auftrag) + '</p>' + formular + liste;
   }
+  // Noch nicht gesendeter Text in den Feldern? {person, a, b} oder null
+  function entwurf() {
+    var fa = document.getElementById('f-a'), fb = document.getElementById('f-b');
+    if (!fa || !fb || !person) return null;
+    var a = fa.value.replace(/\s+/g, ' ').trim(), b = fb.value.replace(/\s+/g, ' ').trim();
+    return a || b ? { person: person, a: a.slice(0, 200), b: b.slice(0, 200) } : null;
+  }
+  // Schaltet die Lehrkraft weiter (oder ändert die Gruppe), wird ein vergessener Entwurf automatisch mitgeschickt
+  function sendeEntwurf() {
+    var e = entwurf();
+    if (!e || gesperrtesWort(e.a + ' ' + e.b)) return;
+    var daten = { raum: raum(), geraet: geraetId(), name: name, art: 'persp', person: e.person, a: e.a, b: e.b };
+    meine.texte.push({ art: 'persp', person: e.person, a: e.a, b: e.b });
+    speichereMeine();
+    post('/fall/text', daten).catch(function () {});
+  }
+
   function verbindePerspektiven(s) {
     Array.prototype.forEach.call(inhalt.querySelectorAll('.f-person'), function (b) {
       b.addEventListener('click', function () {
@@ -449,6 +489,10 @@
     });
     var form = document.getElementById('f-persp-form');
     if (!form) return;
+    var offen = document.getElementById('f-persp-offen');
+    ['f-a', 'f-b'].forEach(function (id) {
+      document.getElementById(id).addEventListener('input', function () { offen.hidden = !entwurf(); });
+    });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var a = document.getElementById('f-a').value.replace(/\s+/g, ' ').trim();
@@ -461,8 +505,12 @@
       knopf.disabled = true;
       post('/fall/text', daten).then(function (r) {
         if (r.status === 429) throw new Error('voll');
-        meine.texte.push({ art: 'persp', person: person, a: daten.a, b: daten.b });
+        meine.texte.push({ art: 'persp', person: daten.person, a: daten.a, b: daten.b });
         speichereMeine();
+        if (person === daten.person && document.getElementById('f-a')) {   // Felder leeren: der Text ist gesendet
+          document.getElementById('f-a').value = '';
+          document.getElementById('f-b').value = '';
+        }
         neuZeichnen();
         var ok = document.createElement('p');
         ok.className = 'f-status f-ok';
