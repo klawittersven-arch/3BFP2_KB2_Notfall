@@ -83,6 +83,16 @@ function umgebung(Raum) {
     (q.ampel ? FALL.ampel : q.optionen).forEach((o) => pruefe(/^[A-Z0-9]{1,6}$/.test(o.kuerzel), 'Kürzel gültig: ' + q.id + ' ' + o.kuerzel));
   }));
 
+  // Bilder: beide Größen vorhanden, mit Beschreibung; Offline-Liste vollständig
+  FALL.schritte.filter((s) => s.bild).forEach((s) => {
+    const gross = path.join(DOCS, s.bild.datei), klein = gross.replace(/\.jpg$/, '-klein.jpg');
+    pruefe(fs.existsSync(gross) && fs.existsSync(klein), 'Bild vorhanden (groß und klein): ' + s.bild.datei);
+    pruefe(typeof s.bild.alt === 'string' && s.bild.alt.length > 10, 'Bildbeschreibung vorhanden: ' + s.id);
+  });
+  const swText = fs.readFileSync(path.join(DOCS, 'sw.js'), 'utf8');
+  const swDateien = JSON.parse(swText.match(/var DATEIEN = (\[[\s\S]*?\]);/)[1].replace(/'/g, '"'));
+  pruefe(swDateien.every((d) => d === './' || fs.existsSync(path.join(DOCS, d))), 'sw.js: alle Dateien der Offline-Liste vorhanden');
+
   // ---------- Teil B: Ablauf im Browser ----------
   const { default: worker, Raum } = await import('../server/src/index.js');
   const env = umgebung(Raum);
@@ -115,6 +125,8 @@ function umgebung(Raum) {
   await lehrer.waitForSelector('.z-kalt-satz');
   pruefe((await lehrer.textContent('.z-kalt-satz')).includes('Frau Maler reagiert nicht'), 'Beamer: Kaltstart-Satz');
   pruefe(await lehrer.evaluate(() => document.body.classList.contains('z-dunkel')), 'Beamer: Kaltstart dunkel');
+  pruefe((await lehrer.getAttribute('.z-kalt', 'style') || '').includes('bilder/kaltstart.jpg'), 'Beamer: Kaltstart-Bild als Hintergrund');
+  pruefe(await lehrer.evaluate(async () => (await fetch('bilder/kaltstart.jpg')).ok), 'Beamer: Kaltstart-Bild ladbar');
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_1_kaltstart.png') });
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-countdown');
@@ -180,8 +192,12 @@ function umgebung(Raum) {
   await lehrer.waitForSelector('.z-nr');
   pruefe((await lehrer.textContent('.z-falltext')).includes('ihre rechte Wade sei seit gestern dick'), 'Beamer: Station 2 bis zur Stopp-Stelle');
   pruefe(!(await lehrer.textContent('.z-buehne')).includes('habe es nicht weitergegeben'), 'Beamer: Christins Handeln noch verdeckt');
+  await lehrer.waitForFunction(() => { const i = document.querySelector('.z-bild img'); return i && i.complete && i.naturalWidth >= 1600; });
+  pruefe((await lehrer.getAttribute('.z-bild img', 'src')) === 'bilder/station2.jpg', 'Beamer: Bild zu Station 2 (große Fassung)');
   await h1.waitForSelector('.f-frage[data-frage="s2"]', { timeout: 8000 });
   pruefe(!(await h1.textContent('#f-inhalt')).includes('habe es nicht weitergegeben'), 'Handy: Christins Handeln noch verdeckt');
+  await h1.waitForFunction(() => { const i = document.querySelector('.f-bild'); return i && i.complete && i.naturalWidth === 800; });
+  pruefe((await h1.getAttribute('.f-bild', 'alt')).includes('rechte Wade'), 'Handy: Bild zu Station 2 (kleine Fassung, mit Beschreibung)');
   pruefe((await h1.textContent('#f-bisher-text')).includes('Frau Maler ist seit gestern'), 'Handy: „Den Fall bis hier lesen“ enthält Station 1');
   await h1.click('.f-ampel .f-rot');
   await h2.waitForSelector('.f-frage[data-frage="s2"]', { timeout: 8000 });
@@ -203,6 +219,8 @@ function umgebung(Raum) {
   await lehrer.click(`[data-gehe="${zurueckIndex}"]`);
   await lehrer.waitForSelector('.z-zeitstrahl');
   pruefe((await lehrer.$$('.z-zeitstrahl li')).length === 7, 'Beamer: Zeitstrahl mit 7 Stationen');
+  await lehrer.waitForFunction(() => [...document.querySelectorAll('.z-zs-bild')].every((i) => i.complete && i.naturalWidth > 0));
+  pruefe((await lehrer.$$('.z-zs-bild')).length === 5, 'Beamer: Zeitstrahl mit 5 Bildern');
   pruefe((await lehrer.textContent('.z-zeitstrahl')).includes('🔴 50\u00a0%'), 'Beamer: Zeitstrahl zeigt Ampel-Anteile');
   await h1.waitForSelector('.f-frage[data-frage="zurueck"]', { timeout: 8000 });
   pruefe((await h1.textContent('#f-bisher-text')).includes('kaltschweißig auf.“'), 'Handy: beim Zurückspulen ist der ganze Fall nachlesbar');

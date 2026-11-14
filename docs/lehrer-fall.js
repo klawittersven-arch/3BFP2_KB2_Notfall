@@ -152,15 +152,21 @@
   }
 
   // Kaltstart: Satz groß, dann 10-Sekunden-Countdown
+  // Bild als abgedunkelter Hintergrund (stärker abgedunkelt, solange der Countdown läuft)
+  function kaltKopf(s, dunkel) {
+    if (!s.bild) return '<div class="z-kalt">';
+    return '<div class="z-kalt z-kalt-bild" role="img" aria-label="' + esc(s.bild.alt) + '" style="background-image:linear-gradient(rgba(15,28,32,' + dunkel +
+      '),rgba(15,28,32,' + dunkel + ')),url(\'' + encodeURI(s.bild.datei) + '\')">';
+  }
   function zeichneKaltstart(s) {
     if (countdown) { clearInterval(countdown); countdown = null; }
     if (ansicht.stufe === 0) {
-      buehne.innerHTML = '<div class="z-kalt"><p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p></div>';
+      buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p></div>';
       return;
     }
     countdownRest = s.sekunden;
     var zeige = function () {
-      buehne.innerHTML = '<div class="z-kalt"><p class="z-kalt-satz">' + esc(s.satz) + '</p>' +
+      buehne.innerHTML = kaltKopf(s, 0.7) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p>' +
         (countdownRest > 0 ? '<p class="z-countdown" aria-live="off">' + countdownRest + '</p>' : '<p class="z-stopp" role="status">' + esc(s.stopp) + '</p>') + '</div>';
     };
     zeige();
@@ -242,13 +248,18 @@
     var auf = ansicht.stufe >= 2;
     var kopf = '<h2 class="z-titel"><span class="z-nr">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>';
     var text = '<div class="z-falltext' + (ansicht.stufe >= 1 ? ' z-klein' : '') + '">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>';
+    var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
+    var rahmen = function (inhalt) {
+      if (!bild) return kopf + inhalt;
+      return kopf + '<div class="z-station' + (ansicht.stufe >= 1 ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
+    };
     if (ansicht.stufe === 0) {
-      return kopf + text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]);
+      return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
     }
-    return kopf + text +
+    return rahmen(text +
       (auf ? '<div class="z-aufloesung"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '') +
-      ergebnisHtml(s.frage, auf ? s.christin : null);
+      ergebnisHtml(s.frage, auf ? s.christin : null));
   }
 
   // Zeitstrahl: alle Stationen nebeneinander mit dem Klassen-Ergebnis und Christins Handeln
@@ -271,7 +282,8 @@
           .filter(function (o) { return erg[o.kuerzel]; }).slice(0, 2);
         inhalt = oben.length ? '<span class="z-mini-legende">' + oben.map(function (o) { return esc(o.text) + ': ' + prozent(erg[o.kuerzel], n) + '\u00a0%'; }).join('<br>') + '</span>' : '<span class="z-mini-legende">–</span>';
       }
-      return '<li><span class="z-zs-nr">' + x.nummer + '</span><span class="z-zs-titel">' + esc(x.kurz) + '</span>' +
+      return '<li>' + (x.bild ? '<img class="z-zs-bild" src="' + esc(x.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="">' : '') +
+        '<span class="z-zs-nr">' + x.nummer + '</span><span class="z-zs-titel">' + esc(x.kurz) + '</span>' +
         '<span class="z-zs-was">' + esc(x.zeitstrahl || '') + '</span>' + inhalt + '</li>';
     }).join('') + '</ol>';
   }

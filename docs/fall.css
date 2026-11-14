@@ -74,3 +74,4 @@
 .f-parkplatz p { margin: 0 0 8px; }
 .f-wort-form { display: flex; gap: 8px; }
 .f-wort-form input { flex: 1; min-width: 0; min-height: 50px; padding: 8px 12px; border: 2px solid var(--petrol); border-radius: 10px; font: inherit; }
+.f-bild { display: block; width: 100%; height: auto; margin: 0 0 12px; border-radius: 12px; }
