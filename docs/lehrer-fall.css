@@ -35,6 +35,9 @@ body { padding-bottom: 96px; }
   background: rgba(0,0,0,.45); color: #fff; font-size: 26px; font-weight: 800; }
 .z-vollbild-hinweis { position: absolute; right: 22px; bottom: 16px; margin: 0; color: rgba(255,255,255,.7); font-size: 16px; }
 body.z-vollbild-an { overflow: hidden; }
+/* Steuerleiste über dem Vollbild: unsichtbar, erscheint, wenn die Maus nach unten fährt (Springen bleibt möglich) */
+body.z-vollbild-an .z-steuer { z-index: 50; opacity: 0; transition: opacity .2s; }
+body.z-vollbild-an .z-steuer:hover, body.z-vollbild-an .z-steuer:focus-within { opacity: 1; }
 
 /* Kaltstart: dunkle Bühne */
 body.z-dunkel { background: #0F1C20; }

@@ -24,7 +24,6 @@
   var gezeichnet = '';
   var letztesHtml = '';
   var countdown = null, countdownRest = 0;
-  var perspNachKb = false;
   var gesendetBis = 0;       // kurz nach einem Klick den Server-Stand für die Steuerung ignorieren
 
   // ---------- Hilfsfunktionen ----------
@@ -481,34 +480,20 @@
     return '<li class="z-pk">' + (mitPerson && p ? '<span class="z-pk-person">' + esc(p.text) + '</span>' : '') +
       (t.a ? '<span class="z-pk-a">' + esc(t.a) + '</span>' : '') +
       (t.b ? '<span class="z-pk-b">❓ ' + esc(t.b) + '</span>' : '') +
-      '<span class="z-pk-leiste">' + F.kb.map(function (k) {
-        return '<button type="button" class="z-kb' + (t.kb === k.kuerzel ? ' z-kb-an' : '') + '" data-kb="' + k.kuerzel + '" data-text="' + esc(t.id) + '" title="' + esc(k.name) + ' zuordnen">' + esc(k.kuerzel) + '</button>';
-      }).join('') + '<button type="button" class="z-kb z-weg" data-weg="' + esc(t.id) + '" aria-label="Eintrag entfernen" title="Eintrag entfernen">×</button></span></li>';
+      '<span class="z-pk-leiste"><button type="button" class="z-kb z-weg" data-weg="' + esc(t.id) + '" aria-label="Eintrag entfernen" title="Eintrag entfernen">×</button></span></li>';
   }
   function perspektivenHtml(s) {
     var texte = stand ? stand.texte.filter(function (t) { return t.art === 'persp'; }) : [];
-    var spalten;
-    if (!perspNachKb) {
-      spalten = s.personen.map(function (p) {
-        var eigene = texte.filter(function (t) { return t.person === p.id; });
-        return '<section class="z-spalte"><h3>' + esc(p.text) + ' <small>' + eigene.length + '</small></h3>' + mitgliederHtml(p.id) + '<ul class="z-karten">' +
-          eigene.map(function (t) { return karteHtml(t, false, s); }).join('') + '</ul></section>';
-      }).join('');
-    } else {
-      spalten = F.kb.concat([{ kuerzel: '', name: 'Noch ohne KB' }]).map(function (k) {
-        var eigene = texte.filter(function (t) { return t.kb === k.kuerzel; });
-        return '<section class="z-spalte' + (k.kuerzel ? '' : ' z-ohne') + '"><h3>' + esc(k.name) + ' <small>' + eigene.length + '</small></h3><ul class="z-karten">' +
-          eigene.map(function (t) { return karteHtml(t, true, s); }).join('') + '</ul></section>';
-      }).join('');
-    }
+    var spalten = s.personen.map(function (p) {
+      var eigene = texte.filter(function (t) { return t.person === p.id; });
+      return '<section class="z-spalte"><h3>' + esc(p.text) + ' <small>' + eigene.length + '</small></h3>' + mitgliederHtml(p.id) + '<ul class="z-karten">' +
+        eigene.map(function (t) { return karteHtml(t, false, s); }).join('') + '</ul></section>';
+    }).join('');
     var mitEintrag = stand ? stand.leute.filter(function (p) { return p.eintraege; }).length : 0;
     return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2><span class="z-persp-knoepfe">' +
-      (perspNachKb ? '' : '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen">Gruppen neu einteilen</button> ') +
-      '<button type="button" class="l-knopf l-zweit" id="z-ordnen">' + (perspNachKb ? 'Nach Personen ordnen' : 'Nach Kompetenzbereichen ordnen') + '</button></span></div>' +
-      (perspNachKb ? '' : '<p class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' + (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</p>') +
-      '<p class="z-hinweis-klein">' + texte.length + ' Einträge · Tippen Sie bei jedem Eintrag auf den passenden KB (I–V)' +
-      (perspNachKb ? '' : ' · Klick auf einen Namen setzt ihn in die nächste Gruppe') + '.</p>' +
-      '<div class="z-spalten' + (perspNachKb ? ' z-sechs' : '') + '">' + spalten + '</div>';
+      '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen" title="Klick auf einen Namen setzt ihn in die nächste Gruppe">Gruppen neu einteilen</button></span></div>' +
+      '<p class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' + (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</p>' +
+      '<div class="z-spalten">' + spalten + '</div>';
   }
 
   function zeigeParkZeile(texte) {
@@ -562,24 +547,12 @@
         sende('/fall/entfernen', { id: b.getAttribute('data-person') }).then(hole, hole);
       };
     });
-    Array.prototype.forEach.call(buehne.querySelectorAll('[data-kb]'), function (b) {
-      b.onclick = function () {
-        var id = b.getAttribute('data-text'), kb = b.getAttribute('data-kb');
-        var t = stand.texte.filter(function (x) { return x.id === id; })[0];
-        if (!t) return;
-        t.kb = t.kb === kb ? '' : kb;   // noch einmal tippen = Zuordnung aufheben
-        gezeichnet = ''; zeichne();
-        sende('/fall/kb', { id: id, kb: t.kb }).then(hole, hole);
-      };
-    });
     Array.prototype.forEach.call(buehne.querySelectorAll('[data-weg]'), function (b) {
       b.onclick = function () {
         if (!window.confirm('Diesen Eintrag entfernen?')) return;
         sende('/fall/text-weg', { id: b.getAttribute('data-weg') }).then(hole, hole);
       };
     });
-    var o = document.getElementById('z-ordnen');
-    if (o) o.onclick = function () { perspNachKb = !perspNachKb; gezeichnet = ''; zeichne(); };
     var ne = document.getElementById('z-neu-einteilen');
     if (ne) ne.onclick = neuEinteilen;
     Array.prototype.forEach.call(buehne.querySelectorAll('[data-wechsel]'), function (b) {

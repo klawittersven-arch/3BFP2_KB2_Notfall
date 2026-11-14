@@ -380,12 +380,8 @@ function umgebung(Raum) {
   const karten = await lehrer.$$eval('.z-pk', (e) => e.map((x) => x.textContent).join(' '));
   pruefe(karten.includes('eine klare Anweisung') && !karten.includes('Lena'), 'Beamer: Einträge selbst ohne Namen');
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_5a_gruppen.png'), fullPage: true });
-  await lehrer.click('.z-pk >> nth=0 >> .z-kb[data-kb="II"]');
-  await warte(500);
-  await lehrer.click('#z-ordnen');
-  await lehrer.waitForSelector('.z-sechs');
-  const spalteII = await lehrer.textContent('.z-spalte >> nth=1');
-  pruefe(spalteII.includes('KB II') && spalteII.includes('klare Anweisungen'), 'Beamer: Lernfrage unter KB II einsortiert');
+  pruefe(!(await lehrer.$('[data-kb]')) && !(await lehrer.$('#z-ordnen')), 'Beamer: keine KB-Zuordnung (nur × zum Entfernen)');
+  pruefe(!(await lehrer.textContent('.z-buehne')).includes('passenden KB'), 'Beamer: kein Hinweis auf KB-Zuordnung');
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_5_perspektiven.png'), fullPage: true });
 
   // Begriffsparkplatz und Ende

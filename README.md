@@ -102,8 +102,7 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
    „Ihre Gruppe bearbeitet: …“ und die Namen der Gruppe. Auf dem Beamer stehen die Namen bei jeder Gruppe, mit ✓ und Zahl,
    sobald jemand einen Eintrag geschickt hat („2 von 22 haben schon etwas geschickt“) – die Einträge selbst bleiben ohne Namen.
    Klick auf einen Namen setzt die Person in die nächste Gruppe; *Gruppen neu einteilen* mischt neu; wer später kommt, landet
-   in der kleinsten Gruppe. Die Lehrkraft tippt bei jedem Eintrag den passenden KB (I–V) an; *Nach Kompetenzbereichen ordnen*
-   zeigt die Lernlandkarte.
+   in der kleinsten Gruppe. Unpassende Einträge entfernt × am Eintrag.
 6. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
 
 **Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;

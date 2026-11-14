@@ -247,15 +247,6 @@ var FALL = {
       handy: 'Danke! Sie bekommen jetzt das Arbeitsblatt mit dem ganzen Fall.' }
   ],
 
-  // Kompetenzbereiche für die Zuordnung der Lernfragen auf dem Beamer
-  kb: [
-    { kuerzel: 'I', name: 'KB I' },
-    { kuerzel: 'II', name: 'KB II' },
-    { kuerzel: 'III', name: 'KB III' },
-    { kuerzel: 'IV', name: 'KB IV' },
-    { kuerzel: 'V', name: 'KB V' }
-  ],
-
   begriffe: {
     titel: 'Begriffsparkplatz',
     text: 'Tippen Sie im Fall auf ein unklares Wort. Oder schreiben Sie es hier auf:',
