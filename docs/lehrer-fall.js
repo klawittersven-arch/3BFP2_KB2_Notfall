@@ -494,7 +494,8 @@
     var auf = ph === 'aufloesung';
     var kopf = '<h2 class="z-titel"><span class="z-nr">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>';
     var teile = abschnitte(s.id, 'frage');
-    var text = '<div class="z-falltext' + (nach ? ' z-klein' : '') + '">' + falltextHtml(teile, ph === 'frage' ? lesenInfo() : null) + '</div>';
+    var text = (s.einleitung ? '<p class="z-einleitung' + (nach ? ' z-klein' : '') + '">' + esc(s.einleitung) + '</p>' : '') +
+      '<div class="z-falltext' + (nach ? ' z-klein' : '') + '">' + falltextHtml(teile, ph === 'frage' ? lesenInfo() : null) + '</div>';
     if (ph === 'frage') text = lesezeileHtml(teile) + text;
     // Lange Abschnitte nach dem Vorlesen zuklappen, damit das Ergebnis ohne Scrollen auf den Beamer passt
     if (nach && teile.map(function (t) { return t.text; }).join(' ').length > 320) {

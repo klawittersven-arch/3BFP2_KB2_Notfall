@@ -336,6 +336,7 @@
     var auf = aktuellePhase() === 'aufloesung' && hatAufloesung(s);
     return '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
       (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
+      (s.einleitung ? '<p class="f-einleitung">' + esc(s.einleitung) + '</p>' : '') +
       '<div class="f-falltext">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>' +
       '<p class="f-tipp-hinweis"><span aria-hidden="true">💡</span> ' + esc(F.begriffe.tippHinweis) + '</p>' +
       frageHtml(s.frage, abgestimmt(), aktuellePhase() === 'aufloesung') +
