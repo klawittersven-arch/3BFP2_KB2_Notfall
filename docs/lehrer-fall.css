@@ -238,3 +238,7 @@ body.z-liest .z-handy-auftrag { position: static; box-shadow: none; }
 /* beim Vorlesen bleibt die Lesezeile (Name + Knöpfe) oben sichtbar, auch wenn der Text gescrollt wird */
 body.z-liest .z-lesezeile { position: sticky; top: 0; z-index: 6; padding: 8px 0; background: #fff; box-shadow: 0 6px 10px -8px rgba(0,0,0,.25); }
 body.z-liest .z-aufloesung .z-lesezeile { background: var(--bernstein-hell); }
+
+/* Einleitung vor dem Abschnitt (nicht Teil des Falltexts): wer spricht, wer ist „sie“ */
+.z-einleitung { margin: 0 0 6px; font-size: clamp(20px, 1.7vw, 26px); font-weight: 700; color: var(--petrol); }
+.z-einleitung.z-klein { font-size: 18px; margin-bottom: 2px; }

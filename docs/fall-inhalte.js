@@ -43,6 +43,9 @@
    nicht im Zeitstrahl und nicht bei „Den Fall bis hier noch einmal lesen“. loesung = Einschätzung beim Auflösen.
    Die Stationen werden automatisch durchnummeriert (mit den zusätzlichen Situationen).
 
+   Einleitung (einleitung: …): eine kurze Zeile VOR dem Abschnitt (nicht Teil des Falltexts), damit klar bleibt,
+   wer spricht und wer mit „sie“ gemeint ist – zwischen den Abschnitten wird ja immer abgestimmt.
+
    Bilder (optional, bei kaltstart, personen und station): bild: { datei: 'bilder/station2.jpg', alt: '…' }
    Jedes Bild liegt zweimal in docs/bilder/: groß für den Beamer (1600 px breit) und mit „-klein“
    für die Handys (800 px), z. B. station2.jpg und station2-klein.jpg. Ein Bild darf nicht mehr
@@ -155,6 +158,7 @@ var FALL = {
       bild: { datei: 'bilder/personen.jpg', alt: 'Frau Maler sitzt aufrecht im Pflegebett. Christin steht neben dem Bett, eine Hand auf dem Bettgitter, und begrüßt sie lächelnd. Vor dem Bett steht ein Rollator.' } },
 
     { id: 's1', art: 'station', kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
+      einleitung: 'Bei der Übergabe am Morgen hört Christin:',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
       frage: { id: 's1', mehrfach: true,
         handyAuftrag: 'Wählen Sie alle Risiken, die Sie im Text finden.',
@@ -173,37 +177,44 @@ var FALL = {
         ] } },
 
     { id: 's2', art: 'station', kurz: 'Am Morgen', zeitstrahl: 'Wade dick, Schmerzen',
+      einleitung: 'Christin erzählt in der Schule („ich“ = Christin, „sie“ = Frau Maler):',
       bild: { datei: 'bilder/station2.jpg', alt: 'Frau Maler sitzt auf der Bettkante und zeigt auf ihre rechte Wade. Die Auszubildende hockt neben ihr.' },
       frage: { id: 's2', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'G', kurz: 'nicht weitergegeben' } },
 
     // Zusätzliche Situation (nicht im Fallbeispiel): alles normal
     { id: 'z1', art: 'station', extra: true, kurz: 'Nach der Körperpflege',
+      einleitung: 'Christin erzählt weiter über Frau Maler:',
       text: 'Danach machte ich ihr Bett. Sie erzählte mir von ihrem Garten und lachte.',
       frage: { id: 'z1', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       loesung: { ampel: 'G', text: 'Ein freundliches Gespräch. Hier gibt es nichts zu beobachten und nichts zu melden.' } },
 
     { id: 's3', art: 'station', kurz: 'Beim Frühstück', zeitstrahl: 'verschluckt, hustet',
+      einleitung: 'Christin erzählt weiter über Frau Maler:',
       frage: { id: 's3', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'Y', kurz: 'husten lassen' } },
 
     // Zusätzliche Situationen (nicht im Fallbeispiel): alles normal – passt zu „drei- bis viermal … bei ihr im Zimmer“
     { id: 'z2', art: 'station', extra: true, kurz: 'Gegen neun Uhr',
+      einleitung: 'Christin erzählt weiter über Frau Maler:',
       text: 'Gegen neun Uhr cremte ich ihr den Rücken ein. Die Haut war gesund und nicht gerötet.',
       frage: { id: 'z2', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       loesung: { ampel: 'G', text: 'Die Haut wurde kontrolliert: Sie ist gesund. Das ist ein guter Befund – kein Warnzeichen.' } },
 
     { id: 'z3', art: 'station', extra: true, kurz: 'Gegen zehn Uhr',
+      einleitung: 'Christin erzählt weiter über Frau Maler:',
       text: 'Gegen zehn Uhr wollte sie fernsehen. Ich gab ihr die Fernbedienung, und sie bedankte sich.',
       frage: { id: 'z3', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       loesung: { ampel: 'G', text: 'Ein normaler Wunsch. Hier gibt es nichts zu melden.' } },
 
     { id: 's4', art: 'station', kurz: 'Gegen elf Uhr', zeitstrahl: 'Atemnot, Puls 118',
+      einleitung: 'Christin erzählt weiter über Frau Maler:',
       bild: { datei: 'bilder/station4.jpg', alt: 'Frau Maler liegt halb aufrecht im Bett, atmet mit offenem Mund und hält eine Hand auf der Brust. Die Auszubildende fühlt den Puls.' },
       frage: { id: 's4', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'G', kurz: 'dachte: nur aufgeregt' } },
 
     { id: 's5', art: 'station', kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
+      einleitung: 'Christin erzählt weiter über Frau Maler:',
       bild: { datei: 'bilder/kaltstart.jpg', alt: 'Das Bild vom Anfang: Frau Maler liegt reglos im Bett, im Vordergrund das Tablett mit Mittagessen.' },
       // Die 3 wichtigsten Schritte nach den Reanimationsleitlinien 2025 (ERC/GRC): Prüfen – Rufen – Drücken.
       // Die ersten 3 Antworten sind die richtigen (in der richtigen Reihenfolge), die übrigen passen nicht.
@@ -226,6 +237,7 @@ var FALL = {
         ] } },
 
     { id: 's6', art: 'station', kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',
+      einleitung: 'Christin erzählt weiter:',
       frage: { id: 's6',
         text: 'War die Reanimation erlaubt?',
         handyAuftrag: 'Wählen Sie eine Antwort.',
@@ -236,6 +248,7 @@ var FALL = {
         ] } },
 
     { id: 's7', art: 'station', kurz: 'Später', zeitstrahl: 'Albträume',
+      einleitung: 'Christin erzählt weiter:',
       bild: { datei: 'bilder/station7.jpg', alt: 'Eine junge Frau sitzt nachts wach auf ihrem Bett und umarmt ihre Knie.' },
       // Genau 3 wählen (waehlen: 3) – so müssen die SuS sich entscheiden. Mehrere Antworten helfen (passt: true),
       // 3 helfen nicht (passt: false). Welche 3 am wichtigsten sind, ist Gesprächsanlass (hinweis bei der Auflösung).

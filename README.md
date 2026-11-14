@@ -119,6 +119,10 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
 dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus.“). Bei langen Abschnitten bleibt er beim Vorlesen unten
 sichtbar. Nach *Ergebnis zeigen* verschwindet er. Die Sätze stehen in `fall-inhalte.js` bei `handyAuftrag`.
 
+**Einleitung:** Vor jedem Abschnitt steht eine kurze Zeile, die nicht zum Falltext gehört, z. B. „Christin erzählt in der
+Schule („ich“ = Christin, „sie“ = Frau Maler):“ oder „Christin erzählt weiter über Frau Maler:“ – zwischen den Abschnitten
+wird abgestimmt, so bleibt klar, wer spricht. Die Zeilen stehen in `fall-inhalte.js` bei `einleitung`.
+
 **Vorlesen:** Über jedem Abschnitt des Falls (und über „Christin erzählt weiter“) steht *🎲 Wer liest vor?*. Ein Klick
 (oder Taste **V**) lost eine angemeldete Person aus und markiert den ersten Abschnitt gelb – mit dem Namen davor; der Text
 ist dafür in Abschnitte zu 2–3 Sätzen geteilt (je Absatz, der Text selbst bleibt unverändert). *Nächster Abschnitt* (oder V)

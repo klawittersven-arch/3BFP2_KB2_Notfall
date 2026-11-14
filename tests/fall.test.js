@@ -79,6 +79,7 @@ function umgebung(Raum) {
   pruefe(fallStationen.length === 7 && fallStationen.every((s) => FALL.text.some((t) => t.teil === s.id && t.art === 'frage')), 'jede Station des Fallbeispiels hat einen Abschnitt des Falls');
   pruefe(extra.length === 3 && extra.every((s) => s.text && s.frage.ampel && s.loesung && !FALL.text.some((t) => t.teil === s.id)), 'zusätzliche Situationen: eigener Text, Ampel, Einschätzung – nicht im Falltext');
   pruefe(extra.every((s) => s.loesung.ampel === 'G'), 'zusätzliche Situationen: alle 🟢 (alles normal)');
+  pruefe(stationen.every((s) => s.einleitung && s.einleitung.length < 80 && !FALL.text.some((t) => t.text.includes(s.einleitung))), 'jede Station hat eine kurze Einleitung (nicht im Falltext)');
   const kuerzel = new Set();
   FALL.schritte.forEach((s) => (s.fragen || (s.frage ? [s.frage] : [])).forEach((q) => {
     pruefe(!kuerzel.has(q.id), 'Frage-Kennung eindeutig: ' + q.id); kuerzel.add(q.id);
@@ -321,11 +322,14 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-nr');
   pruefe((await lehrer.textContent('.z-falltext')).includes('ihre rechte Wade sei seit gestern dick'), 'Beamer: Station 2 bis zur Stopp-Stelle');
+  pruefe((await lehrer.textContent('.z-einleitung')).includes('Christin erzählt in der Schule') && !(await lehrer.textContent('.z-falltext')).includes('Christin erzählt in der Schule'), 'Beamer: Einleitung „Christin erzählt …“ vor dem Abschnitt, nicht im Falltext');
   pruefe(!(await lehrer.textContent('.z-buehne')).includes('habe es nicht weitergegeben'), 'Beamer: Christins Handeln noch verdeckt');
   await lehrer.waitForFunction(() => { const i = document.querySelector('.z-bild img'); return i && i.complete && i.naturalWidth >= 1600; });
   pruefe((await lehrer.getAttribute('.z-bild img', 'src')) === 'bilder/station2.jpg', 'Beamer: Bild zu Station 2 (große Fassung)');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3_station2_frage.png') });
   await h1.waitForSelector('.f-frage[data-frage="s2"]', { timeout: 8000 });
   pruefe(!(await h1.textContent('#f-inhalt')).includes('habe es nicht weitergegeben'), 'Handy: Christins Handeln noch verdeckt');
+  pruefe((await h1.textContent('#f-inhalt .f-einleitung')).includes('„ich“ = Christin'), 'Handy: Einleitung vor dem Abschnitt');
   await h1.waitForFunction(() => { const i = document.querySelector('.f-bild'); return i && i.complete && i.naturalWidth === 800; });
   pruefe((await h1.getAttribute('.f-bild', 'alt')).includes('rechte Wade'), 'Handy: Bild zu Station 2 (kleine Fassung, mit Beschreibung)');
   pruefe((await h1.textContent('#f-bisher-text')).includes('Frau Maler ist seit gestern'), 'Handy: „Den Fall bis hier lesen“ enthält Station 1');
