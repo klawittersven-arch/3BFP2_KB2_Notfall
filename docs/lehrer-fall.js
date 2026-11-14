@@ -19,6 +19,7 @@
   var stand = null;          // letzter Stand vom Server
   var ansicht = { schritt: 0, stufe: 0 };  // was gerade gezeigt wird (sofort, ohne auf den Server zu warten)
   var gezeichnet = '';
+  var letztesHtml = '';
   var countdown = null, countdownRest = 0;
   var perspNachKb = false;
   var gesendetBis = 0;       // kurz nach einem Klick den Server-Stand für die Steuerung ignorieren
@@ -117,13 +118,15 @@
     gezeichnet = schluessel;
     if (s.art !== 'kaltstart' && countdown) { clearInterval(countdown); countdown = null; }
     document.body.classList.toggle('z-dunkel', s.art === 'kaltstart');
-    if (s.art === 'kaltstart') { if (neu) zeichneKaltstart(s); return; }
+    if (s.art === 'kaltstart') { letztesHtml = ''; if (neu) zeichneKaltstart(s); return; }
     var html = '';
     if (s.art === 'fragen') html = fragenHtml(s);
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = zurueckHtml(s);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
     else if (s.art === 'ende') html = endeHtml(s);
+    if (!neu && html === letztesHtml) return;   // nichts geändert: nicht neu zeichnen (kein Flackern, Klicks gehen nicht verloren)
+    letztesHtml = html;
     var y = window.scrollY;
     buehne.innerHTML = html;
     if (!neu) window.scrollTo(0, y); else window.scrollTo(0, 0);
