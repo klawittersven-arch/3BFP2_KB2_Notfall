@@ -90,6 +90,16 @@ body.z-dunkel .l-fuss { display: none; }
 .z-folge-falsch { color: #8A1C14; }
 .z-folge-richtig li { color: var(--dunkelpetrol); }
 .z-folge-ganz { font-size: 24px; margin: 0 0 10px; }
+.z-plaetze { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.z-platz { padding: 10px 12px; border-radius: 12px; background: var(--hellblau); border: 2px solid var(--rand); }
+.z-platz-kopf { margin: 0 0 6px; font-size: 20px; font-weight: 800; color: var(--dunkelpetrol); }
+.z-platz ul { list-style: none; margin: 0; padding: 0; }
+.z-platz li { margin: 4px 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
+.z-platz small { font-weight: 400; color: #5B6B6F; }
+.z-merk { display: inline-block; margin-left: 4px; padding: 0 10px; border-radius: 999px; background: var(--dunkelpetrol); color: #fff; font-size: 17px; }
+.z-merksatz { margin: 0 0 10px; font-size: 26px; font-weight: 900; color: var(--dunkelpetrol); letter-spacing: .02em; }
+.z-grundliste { margin: 0; padding-left: 22px; font-size: 17px; }
+.z-grundliste li { margin: 2px 0; }
 .z-quelle { font-size: 16px; color: #5B6B6F; margin: 8px 0 0; }
 .z-grund { display: block; font-size: 17px; font-weight: 400; color: #3D5257; }
 .z-passt .z-option { color: var(--gruen); }

@@ -25,6 +25,7 @@
 
    Reihenfolge-Fragen (reihenfolge: true): Die Antworten stehen hier in der RICHTIGEN Reihenfolge,
    die Handys zeigen sie gemischt. Die SuS tippen sie nacheinander an (1., 2., 3. …).
+   Mit „anzahl: 3“ werden nur die ersten 3 gesucht – die übrigen Antworten passen nicht (mit „grund“).
 
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
    kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
@@ -155,19 +156,23 @@ var FALL = {
 
     { id: 's5', art: 'station', nummer: 5, kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
       bild: { datei: 'bilder/kaltstart.jpg', alt: 'Das Bild vom Anfang: Frau Maler liegt reglos im Bett, im Vordergrund das Tablett mit Mittagessen.' },
-      // Reihenfolge nach den Reanimationsleitlinien des ERC 2025 (Basismaßnahmen, außerhalb des Krankenhauses):
-      // Notruf VOR der Atemkontrolle (neu seit 2025). Kürzel höchstens 4 Zeichen.
-      frage: { id: 's5', reihenfolge: true,
-        text: 'Was tun Sie? Bringen Sie die Schritte in die richtige Reihenfolge.',
-        hilfe: 'Tippen Sie die Schritte nacheinander an: zuerst Schritt 1, dann Schritt 2 … Noch einmal tippen nimmt einen Schritt wieder heraus.',
-        quelle: 'Reihenfolge nach den Reanimationsleitlinien 2025 (ERC/GRC)',
+      // Die 3 wichtigsten Schritte nach den Reanimationsleitlinien 2025 (ERC/GRC): Prüfen – Rufen – Drücken.
+      // Die ersten 3 Antworten sind die richtigen (in der richtigen Reihenfolge), die übrigen passen nicht.
+      // Die Handys zeigen alle gemischt. Kürzel höchstens 4 Zeichen.
+      frage: { id: 's5', reihenfolge: true, anzahl: 3,
+        text: 'Was sind die 3 wichtigsten Schritte? Tippen Sie sie in der richtigen Reihenfolge an.',
+        hilfe: 'Tippen Sie zuerst Schritt 1, dann Schritt 2, dann Schritt 3. Noch einmal tippen nimmt einen Schritt wieder heraus.',
+        merksatz: 'Prüfen – Rufen – Drücken',
+        quelle: 'Nach den Reanimationsleitlinien 2025 (ERC/GRC)',
         optionen: [
-          { kuerzel: 'ANSP', text: 'Ansprechen und an den Schultern rütteln' },
-          { kuerzel: 'RUF', text: 'Laut um Hilfe rufen' },
-          { kuerzel: 'NOT', text: 'Notruf 112 wählen (Handy auf laut)' },
-          { kuerzel: 'ATEM', text: 'Atemwege frei machen, Atmung prüfen' },
-          { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen (30 : 2)' },
-          { kuerzel: 'AED', text: 'Defibrillator (AED) holen lassen und anlegen' }
+          { kuerzel: 'ANSP', text: 'Ansprechen und an den Schultern rütteln', merk: 'Prüfen' },
+          { kuerzel: 'RUF', text: 'Laut um Hilfe rufen und Notruf 112 wählen (lassen)', merk: 'Rufen' },
+          { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen', merk: 'Drücken' },
+          { kuerzel: 'PULS', text: 'Den Puls fühlen', grund: 'kostet Zeit – geprüft werden Bewusstsein und Atmung' },
+          { kuerzel: 'GEH', text: 'Selbst losgehen und Hilfe holen', grund: 'Frau Maler nicht allein lassen – laut rufen, andere holen lassen' },
+          { kuerzel: 'HOCH', text: 'Den Oberkörper hochlagern', grund: 'Herzdruckmassage nur flach auf dem Rücken, auf harter Unterlage' },
+          { kuerzel: 'WART', text: 'Abwarten, ob sie wieder zu sich kommt', grund: 'jede Sekunde zählt' },
+          { kuerzel: 'ANGE', text: 'Die Angehörigen anrufen', grund: 'erst später – zuerst die Notfallversorgung' }
         ] } },
 
     { id: 's6', art: 'station', nummer: 6, kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',

@@ -228,16 +228,17 @@
       .sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); })
       .map(function (c) { return c.replace(/^\d+/, ''); });
   }
+  function folgeAnzahl(q) { return q.anzahl || q.optionen.length; }
+  function folgeRichtig(q) { return q.optionen.slice(0, folgeAnzahl(q)).map(function (o) { return o.kuerzel; }); }
   function folgeAlsWert(q, liste) {
-    var richtig = q.optionen.map(function (o) { return o.kuerzel; });
     var wert = liste.map(function (k, i) { return (i + 1) + k; });
-    if (liste.join() === richtig.join()) wert.push('OK');
+    if (liste.join() === folgeRichtig(q).join()) wert.push('OK');
     return wert;
   }
   function gemischt(q) {
     if (mischung[q.id]) return mischung[q.id];
-    var a = q.optionen.slice(), richtig = a.map(function (o) { return o.kuerzel; }).join();
-    for (var n = 0; n < 20; n++) {          // nie zufällig schon richtig sortiert anzeigen
+    var a = q.optionen.slice(), richtig = q.optionen.map(function (o) { return o.kuerzel; }).join();
+    for (var n = 0; n < 20; n++) {          // nie zufällig in der richtigen Reihenfolge anzeigen
       for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
       if (a.map(function (o) { return o.kuerzel; }).join() !== richtig) break;
     }
@@ -247,30 +248,32 @@
     var gesendet = folgeAusWert(meine.antworten[q.id]);
     if (!folge[q.id]) folge[q.id] = gesendet.slice();
     var liste = gesperrt ? gesendet : folge[q.id];
-    var richtig = q.optionen.map(function (o) { return o.kuerzel; });
-    var text = function (k) { return q.optionen.filter(function (o) { return o.kuerzel === k; })[0].text; };
+    var n = folgeAnzahl(q), richtig = folgeRichtig(q), voll = liste.length >= n;
+    var opt = function (k) { return q.optionen.filter(function (o) { return o.kuerzel === k; })[0]; };
     var html;
     if (!aufgeloest) {
       html = '<div class="f-folge" role="group" aria-label="' + esc(q.text) + '">' + gemischt(q).map(function (o) {
         var platz = liste.indexOf(o.kuerzel);
         return '<button type="button" class="f-opt f-folge-opt' + (platz >= 0 ? ' f-an' : '') + '" data-folge="' + esc(q.id) +
-          '" data-kuerzel="' + esc(o.kuerzel) + '"' + (gesperrt ? ' disabled' : '') + '>' +
+          '" data-kuerzel="' + esc(o.kuerzel) + '"' + (gesperrt || (voll && platz < 0) ? ' disabled' : '') + '>' +
           '<span class="f-platz" aria-hidden="true">' + (platz >= 0 ? platz + 1 : '') + '</span><span>' + esc(o.text) + '</span></button>';
       }).join('') + '</div>';
       if (liste.length) {
         html += '<p class="f-unter">' + esc(H.ihreReihenfolge) + '</p><ol class="f-folge-liste">' +
-          liste.map(function (k) { return '<li>' + esc(text(k)) + '</li>'; }).join('') + '</ol>';
+          liste.map(function (k) { return '<li>' + esc(opt(k).text) + '</li>'; }).join('') + '</ol>';
       }
     } else {
       // Auflösung: eigene Reihenfolge mit ✓/✗ und die richtige Reihenfolge
       html = '<p class="f-unter">' + esc(H.ihreReihenfolge) + '</p><ol class="f-folge-liste">' + (gesendet.length ? gesendet.map(function (k, i) {
-        var ok = richtig[i] === k;
-        return '<li class="' + (ok ? 'f-folge-ok' : 'f-folge-falsch') + '">' + (ok ? '✓ ' : '✗ ') + esc(text(k)) +
-          (ok ? '' : ' <small>(richtig: Platz ' + (richtig.indexOf(k) + 1) + ')</small>') + '</li>';
+        var ok = richtig[i] === k, o = opt(k), pr = richtig.indexOf(k);
+        return '<li class="' + (ok ? 'f-folge-ok' : 'f-folge-falsch') + '">' + (ok ? '✓ ' : '✗ ') + esc(o.text) +
+          (ok ? '' : ' <small>(' + (pr >= 0 ? 'richtig: Platz ' + (pr + 1) : 'passt nicht: ' + esc(o.grund || '')) + ')</small>') + '</li>';
       }).join('') : '<li>' + esc(H.keineAntwort) + '</li>') + '</ol>' +
-        '<p class="f-unter">' + esc(H.richtigeReihenfolge) + '</p><ol class="f-folge-liste f-folge-richtig">' +
-        richtig.map(function (k) { return '<li>' + esc(text(k)) + '</li>'; }).join('') + '</ol>' +
-        (q.quelle ? '<p class="f-hilfe">' + esc(q.quelle) + '</p>' : '');
+        '<p class="f-unter">' + esc(H.richtigeReihenfolge) + (q.merksatz ? ' <strong>' + esc(q.merksatz) + '</strong>' : '') + '</p>' +
+        '<ol class="f-folge-liste f-folge-richtig">' + richtig.map(function (k) {
+          var o = opt(k);
+          return '<li>' + (o.merk ? esc(o.merk) + ': ' : '') + esc(o.text) + '</li>';
+        }).join('') + '</ol>' + (q.quelle ? '<p class="f-hilfe">' + esc(q.quelle) + '</p>' : '');
     }
     var status = '';
     if (gesperrt && !aufgeloest) status = '<p class="f-status">' + esc(H.gesperrt) + (gesendet.length ? '' : ' ' + esc(H.keineAntwort)) + '</p>';
@@ -278,8 +281,8 @@
     return '<section class="f-frage" data-frage="' + esc(q.id) + '"><h3>' + esc(q.text) + '</h3>' +
       (q.hilfe && !gesperrt ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') + html +
       (!gesperrt ? '<button type="button" class="knopf f-senden" data-senden-folge="' + esc(q.id) + '"' +
-        (liste.length === q.optionen.length ? '' : ' disabled') + '>' + esc(H.senden) +
-        (liste.length < q.optionen.length ? ' (' + liste.length + ' von ' + q.optionen.length + ')' : '') + '</button>' : '') +
+        (liste.length === n ? '' : ' disabled') + '>' + esc(H.senden) +
+        (liste.length < n ? ' (' + liste.length + ' von ' + n + ')' : '') + '</button>' : '') +
       status + '</section>';
   }
 
@@ -345,8 +348,9 @@
       b.addEventListener('click', function () {
         var id = b.getAttribute('data-folge'), k = b.getAttribute('data-kuerzel');
         if (abgestimmt()) return;
-        var a = folge[id], i = a.indexOf(k);
-        if (i >= 0) a.splice(i, 1); else a.push(k);   // noch einmal tippen = herausnehmen, die anderen rücken nach
+        var a = folge[id], i = a.indexOf(k), q = sucheFrage(id);
+        if (i >= 0) a.splice(i, 1);                     // noch einmal tippen = herausnehmen, die anderen rücken nach
+        else if (a.length < folgeAnzahl(q)) a.push(k);
         var y = window.scrollY;
         neuZeichnen();
         window.scrollTo(0, y);
@@ -355,7 +359,7 @@
     Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden-folge]'), function (b) {
       b.addEventListener('click', function () {
         var id = b.getAttribute('data-senden-folge'), q = sucheFrage(id);
-        if (!q || folge[id].length !== q.optionen.length) return;
+        if (!q || folge[id].length !== folgeAnzahl(q)) return;
         sendeAntwort(id, folgeAlsWert(q, folge[id]));
         var y = window.scrollY;
         neuZeichnen();

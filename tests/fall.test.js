@@ -266,42 +266,45 @@ function umgebung(Raum) {
   pruefe((await h1.textContent('.f-aufloesung')).includes('habe es nicht weitergegeben'), 'Handy: Auflösung erscheint');
   pruefe((await h1.getAttribute('.f-ampel .f-rot', 'aria-pressed')) === 'true', 'Handy: eigene Antwort bleibt sichtbar');
 
-  // Station 5: Schritte in die richtige Reihenfolge bringen
+  // Station 5: die 3 wichtigsten Schritte aus 8 in der richtigen Reihenfolge antippen
   const s5Index = FALL.schritte.findIndex((x) => x.id === 's5');
   const s5 = FALL.schritte[s5Index].frage;
-  const richtig = s5.optionen.map((o) => o.kuerzel);
+  const richtig = s5.optionen.slice(0, s5.anzahl).map((o) => o.kuerzel);
+  pruefe(s5.anzahl === 3 && s5.optionen.length === 8 && s5.optionen.slice(3).every((o) => o.grund), 'Station 5: 3 richtige aus 8, unpassende mit Grund');
   await lehrer.click(`[data-gehe="${s5Index}"]`);
   await lehrer.waitForSelector('.z-vollbild');
   await lehrer.keyboard.press('ArrowRight');
   await h1.waitForSelector('.f-frage[data-frage="s5"] .f-folge-opt', { timeout: 8000 });
-  const anzeige = await h1.$$eval('.f-folge-opt', (b) => b.map((x) => x.getAttribute('data-kuerzel')));
-  pruefe(anzeige.length === 6 && anzeige.join() !== richtig.join(), 'Handy: Station 5 zeigt 6 Schritte gemischt');
+  pruefe((await h1.$$('.f-folge-opt')).length === 8, 'Handy: Station 5 zeigt 8 Aktionen');
   const tippe = async (h, k) => h.click(`.f-folge-opt[data-kuerzel="${k}"]`);
   await tippe(h1, richtig[1]); await tippe(h1, richtig[0]);
   pruefe((await h1.textContent(`.f-folge-opt[data-kuerzel="${richtig[0]}"] .f-platz`)) === '2', 'Handy: angetippte Schritte bekommen ihre Platznummer');
   await tippe(h1, richtig[1]);   // wieder herausnehmen
   pruefe((await h1.textContent(`.f-folge-opt[data-kuerzel="${richtig[0]}"] .f-platz`)) === '1', 'Handy: herausnehmen – die anderen rücken nach');
-  pruefe(await h1.isDisabled('[data-senden-folge="s5"]'), 'Handy: Senden erst, wenn alle Schritte sortiert sind');
-  for (const k of richtig.slice(1)) await tippe(h1, k);
+  pruefe(await h1.isDisabled('[data-senden-folge="s5"]'), 'Handy: Senden erst bei 3 Schritten');
+  await tippe(h1, richtig[1]); await tippe(h1, richtig[2]);
+  pruefe(await h1.isDisabled('.f-folge-opt[data-kuerzel="PULS"]'), 'Handy: nach 3 Schritten sind die übrigen gesperrt');
   await h1.click('[data-senden-folge="s5"]');
   await h1.screenshot({ path: path.join(__dirname, 'fall_h_station5.png'), fullPage: true });
   await h2.waitForSelector('.f-frage[data-frage="s5"] .f-folge-opt', { timeout: 8000 });
-  const falsch = [richtig[0], richtig[1], richtig[3], richtig[2], richtig[4], richtig[5]];   // Atmung vor Notruf (alte Reihenfolge)
-  for (const k of falsch) await tippe(h2, k);
+  for (const k of ['ANSP', 'PULS', 'RUF']) await tippe(h2, k);   // Puls fühlen passt nicht
   await h2.click('[data-senden-folge="s5"]');
   await warte(2300);
   await lehrer.click('#z-weiter'); // Ergebnis
-  await lehrer.waitForSelector('.z-folge');
-  pruefe((await lehrer.textContent('.z-folge li')).includes('Ansprechen'), 'Beamer: Reihenfolge der Klasse nach Durchschnittsplatz');
-  pruefe(!(await lehrer.$('.z-folge-ganz')), 'Beamer: richtige Reihenfolge erst bei „Auflösen“');
+  await lehrer.waitForSelector('.z-platz');
+  pruefe((await lehrer.$$('.z-platz')).length === 3 && (await lehrer.textContent('.z-platz')).includes('Ansprechen'), 'Beamer: je Platz, was die Klasse gewählt hat');
+  pruefe(!(await lehrer.$('.z-folge-ganz')) && !(await lehrer.$('.z-merksatz')), 'Beamer: Lösung erst bei „Auflösen“');
   await lehrer.click('#z-weiter'); // Auflösen
   await lehrer.waitForSelector('.z-folge-ganz');
-  pruefe((await lehrer.textContent('.z-folge-ganz')).includes('1 von 2'), 'Beamer: „Ganz richtig sortiert: 1 von 2“');
+  pruefe((await lehrer.textContent('.z-folge-ganz')).includes('1 von 2'), 'Beamer: „Ganz richtig: 1 von 2“');
+  pruefe((await lehrer.textContent('.z-merksatz')).includes('Prüfen – Rufen – Drücken'), 'Beamer: Merksatz Prüfen – Rufen – Drücken');
+  pruefe((await lehrer.textContent('.z-grundliste')).includes('Den Puls fühlen'), 'Beamer: gewählte unpassende Aktion mit Grund');
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_3b_station5.png'), fullPage: true });
   await h1.waitForSelector('.f-folge-ok', { timeout: 8000 });
-  pruefe((await h1.$$('.f-folge-ok')).length === 6, 'Handy: richtige Reihenfolge – alle 6 mit ✓');
+  pruefe((await h1.$$('.f-folge-ok')).length === 3, 'Handy: richtige Wahl – alle 3 mit ✓');
   await h2.waitForSelector('.f-folge-falsch', { timeout: 8000 });
-  pruefe((await h2.$$('.f-folge-falsch')).length === 2 && (await h2.textContent('.f-folge-falsch')).includes('richtig: Platz'), 'Handy: falsche Plätze mit dem richtigen Platz');
+  const h2Falsch = await h2.$$eval('.f-folge-falsch', (e) => e.map((x) => x.textContent).join(' | '));
+  pruefe(h2Falsch.includes('passt nicht') && h2Falsch.includes('richtig: Platz 2'), 'Handy: unpassende Aktion mit Grund, richtige auf falschem Platz mit richtigem Platz');
 
   // Sprung zum Zurückspulen (Punkt in der Steuerleiste)
   const zurueckIndex = FALL.schritte.findIndex((s) => s.id === 'zurueck');
