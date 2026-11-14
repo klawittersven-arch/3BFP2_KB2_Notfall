@@ -52,11 +52,21 @@
     return g;
   }
   // Abschnitte des Falltexts zu Absätzen zusammensetzen
+  // Jedes Wort des Falltexts wird antippbar (für den Begriffsparkplatz). Der Text selbst bleibt Zeichen für Zeichen gleich.
+  var WORT = /^([^\p{L}\p{N}]*)(.*?[\p{L}\p{N}])([^\p{L}\p{N}]*)$/u;
+  function woerterHtml(text) {
+    return text.split(/(\s+)/).map(function (t) {
+      if (!t || /^\s+$/.test(t)) return esc(t);
+      var m = t.match(WORT);
+      if (!m || !/\p{L}/u.test(m[2])) return esc(t);
+      return esc(m[1]) + '<span class="f-wort" role="button" tabindex="0">' + esc(m[2]) + '</span>' + esc(m[3]);
+    }).join('');
+  }
   function falltextHtml(teile) {
     var absaetze = [];
     teile.forEach(function (t, i) {
-      if (t.absatz || i === 0) absaetze.push(esc(t.text));
-      else absaetze[absaetze.length - 1] += ' ' + esc(t.text);
+      if (t.absatz || i === 0) absaetze.push(woerterHtml(t.text));
+      else absaetze[absaetze.length - 1] += ' ' + woerterHtml(t.text);
     });
     return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
   }
@@ -81,6 +91,7 @@
     var s = holeLokal(sitzungsSchluessel());
     try { meine = s ? JSON.parse(s) : null; } catch (e) { meine = null; }
     if (!meine || typeof meine !== 'object') meine = { antworten: {}, texte: [] };
+    if (!Array.isArray(meine.begriffe)) meine.begriffe = [];
   }
   function speichereMeine() { setzeLokal(sitzungsSchluessel(), JSON.stringify(meine)); }
 
@@ -166,6 +177,8 @@
     verbinde(s);
     zeichneBisher(s);
     zeichneParkplatz(s);
+    leereWortauswahl();
+    markiereGeparkte();
     if (!gleicherSchritt) window.scrollTo(0, 0);
   }
 
@@ -179,6 +192,7 @@
     return '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
       (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
       '<div class="f-falltext">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>' +
+      '<p class="f-tipp-hinweis"><span aria-hidden="true">💡</span> ' + esc(F.begriffe.tippHinweis) + '</p>' +
       frageHtml(s.frage, stand.stufe >= 1) +
       (auf ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.christinErzaehlt) + '</p><div class="f-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '');
@@ -353,7 +367,9 @@
     parkplatz.innerHTML = '<h2><span aria-hidden="true">🅿️</span> ' + esc(B.titel) + '</h2><p>' + esc(B.text) + '</p>' +
       '<form id="f-wort-form" class="f-wort-form" novalidate><label for="f-wort" class="unsichtbar">' + esc(B.titel) + '</label>' +
       '<input id="f-wort" type="text" maxlength="40" autocomplete="off" spellcheck="false">' +
-      '<button type="submit" class="knopf">' + esc(B.knopf) + '</button></form><p class="f-status" id="f-wort-status" role="status"></p>';
+      '<button type="submit" class="knopf">' + esc(B.knopf) + '</button></form><p class="f-status" id="f-wort-status" role="status"></p>' +
+      '<p class="f-meine-woerter" id="f-meine-woerter" hidden></p>';
+    zeigeMeineWoerter();
     document.getElementById('f-wort-form').addEventListener('submit', function (ev) {
       ev.preventDefault();
       var feld = document.getElementById('f-wort');
@@ -361,13 +377,119 @@
       var w = feld.value.replace(/\s+/g, ' ').trim().slice(0, 40);
       if (!w) return;
       if (gesperrtesWort(w)) { st.textContent = 'Bitte formulieren Sie das anders.'; return; }
-      post('/fall/text', { raum: raum(), geraet: geraetId(), name: name, art: 'begriff', a: w }).then(function (r) {
-        if (r.status === 429) throw new Error('voll');
+      parke(w).then(function () {
         feld.value = '';
         st.textContent = '✓ ' + B.danke;
       }).catch(function () { st.textContent = 'Nicht gesendet. Bitte noch einmal versuchen.'; });
     });
   }
+
+  // Ein Wort parken (aus dem Text angetippt oder eingetippt)
+  function parke(w) {
+    return post('/fall/text', { raum: raum(), geraet: geraetId(), name: name, art: 'begriff', a: w }).then(function (r) {
+      if (r.status === 429) throw new Error('voll');
+      if (meine.begriffe.indexOf(w) < 0) meine.begriffe.push(w);
+      speichereMeine();
+      markiereGeparkte();
+      zeigeMeineWoerter();
+    });
+  }
+  function zeigeMeineWoerter() {
+    var el = document.getElementById('f-meine-woerter');
+    if (!el) return;
+    el.hidden = !meine.begriffe.length;
+    el.innerHTML = '<strong>' + esc(F.begriffe.meine) + '</strong> ' + meine.begriffe.map(esc).join(' · ');
+  }
+  function geparkteWoerter() {
+    var menge = {};
+    meine.begriffe.forEach(function (b) { b.toLowerCase().split(' ').forEach(function (x) { menge[x] = true; }); });
+    return menge;
+  }
+  function markiereGeparkte() {
+    var menge = geparkteWoerter();
+    Array.prototype.forEach.call(document.querySelectorAll('.f-wort'), function (s) {
+      s.classList.toggle('f-geparkt', !!menge[s.textContent.toLowerCase()]);
+    });
+  }
+
+  // ---------- Wörter im Text antippen ----------
+  // 1. Tipp: Wort wird markiert, unten erscheint „Parken“. Tipp auf das Wort daneben nimmt es dazu
+  // (z. B. „lebensverlängernden Maßnahmen“), höchstens 4 Wörter / 40 Zeichen. Noch einmal tippen = abwählen.
+  var wahl = null;          // { p: Absatz, von: Index, bis: Index }
+  var leiste2 = document.createElement('div');
+  leiste2.className = 'f-parkleiste';
+  leiste2.id = 'f-parkleiste';
+  leiste2.setAttribute('role', 'region');
+  leiste2.setAttribute('aria-label', F.begriffe.titel);
+  leiste2.hidden = true;
+  document.body.appendChild(leiste2);
+  var leisteTimer = null;
+
+  function woerterIn(p) { return Array.prototype.slice.call(p.querySelectorAll('.f-wort')); }
+  function wahlText(w) {
+    return woerterIn(w.p).slice(w.von, w.bis + 1).map(function (s) { return s.textContent.replace(/-$/, ''); }).join(' ');
+  }
+  function waehle(span) {
+    var p = span.closest('p');
+    if (!p) return;
+    var i = woerterIn(p).indexOf(span);
+    if (wahl && wahl.p === p) {
+      if (i >= wahl.von && i <= wahl.bis) {
+        if (wahl.von === wahl.bis) { leereWortauswahl(); return; }
+        if (i === wahl.von) wahl.von++;
+        else if (i === wahl.bis) wahl.bis--;
+        else wahl = { p: p, von: i, bis: i };
+      } else if (i === wahl.bis + 1 || i === wahl.von - 1) {
+        var neu = { p: p, von: Math.min(i, wahl.von), bis: Math.max(i, wahl.bis) };
+        wahl = (neu.bis - neu.von < 4 && wahlText(neu).length <= 40) ? neu : { p: p, von: i, bis: i };
+      } else {
+        wahl = { p: p, von: i, bis: i };
+      }
+    } else {
+      wahl = { p: p, von: i, bis: i };
+    }
+    zeigeWahl();
+  }
+  function zeigeWahl() {
+    Array.prototype.forEach.call(document.querySelectorAll('.f-gewaehlt'), function (s) { s.classList.remove('f-gewaehlt'); });
+    if (!wahl) { leiste2.hidden = true; return; }
+    woerterIn(wahl.p).slice(wahl.von, wahl.bis + 1).forEach(function (s) { s.classList.add('f-gewaehlt'); });
+    var B = F.begriffe;
+    clearTimeout(leisteTimer);
+    leiste2.hidden = false;
+    leiste2.innerHTML = '<div class="f-pl-zeile"><span class="f-pl-wort">„' + esc(wahlText(wahl)) + '“</span>' +
+      '<button type="button" class="knopf f-pl-parken" id="f-pl-parken"><span aria-hidden="true">🅿️</span> ' + esc(B.tippKnopf) + '</button>' +
+      '<button type="button" class="f-pl-zu" id="f-pl-zu" aria-label="Abbrechen">×</button></div>' +
+      '<p class="f-pl-hinweis">' + esc(B.tippDazu) + '</p>';
+    document.getElementById('f-pl-zu').onclick = leereWortauswahl;
+    document.getElementById('f-pl-parken').onclick = function () {
+      var w = wahlText(wahl);
+      if (gesperrtesWort(w)) { leereWortauswahl(); return; }
+      this.disabled = true;
+      parke(w).then(function () {
+        wahl = null;
+        zeigeWahl();
+        leiste2.hidden = false;
+        leiste2.innerHTML = '<p class="f-pl-ok" role="status">✓ „' + esc(w) + '“ ' + esc(B.geparkt) + '</p>';
+        leisteTimer = setTimeout(function () { if (!wahl) leiste2.hidden = true; }, 2500);
+      }).catch(function () {
+        leiste2.innerHTML = '<p class="f-pl-ok f-warnung" role="status">Nicht gesendet. Bitte noch einmal tippen.</p>';
+        wahl = null;
+        leisteTimer = setTimeout(function () { if (!wahl) leiste2.hidden = true; }, 3000);
+      });
+    };
+  }
+  function leereWortauswahl() { wahl = null; zeigeWahl(); }
+  document.addEventListener('click', function (ev) {
+    var s = ev.target.closest ? ev.target.closest('.f-wort') : null;
+    if (s) waehle(s);
+  });
+  document.addEventListener('keydown', function (ev) {
+    if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.classList && ev.target.classList.contains('f-wort')) {
+      ev.preventDefault();
+      waehle(ev.target);
+    }
+  });
 
   // ---------- Namenseingabe mit Klassenwahl (wie in den Übungen) ----------
   function zeigeName() {

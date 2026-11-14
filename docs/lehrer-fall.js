@@ -12,6 +12,9 @@
   var HANDY_ADRESSE = new URL('fall.html', location.href).href;
 
   var buehne = document.getElementById('z-buehne');
+  var parkZeile = document.createElement('p');   // geparkte Wörter live (für die Lehrkraft)
+  parkZeile.className = 'l-status z-park';
+  parkZeile.hidden = true;
   var steuer = document.getElementById('z-steuer');
   var status = document.getElementById('l-status');
   var fuss = document.getElementById('l-fuss');
@@ -68,6 +71,7 @@
         status.textContent = 'Stand ' + uhrzeit(d.jetzt) + ' · ' + d.leute.length + ' angemeldet · ' +
           (d.steuerung.durchgang === 'sw13' ? 'Abschluss (SW 13)' : 'Einführung (SW 6)');
         status.className = 'l-status';
+        zeigeParkZeile(d.texte);
         zeichne();
       })
       .catch(function () {
@@ -326,14 +330,24 @@
       '<div class="z-spalten' + (perspNachKb ? ' z-sechs' : '') + '">' + spalten + '</div>';
   }
 
-  function begriffeHtml(texte) {
+  function zeigeParkZeile(texte) {
+    if (!parkZeile.parentNode) status.parentNode.appendChild(parkZeile);
+    var liste = begriffListe(texte);
+    parkZeile.hidden = !liste.length;
+    parkZeile.textContent = '🅿️ Geparkt: ' + liste.slice(0, 6).map(function (w) { return w.text + (w.anzahl > 1 ? ' ' + w.anzahl + '×' : ''); }).join(' · ') +
+      (liste.length > 6 ? ' · +' + (liste.length - 6) : '');
+  }
+  function begriffListe(texte) {
     var zaehler = {};
     texte.filter(function (t) { return t.art === 'begriff'; }).forEach(function (t) {
       var k = t.a.toLowerCase();
       if (!zaehler[k]) zaehler[k] = { text: t.a, anzahl: 0, id: t.id };
       zaehler[k].anzahl++;
     });
-    var liste = Object.keys(zaehler).map(function (k) { return zaehler[k]; }).sort(function (a, b) { return b.anzahl - a.anzahl || a.text.localeCompare(b.text, 'de'); });
+    return Object.keys(zaehler).map(function (k) { return zaehler[k]; }).sort(function (a, b) { return b.anzahl - a.anzahl || a.text.localeCompare(b.text, 'de'); });
+  }
+  function begriffeHtml(texte) {
+    var liste = begriffListe(texte);
     if (!liste.length) return '<p class="l-leer">Noch keine Begriffe geparkt.</p>';
     return '<ul class="z-woerter">' + liste.map(function (w) {
       return '<li><span>' + esc(w.text) + '</span>' + (w.anzahl > 1 ? '<small>' + w.anzahl + '×</small>' : '') +

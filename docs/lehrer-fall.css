@@ -18,6 +18,8 @@ body { padding-bottom: 96px; }
 .z-aufloesung { margin: 0 0 18px; padding: 14px 22px 4px; border-radius: 16px; background: var(--bernstein-hell); border: 4px solid #D98B00; }
 .z-auf-kopf { margin: 0 0 6px; font-size: 22px; font-weight: 800; color: var(--bernstein); }
 
+.z-park { flex-basis: 100%; font-weight: 600; }
+
 /* Kaltstart: dunkle Bühne */
 body.z-dunkel { background: #0F1C20; }
 body.z-dunkel .l-kopf { background: #0F1C20; color: #8FA6AC; }

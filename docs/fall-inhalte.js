@@ -231,9 +231,15 @@ var FALL = {
 
   begriffe: {
     titel: 'Begriffsparkplatz',
-    text: 'Ein Wort ist unklar? Schreiben Sie es hier auf.',
+    text: 'Tippen Sie im Fall auf ein unklares Wort. Oder schreiben Sie es hier auf:',
     knopf: 'Parken',
-    danke: 'Danke! Das Wort steht jetzt auf dem Begriffsparkplatz.'
+    danke: 'Danke! Das Wort steht jetzt auf dem Begriffsparkplatz.',
+    // Wörter im Falltext antippen (Handy)
+    tippHinweis: 'Wort unklar? Tippen Sie darauf.',
+    tippDazu: 'Tippen Sie auf das Wort daneben, um es dazuzunehmen.',
+    tippKnopf: 'Parken',
+    geparkt: 'geparkt',
+    meine: 'Ihre geparkten Wörter:'
   },
 
   // Texte auf dem Handy

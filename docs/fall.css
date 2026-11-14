@@ -74,4 +74,22 @@
 .f-parkplatz p { margin: 0 0 8px; }
 .f-wort-form { display: flex; gap: 8px; }
 .f-wort-form input { flex: 1; min-width: 0; min-height: 50px; padding: 8px 12px; border: 2px solid var(--petrol); border-radius: 10px; font: inherit; }
+/* Wörter im Falltext antippen → Begriffsparkplatz */
+.f-wort { cursor: pointer; border-radius: 4px; -webkit-tap-highlight-color: rgba(63,108,114,.25); }
+.f-wort.f-geparkt { text-decoration: underline dotted var(--petrol); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.f-wort.f-gewaehlt { background: #FFD24D; color: #2A2000; box-shadow: 0 0 0 2px #FFD24D; }
+.f-tipp-hinweis { margin: -8px 0 16px; font-size: 15px; color: #3D5257; }
+.f-meine-woerter { margin: 10px 0 0; font-size: 16px; }
+.f-parkleiste {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: #fff;
+  border-top: 3px solid var(--petrol); box-shadow: 0 -4px 14px rgba(0,0,0,.12);
+}
+.f-pl-zeile { display: flex; align-items: center; gap: 10px; }
+.f-pl-wort { flex: 1; min-width: 0; font-size: 19px; font-weight: 800; color: var(--dunkelpetrol); overflow-wrap: anywhere; }
+.f-pl-parken { min-height: 48px; padding: 8px 14px; }
+.f-pl-zu { min-width: 44px; min-height: 44px; border: 2px solid var(--rand); border-radius: 10px; background: #fff; font: inherit; font-size: 22px; color: #5B6B6F; cursor: pointer; }
+.f-pl-hinweis { margin: 6px 0 0; font-size: 14px; color: #3D5257; }
+.f-pl-ok { margin: 4px 0; font-size: 18px; font-weight: 700; color: var(--gruen); }
+body:has(.f-parkleiste:not([hidden])) .inhalt { padding-bottom: 130px; }
 .f-bild { display: block; width: 100%; height: auto; margin: 0 0 12px; border-radius: 12px; }

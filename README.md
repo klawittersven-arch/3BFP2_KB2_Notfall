@@ -89,7 +89,13 @@ Handy: https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/fall.html – der 
 5. **Perspektiven-Runde:** Jede Gruppe wählt eine Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft,
    die Angehörigen, Frau Maler): „Was hätte diese Person gebraucht?“ + Lernfrage. Auf dem Beamer je Person eine Spalte;
    die Lehrkraft tippt bei jedem Eintrag den passenden KB (I–V) an. *Nach Kompetenzbereichen ordnen* zeigt die Lernlandkarte.
-6. **Ausblick:** Begriffsparkplatz (unbekannte Wörter, von den Handys jederzeit „geparkt“) und **Ergebnis sichern**.
+6. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
+
+**Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;
+ein Tipp auf das Wort daneben nimmt es dazu (z. B. „lebensverlängernden Maßnahmen“, höchstens 4 Wörter), noch einmal
+tippen nimmt es wieder weg. Geparkte Wörter sind im Text gepunktet unterstrichen. Eintippen geht weiterhin. Auf dem
+Beamer stehen die geparkten Wörter live in der Kopfzeile (häufigste zuerst) – so lassen sie sich schon während der
+Stationen kurz klären; beim Ausblick erscheinen alle.
 
 **SW 13:** Unten auf der Beamer-Seite *Abschluss (SW 13) – mit Vergleich* wählen und die Zeitlupe noch einmal spielen.
 Alle Ergebnisse erscheinen dann neben denen der Einführung (z. B. Ampel bei der Wade: SW 6 → heute), am Ende stehen die
