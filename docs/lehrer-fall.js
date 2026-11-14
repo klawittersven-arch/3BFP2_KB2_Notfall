@@ -382,7 +382,7 @@
         '<p class="z-adresse">' + esc(HANDY_ADRESSE.replace(/^https?:\/\//, '')) + '</p></div>' +
         '<div><h2 class="z-titel">' + esc(s.titel) + '</h2><p class="z-gross">' + esc(s.beamerText) + '</p>' +
         (s.handyAuftrag ? handyAuftragHtml(s.handyAuftrag) : '') +
-        '<p class="z-hinweis">' + esc(s.hinweis) + '</p>' + namenHtml(ids) + '</div></section>';
+        (s.hinweis ? '<p class="z-hinweis">' + esc(s.hinweis) + '</p>' : '') + namenHtml(ids) + '</div></section>';
     }
     return '<h2 class="z-titel">' + esc(s.titel) + '</h2><div class="z-raster">' +
       s.fragen.map(function (q) { return ergebnisHtml(q); }).join('') + '</div>';

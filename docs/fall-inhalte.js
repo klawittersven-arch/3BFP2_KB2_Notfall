@@ -115,7 +115,6 @@ var FALL = {
       titel: 'Ihre 10 Sekunden',
       beamerText: 'Scannen Sie den QR-Code und melden Sie sich mit Ihrem Namen an.',
       handyAuftrag: 'Beantworten Sie die 2 Fragen. Nehmen Sie Ihren Zettel dazu.',
-      hinweis: 'Der Fall ist belastend. Wenn es Ihnen zu viel wird, dürfen Sie kurz rausgehen.',
       fragen: [
         { id: 'kalttat', mehrfach: true,
           text: 'Was steht auf Ihrem Zettel?',

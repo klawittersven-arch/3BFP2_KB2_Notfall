@@ -171,7 +171,7 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-qr img');
   pruefe(await lehrer.evaluate(() => { const i = document.querySelector('.z-qr img'); return i.complete && i.naturalWidth > 100; }), 'Beamer: QR-Code wird angezeigt');
-  pruefe((await lehrer.textContent('.z-hinweis')).includes('kurz rausgehen'), 'Beamer: Hinweis auf Belastung');
+  pruefe(!(await lehrer.$('.z-hinweis')) && !(await lehrer.textContent('.z-buehne')).includes('rausgehen'), 'Beamer: kein Hinweis „kurz rausgehen“');
   pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Jetzt am Smartphone: Beantworten Sie die 2 Fragen'), 'Beamer: „Jetzt am Smartphone“ beim Anmelden');
   await h1.waitForSelector('.f-frage[data-frage="kalttat"]', { timeout: 8000 });
   await h1.click('.f-opt[data-frage="kalttat"][data-kuerzel="ANSP"]');

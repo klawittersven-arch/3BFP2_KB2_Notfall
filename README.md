@@ -87,7 +87,7 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
 1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ + „Schreiben Sie Ihre
    ersten Ideen sofort in Stichworten auf Ihren Zettel.“ → *10 Sekunden starten* → Countdown mit „Aufschreiben!“ → „Stopp!“
    (Stift und Zettel vorher bereitlegen lassen – so kann später niemand Antworten „übernehmen“, die erst danach gezeigt werden.)
-2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was steht auf Ihrem Zettel? Wie sicher haben Sie sich gefühlt (1–5)?
+2. **Ihre 10 Sekunden:** QR-Code, Namen mit ✓. Fragen: Was steht auf Ihrem Zettel? Wie sicher haben Sie sich gefühlt (1–5)?
 3. **Vorstellung:** „Genau diese Situation hat Christin erlebt.“ – zwei Namenskarten (Christin, Frau Maler) mit Angaben
    aus dem Falltext, dann „Wir gehen zurück an den Anfang dieses Tages.“ Bewusst erst **nach** dem Kaltstart: Dort sollen
    die SuS selbst handeln, nicht Christin zuschauen. Mit Bild (`bild:` beim Schritt `personen`) erst Vollbild, dann
