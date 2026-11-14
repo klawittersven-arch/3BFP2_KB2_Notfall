@@ -533,6 +533,8 @@ var INHALTE = {
 
   spiel: {
     titel: 'KBS Notfall-Run!',
+    // 'nacht' = Nachtdienst (dunkler Himmel, Mond, Sterne) · 'tag' = bei Tag
+    tageszeit: 'nacht',
     logoAlt: 'Logo der Schule',
     // {titel} = Titel der Übung ohne „Übung:“
     gesperrt: 'Das Spiel ist eine Belohnung: Lösen Sie zuerst die Übung „{titel}“.',
@@ -552,7 +554,7 @@ var INHALTE = {
 
     steuerungHandy: 'Tippen Sie unten auf „⬆ Springen“ oder „⬇ Ducken“. In der Luft noch einmal springen = Doppelsprung.',
     steuerungTastatur: 'Tastatur: Leertaste oder Pfeil hoch = springen, Pfeil runter = ducken.',
-    spielidee: 'Notfall! Die Hohenloher Pflegekraft eilt zum Einsatz – doch unterwegs liegt einiges im Weg. Notfallkoffer, Defi-Koffer, Leitkegel, Notfallwagen und Schlaglöcher überspringen. Bei Rauch ducken – Rauch steigt nach oben! Und für den Rettungswagen braucht es einen Doppelsprung. Ab 30 Sekunden geht’s erst richtig los!',
+    spielidee: 'Nachtdienst! Die Hohenloher Pflegekraft eilt zu einem Notfall – doch unterwegs liegt einiges im Weg. Notfallkoffer, Defi-Koffer, Leitkegel, Notfallwagen und Schlaglöcher überspringen. Bei Rauch ducken – Rauch steigt nach oben! Und für den Rettungswagen braucht es einen Doppelsprung. Ab 30 Sekunden geht’s erst richtig los!',
     knopfDucken: '⬇ Ducken',
     knopfSpringen: '⬆ Springen',
 

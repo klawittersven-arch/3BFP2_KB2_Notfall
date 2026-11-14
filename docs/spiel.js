@@ -290,6 +290,7 @@
     bilder.rauchSaeule2 = rauchBauen(bilder.rauch2, bilder.rauch1);
     bilder.rauch = bilder.rauchSaeule1;
     bilder.hintergrund = hintergrundBauen();
+    if (FARBE.rahmen) rahmen.style.background = FARBE.rahmen;
     bilder.strasse = strasseBauen();
   }
 
@@ -305,7 +306,28 @@
     return c;
   }
 
-  // Hintergrund (Himmel, Hügel mit Weinbergen, Dörfer, Krankenhaus) einmal vorzeichnen.
+  // Tag oder Nacht: inhalte.js → spiel.tageszeit ('tag' oder 'nacht').
+  // Zum Ausprobieren ohne Änderung: spiel.html?ab=ab3a&nacht=1 bzw. &tag=1
+  var NACHT = T.tageszeit === 'nacht';
+  try {
+    var tq = new URLSearchParams(location.search);
+    if (tq.get('nacht') === '1') NACHT = true;
+    if (tq.get('tag') === '1') NACHT = false;
+  } catch (e) { /* alter Browser */ }
+  var FARBE = NACHT ? {
+    himmelOben: '#0B1530', himmelUnten: '#2B3D63', fern: '#2E4643', nah: '#25402F', reihe: '#1B3024', wiese: '#2C4A2A',
+    wand: '#737A86', dach: '#5B2F27', licht: '#F6CF62', kreuz: '#FF3B45', fenster: '#F6CF62', mond: '#F3EDCB', mondSchatten: '#D6CFA8',
+    stern: '#FFFFFF', sternSchwach: '#9FB0D6',
+    strasse: '#555B60', strasseOben: '#767D83', strasseUnten: '#43484C', streifen: '#E4E4E4',
+    lochRand: '#8A9096', loch: '#0A0B0D', bake: '#F2A30F', bakeLicht: '#FFE27A', rahmen: '#0B1530'
+  } : {
+    himmelOben: '#CFE5EC', himmelUnten: '#CFE5EC', fern: '#A5C59A', nah: '#7FA86A', reihe: '#5F8A4E', wiese: '#8DBA62',
+    wand: '#F2EEE6', dach: '#B5523B', licht: null, kreuz: '#D7262F', fenster: '#9DB5BD',
+    strasse: '#6E7377', strasseOben: '#A8ADB0', strasseUnten: '#5C6064', streifen: '#F4F4F4',
+    lochRand: '#3A3F43', loch: '#1C1F22', bake: '#F2A30F', bakeLicht: null, rahmen: ''
+  };
+
+  // Hintergrund (Himmel, Hügel mit Weinbergen, Dörfer, Krankenhaus; nachts mit Mond und Sternen) einmal vorzeichnen.
   // 640 px breit und nach 320 px wiederholend, damit er nur verschoben wird.
   function hintergrundBauen() {
     var bb = 640, hh = 150;
@@ -314,22 +336,44 @@
     var bild = g.createImageData(bb, hh);
     var d = bild.data;
     function rgb(hex) { return [parseInt(hex.substr(1, 2), 16), parseInt(hex.substr(3, 2), 16), parseInt(hex.substr(5, 2), 16)]; }
-    var HIMMEL = rgb('#CFE5EC'), FERN = rgb('#A5C59A'), NAH = rgb('#7FA86A'), REIHE = rgb('#5F8A4E'),
-      WIESE = rgb('#8DBA62'), WAND = rgb('#F2EEE6'), DACH = rgb('#B5523B');
+    var OBEN = rgb(FARBE.himmelOben), UNTEN = rgb(FARBE.himmelUnten), FERN = rgb(FARBE.fern), NAH = rgb(FARBE.nah),
+      REIHE = rgb(FARBE.reihe), WIESE = rgb(FARBE.wiese), WAND = rgb(FARBE.wand), DACH = rgb(FARBE.dach);
+    var HIMMEL = [];   // Himmel mit leichtem Verlauf (am Tag einfarbig)
+    for (var hy = 0; hy < hh; hy++) {
+      var a = Math.min(1, hy / 90);
+      HIMMEL.push([0, 1, 2].map(function (j) { return Math.round(OBEN[j] + (UNTEN[j] - OBEN[j]) * a); }));
+    }
     function setzen(x, y, f) {
       var i = (y * bb + x) * 4;
       d[i] = f[0]; d[i + 1] = f[1]; d[i + 2] = f[2]; d[i + 3] = 255;
     }
     var P = 2 * Math.PI / 320;
+    function fernBei(x) { return Math.round(78 + 10 * Math.sin(x * P) + 6 * Math.sin(x * P * 3 + 1)); }
     for (var x = 0; x < bb; x++) {
-      var fern = Math.round(78 + 10 * Math.sin(x * P) + 6 * Math.sin(x * P * 3 + 1));
+      var fern = fernBei(x);
       var nah = Math.round(104 + 12 * Math.sin(x * P * 2 + 2) + 5 * Math.sin(x * P * 5));
       for (var y = 0; y < hh; y++) {
-        var f = HIMMEL;
+        var f = HIMMEL[y];
         if (y >= 138) f = WIESE;
         else if (y >= nah) f = ((y - nah + Math.floor((x % 320) / 3)) % 5 === 0 && y > nah + 1) ? REIHE : NAH;
         else if (y >= fern) f = FERN;
         setzen(x, y, f);
+      }
+    }
+    // Nachts: Sterne (immer an denselben Stellen) und Mond – nur im Himmel über den Hügeln
+    if (NACHT) {
+      var STERN = rgb(FARBE.stern), SCHWACH = rgb(FARBE.sternSchwach), MOND = rgb(FARBE.mond), MS = rgb(FARBE.mondSchatten);
+      var zufall = 7;
+      var naechste = function () { zufall = (zufall * 16807) % 2147483647; return zufall / 2147483647; };
+      for (var st = 0; st < 46; st++) {
+        var sx = Math.floor(naechste() * 320), sy = 2 + Math.floor(naechste() * 60), hell = naechste() < 0.35;
+        for (var kk = 0; kk < 2; kk++) if (sy < fernBei(sx + kk * 320) - 3) setzen(sx + kk * 320, sy, hell ? STERN : SCHWACH);
+      }
+      for (var km = 0; km < 2; km++) {
+        var mx = 104 + km * 320, my = 24;
+        for (var dy = -6; dy <= 6; dy++) for (var dx = -6; dx <= 6; dx++) {
+          if (dx * dx + dy * dy <= 38) setzen(mx + dx, my + dy, (dx === -2 && dy === -1) || (dx === 2 && dy === 2) || (dx === -1 && dy === 3) ? MS : MOND);
+        }
       }
     }
     // kleine Dörfer an den Hängen (wiederholen sich alle 320 px)
@@ -341,9 +385,10 @@
         for (var yy = 0; yy < 5; yy++) for (var xx = 0; xx < 7; xx++) setzen(hx + xx, basis - yy, WAND);
         for (var yr = 0; yr < 3; yr++) for (var xr = yr; xr < 7 - yr; xr++) setzen(hx + xr, basis - 5 - yr, DACH);
         if (hs[1]) for (var yt = 0; yt < 6; yt++) { setzen(hx + 3, basis - 8 - yt, WAND); }
+        if (FARBE.licht) { setzen(hx + 1, basis - 2, rgb(FARBE.licht)); setzen(hx + 5, basis - 2, rgb(FARBE.licht)); }   // Licht im Fenster
       });
       // Krankenhaus mit rotem Kreuz
-      var KREUZ = rgb('#D7262F'), FENSTER = rgb('#9DB5BD');
+      var KREUZ = rgb(FARBE.kreuz), FENSTER = rgb(FARBE.fenster);
       var kx = 194 + k * 320;
       var kb = Math.round(78 + 10 * Math.sin(kx * P) + 6 * Math.sin(kx * P * 3 + 1)) + 4;
       for (var y1 = 0; y1 < 12; y1++) for (var x1 = 0; x1 < 19; x1++) setzen(kx + x1, kb - y1, WAND);
@@ -358,10 +403,10 @@
   function strasseBauen() {
     var c = PIXEL.leinwand(360, 30);
     var g = c.getContext('2d');
-    g.fillStyle = '#6E7377'; g.fillRect(0, 0, 360, 30);
-    g.fillStyle = '#A8ADB0'; g.fillRect(0, 0, 360, 2);
-    g.fillStyle = '#5C6064'; g.fillRect(0, 28, 360, 2);
-    g.fillStyle = '#F4F4F4';
+    g.fillStyle = FARBE.strasse; g.fillRect(0, 0, 360, 30);
+    g.fillStyle = FARBE.strasseOben; g.fillRect(0, 0, 360, 2);
+    g.fillStyle = FARBE.strasseUnten; g.fillRect(0, 28, 360, 2);
+    g.fillStyle = FARBE.streifen;
     for (var x = 0; x < 360; x += 40) g.fillRect(x, 16, 18, 2);
     return c;
   }
@@ -595,13 +640,18 @@
       if (!o.aktiv) continue;
       if (o.art === 'loch') {
         var lx = Math.round(o.x);
-        ctx.fillStyle = '#3A3F43';
+        ctx.fillStyle = FARBE.lochRand;
         ctx.fillRect(lx - 1, 155, o.b + 2, 1);
-        ctx.fillStyle = '#1C1F22';
+        ctx.fillStyle = FARBE.loch;
         ctx.fillRect(lx, 156, o.b, 24);
-        ctx.fillStyle = '#F2A30F';
+        ctx.fillStyle = FARBE.bake;
         ctx.fillRect(lx - 3, 150, 2, 6);
         ctx.fillRect(lx + o.b + 1, 150, 2, 6);
+        if (FARBE.bakeLicht && wabern) {   // nachts blinken die Warnleuchten
+          ctx.fillStyle = FARBE.bakeLicht;
+          ctx.fillRect(lx - 3, 148, 2, 2);
+          ctx.fillRect(lx + o.b + 1, 148, 2, 2);
+        }
         continue;
       }
       if (o.art === 'rtw') { rtwZeichnen(o, wabern); continue; }

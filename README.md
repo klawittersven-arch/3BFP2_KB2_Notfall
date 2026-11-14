@@ -31,7 +31,8 @@ Die SuS gelangen **nur über die QR-Codes** zu den Übungen. Die Startseite
   Es ist der Endless Runner „Diabetes Run!“ aus dem AB zur Beratung (Repository `kb2-beratung`) mit derselben
   Pixel-Krankenschwester – neu gestaltet für den Themenblock Notfall: Notfallkoffer, Defi-Koffer, Leitkegel und
   Notfallwagen überspringen, unter Rauch ducken („Rauch steigt nach oben“), Doppelsprung über den Rettungswagen („112“),
-  im Hintergrund ein Krankenhaus. Ein Lauf dauert selten länger als 2 Minuten, kein Ton.
+  im Hintergrund ein Krankenhaus. Das Spiel spielt nachts (Nachtdienst, Mond und Sterne); bei Tag:
+  in `inhalte.js` `tageszeit: 'tag'`. Ein Lauf dauert selten länger als 2 Minuten, kein Ton.
 - Name und Klasse kommen aus der Übung – keine zweite Eingabe. Nach jedem Lauf geht die **Bestleistung** an den Worker.
 - Die **Lehrerseite** dieses Arbeitsblatts zeigt sie neben dem Namen: **🎮 340** · die höchste der Klasse mit **🏆**.
 - Freigeschaltet für 12 Stunden auf diesem Handy; „Noch einmal üben“ nimmt die Freischaltung nicht zurück.
