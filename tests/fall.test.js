@@ -275,7 +275,7 @@ function umgebung(Raum) {
   for (let i = 0; i < 3; i++) await lehrer.click('[data-lesen="weiter"]');   // bis zum Ende: „✓ Fertig“
   await lehrer.waitForFunction(() => !document.querySelector('.z-lesen-an'));
   pruefe((await lehrer.textContent('[data-lesen="weiter"]')).includes('Wer liest vor'), 'Vorlesen: nach „Fertig“ keine Markierung mehr');
-  await h1.waitForFunction(() => !document.querySelector('.f-lesen-an'), null, { timeout: 8000 });
+  for (const h of [h1, h2]) await h.waitForFunction(() => !document.querySelector('.f-lesen-an'), null, { timeout: 8000 });
   pruefe(await h1.isHidden('.f-lesen-ich') && await h2.isHidden('.f-lesen-ich'), 'Vorlesen: Handys ohne Markierung und ohne „Sie sind dran“');
   const wort = (t) => h1.locator('#f-inhalt .f-wort', { hasText: new RegExp('^' + t + '$') }).first();
   await wort('Heparin-Spritze').click();
