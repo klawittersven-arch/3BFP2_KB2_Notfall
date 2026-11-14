@@ -84,8 +84,10 @@ Handy: https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/fall.html – der 
 Jedes Bild erscheint zuerst **im Vollbild** (Klick aufs Bild, Pfeiltaste oder Presenter = weiter); danach steht es
 klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schauen Sie nach vorn.“
 
-1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
-2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was haben Sie getan? Wie sicher haben Sie sich gefühlt (1–5)?
+1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ + „Schreiben Sie Ihre
+   ersten Ideen sofort in Stichworten auf Ihren Zettel.“ → *10 Sekunden starten* → Countdown mit „Aufschreiben!“ → „Stopp!“
+   (Stift und Zettel vorher bereitlegen lassen – so kann später niemand Antworten „übernehmen“, die erst danach gezeigt werden.)
+2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was steht auf Ihrem Zettel? Wie sicher haben Sie sich gefühlt (1–5)?
 3. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
    *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).
    Station 1: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.

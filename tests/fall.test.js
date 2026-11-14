@@ -132,6 +132,7 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-kalt-satz');
   pruefe((await lehrer.textContent('.z-kalt-satz')).includes('Frau Maler reagiert nicht'), 'Beamer: Kaltstart-Satz');
+  pruefe((await lehrer.textContent('.z-kalt-notiz')).includes('Stichworten auf Ihren Zettel'), 'Beamer: Kaltstart fordert zum Aufschreiben auf');
   pruefe(await lehrer.evaluate(() => document.body.classList.contains('z-dunkel')), 'Beamer: Kaltstart dunkel');
   pruefe((await lehrer.getAttribute('.z-kalt', 'style') || '').includes('bilder/kaltstart.jpg'), 'Beamer: Kaltstart-Bild als Hintergrund');
   pruefe(await lehrer.evaluate(async () => (await fetch('bilder/kaltstart.jpg')).ok), 'Beamer: Kaltstart-Bild ladbar');
@@ -141,6 +142,8 @@ function umgebung(Raum) {
   pruefe((await lehrer.textContent('.z-countdown')).trim() === '10', 'Beamer: Countdown beginnt bei 10');
   await warte(1300);
   pruefe(Number((await lehrer.textContent('.z-countdown')).trim()) <= 9, 'Beamer: Countdown läuft');
+  pruefe((await lehrer.textContent('.z-kalt-notiz')).includes('Aufschreiben'), 'Beamer: während des Countdowns „Aufschreiben!“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_1b_countdown.png') });
 
   // Zwei Handys
   async function handy(vorname, klasseText) {

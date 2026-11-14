@@ -91,6 +91,10 @@ var FALL = {
     { id: 'kalt', art: 'kaltstart', kurz: 'Kaltstart',
       satz: 'Sie kommen ins Zimmer. Frau Maler reagiert nicht.',
       aufforderung: 'Sie haben 10 Sekunden: Was tun Sie?',
+      // Die SuS schreiben ihre ersten Ideen sofort auf (Stift und Zettel vorher bereitlegen lassen).
+      // So kann sich später niemand an Antworten „erinnern“, die erst danach gezeigt werden.
+      notiz: 'Schreiben Sie Ihre ersten Ideen sofort in Stichworten auf Ihren Zettel.',
+      notizKurz: 'Aufschreiben!',
       sekunden: 10,
       stopp: 'Stopp!',
       handy: 'Schauen Sie nach vorn.',
@@ -98,24 +102,25 @@ var FALL = {
 
     { id: 'anmelden', art: 'fragen', kurz: 'Ihre 10 Sekunden',
       titel: 'Ihre 10 Sekunden',
-      beamerText: 'Scannen Sie den QR-Code und beantworten Sie zwei Fragen.',
+      beamerText: 'Scannen Sie den QR-Code. Beantworten Sie die Fragen mit Ihrem Zettel.',
       hinweis: 'Der Fall ist belastend. Wenn es Ihnen zu viel wird, dürfen Sie kurz rausgehen.',
       fragen: [
         { id: 'kalttat', mehrfach: true,
-          text: 'Was haben Sie in den 10 Sekunden getan?',
-          hilfe: 'Mehrere Antworten sind möglich.',
+          text: 'Was steht auf Ihrem Zettel?',
+          hilfe: 'Kreuzen Sie nur an, was Sie in den 10 Sekunden aufgeschrieben haben.',
           optionen: [
-            { kuerzel: 'NICHTS', text: 'Nichts – ich wusste nicht, was ich tun soll' },
-            { kuerzel: 'ANSP', text: 'Frau Maler angesprochen oder angefasst' },
-            { kuerzel: 'RUF', text: 'Laut um Hilfe gerufen' },
-            { kuerzel: 'ATEM', text: 'Die Atmung geprüft' },
-            { kuerzel: 'PULS', text: 'Den Puls gefühlt' },
-            { kuerzel: 'NOT', text: 'Den Notruf gewählt' },
-            { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage begonnen' },
-            { kuerzel: 'HOL', text: 'Jemanden geholt' }
+            { kuerzel: 'NICHTS', text: 'Nichts – mir ist nichts eingefallen' },
+            { kuerzel: 'ANSP', text: 'Frau Maler ansprechen oder anfassen' },
+            { kuerzel: 'RUF', text: 'Laut um Hilfe rufen' },
+            { kuerzel: 'ATEM', text: 'Die Atmung prüfen' },
+            { kuerzel: 'PULS', text: 'Den Puls fühlen' },
+            { kuerzel: 'NOT', text: 'Den Notruf wählen' },
+            { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen' },
+            { kuerzel: 'HOL', text: 'Jemanden holen' },
+            { kuerzel: 'ANDERS', text: 'Etwas anderes' }
           ] },
         { id: 'kaltsicher', skala: true,
-          text: 'Wie sicher haben Sie sich gefühlt?',
+          text: 'Wie sicher haben Sie sich in den 10 Sekunden gefühlt?',
           optionen: [
             { kuerzel: '1', text: 'sehr unsicher' },
             { kuerzel: '2', text: 'unsicher' },

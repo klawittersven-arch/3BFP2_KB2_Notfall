@@ -187,13 +187,16 @@
     if (countdown) { clearInterval(countdown); countdown = null; }
     if (phase() === 'bild') { buehne.innerHTML = vollbildHtml(s.bild, ''); return; }
     if (phase() === 'satz') {
-      buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p></div>';
+      buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p>' +
+        (s.notiz ? '<p class="z-kalt-notiz"><span aria-hidden="true">✍️</span> ' + esc(s.notiz) + '</p>' : '') + '</div>';
       return;
     }
     countdownRest = s.sekunden;
     var zeige = function () {
       buehne.innerHTML = kaltKopf(s, 0.7) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p>' +
-        (countdownRest > 0 ? '<p class="z-countdown" aria-live="off">' + countdownRest + '</p>' : '<p class="z-stopp" role="status">' + esc(s.stopp) + '</p>') + '</div>';
+        (countdownRest > 0 ? '<p class="z-countdown" aria-live="off">' + countdownRest + '</p>' +
+          (s.notizKurz ? '<p class="z-kalt-notiz"><span aria-hidden="true">✍️</span> ' + esc(s.notizKurz) + '</p>' : '') :
+          '<p class="z-stopp" role="status">' + esc(s.stopp) + '</p>') + '</div>';
     };
     zeige();
     countdown = setInterval(function () {

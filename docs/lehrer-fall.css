@@ -46,6 +46,8 @@ body.z-dunkel .l-fuss { display: none; }
 .z-kalt { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; }
 .z-kalt-satz { font-size: clamp(36px, 4.2vw, 72px); font-weight: 800; margin: 0 0 30px; max-width: 1300px; }
 .z-kalt-frage { font-size: clamp(28px, 2.8vw, 46px); color: #FFD24D; margin: 0; }
+.z-kalt-notiz { margin: 22px 0 0; padding: 10px 22px; border-radius: 14px; background: rgba(255,210,77,.95); color: #1A1A1A;
+  font-size: clamp(24px, 2.4vw, 40px); font-weight: 800; text-shadow: none !important; }
 .z-countdown { font-size: clamp(120px, 16vw, 260px); font-weight: 900; color: #FFD24D; margin: 0; font-variant-numeric: tabular-nums; }
 .z-stopp { font-size: clamp(80px, 10vw, 180px); font-weight: 900; color: #FF6B5E; margin: 0; }
 .z-kalt-bild { min-height: calc(100vh - 190px); margin: -18px -3vw 0; padding: 0 3vw; background-size: cover; background-position: center; }
