@@ -82,7 +82,11 @@ var INHALTE = {
     nameFehler: 'Bitte so eingeben: Vorname, Leerzeichen, erster Buchstabe des Nachnamens – z. B. „Lena K.“',
     nameDatenschutz: 'Gespeichert werden nur Ihr Name, Ihre Klasse, Ihr Fortschritt und bei welchen Karten der erste Versuch falsch war (die Lehrkraft sieht das nur zusammengefasst für die Klasse). Alles wird nach spätestens 12 Stunden automatisch gelöscht.',
     nameAnzeige: 'Angemeldet als {x} · {y}',
-    nameAendern: 'ändern'
+    nameAendern: 'ändern',
+
+    // Belohnung nach dem Lösen (nur bei Übungen mit „belohnungsspiel: true“, nicht nach dem Durchklicken)
+    spielText: 'Super gemacht! Zur Belohnung dürfen Sie jetzt „Diabetes Run!“ spielen.',
+    spielKnopf: '🎮 Jetzt spielen'
   },
 
   /* ========================================================================
@@ -442,6 +446,9 @@ var INHALTE = {
   ab3a: {
     ab: 'Informationen geben in Krisen',
     raum: 'ab3',
+    // Wer die Übung löst (nicht durchklickt), darf zur Belohnung „Diabetes Run!“ spielen.
+    // Die Bestleistung erscheint auf der Lehrerseite neben dem Namen. false = kein Spiel.
+    belohnungsspiel: true,
     titel: 'Übung: Hilfreich oder ungünstig?',
     anweisung: 'Das sagen oder tun Pflegende bei Angehörigen in einer Krise. Ist das **hilfreich**? Oder gegen welche **Regel** verstößt es?',
     knoepfe: [
@@ -518,5 +525,52 @@ var INHALTE = {
     ],
     merksatz: 'Informationen geben in Krisen: **dosieren** · **einfache Sprache** · **Schweigen aushalten** · **Verständnis offen prüfen** · **ehrlich bleiben** · **Wichtiges wiederholen und aufschreiben**.',
     danach: 'Prüfen Sie mit diesen Regeln noch einmal Ihre Reihenfolge in Aufgabe 2 auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
+     BELOHNUNGSSPIEL „Diabetes Run!“ (spiel.html) – übernommen aus dem AB zur Beratung
+     ======================================================================== */
+
+  spiel: {
+    titel: 'KBS Diabetes Run!',
+    logoAlt: 'Logo der Schule',
+    // {titel} = Titel der Übung ohne „Übung:“
+    gesperrt: 'Das Spiel ist eine Belohnung: Lösen Sie zuerst die Übung „{titel}“.',
+    zurUebungKnopf: 'Zur Übung',
+    unbekannt: 'Bitte scannen Sie den QR-Code auf Ihrem Arbeitsblatt.',
+    zurueckZurUebung: '← Zurück zur Übung',
+
+    los: 'Los geht’s!',
+    nochmal: 'Nochmal',
+    zurueckZumStart: 'Zum Startbildschirm',
+    // {x} wird durch die Punktzahl ersetzt
+    bestleistung: 'Ihre Bestleistung: {x}',
+    punkte: 'Punkte: {x}',
+    neueBestleistung: 'Neue Bestleistung!',
+    gameOver: 'Game over',
+    pausiert: 'Pause – tippen Sie hier, um weiterzuspielen.',
+
+    steuerungHandy: 'Tippen Sie unten auf „⬆ Springen“ oder „⬇ Ducken“. In der Luft noch einmal springen = Doppelsprung.',
+    steuerungTastatur: 'Tastatur: Leertaste oder Pfeil hoch = springen, Pfeil runter = ducken.',
+    spielidee: 'Diese Hohenloher Pflegekraft ist auf Tour durchs schöne Ländle, doch der Zeitplan ist eng – und es lauern zahlreiche Gefahren, nicht nur für ihren Blutzucker! Verlockende Kuchen, Weinkisten, Rollatoren, Pflegewagen und Schlaglöcher überspringen, unter Wespenschwärmen durchducken, und für den Lkw braucht es einen Doppelsprung. Ab 30 Sekunden geht’s erst richtig los!',
+    knopfDucken: '⬇ Ducken',
+    knopfSpringen: '⬆ Springen',
+
+    // Statuszeile: Bestleistung auf der Lehrerseite (Beamer)
+    statusHinweis: '📡 Ihre Bestleistung erscheint auf dem Beamer neben Ihrem Namen.',
+    statusGesendet: '📡 Ihre Bestleistung steht auf dem Beamer neben Ihrem Namen.',
+    statusWartet: '📡 Ihre Bestleistung wird übertragen, sobald das Internet wieder geht.',
+    statusNichtAufListe: '📡 Ihr Name steht gerade nicht auf der Liste der Lehrkraft. Öffnen Sie die Übung noch einmal, dann klappt es.',
+
+    // Nach jedem „Game over“ erscheint zufällig einer dieser Sätze (Wiederholung der sechs Regeln).
+    schonGewusstUeberschrift: 'Schon gewusst?',
+    schonGewusst: [
+      'Im Schock nehmen Menschen nur wenig auf. Viele erinnern sich später nur an den ersten Satz.',
+      'Fachwörter verunsichern zusätzlich: „Wiederbelebung“ statt „Reanimation“.',
+      'Nach einer schweren Nachricht: Pause machen, zugewandt bleiben – „Ich bin da. Nehmen Sie sich Zeit.“',
+      'Auf „Haben Sie das verstanden?“ sagen fast alle „Ja“. Besser: „Was haben Sie verstanden?“',
+      'Ehrlich bleiben: „Das weiß ich nicht. Die Ärztin oder der Arzt kann Ihnen das sagen.“',
+      'Im Stress vergisst man viel: Telefonnummer und Namen aufschreiben.'
+    ]
   }
 };

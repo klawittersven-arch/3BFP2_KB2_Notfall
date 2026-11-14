@@ -281,12 +281,20 @@
         (U.danach ? '<p class="weiter-text">' + fmt(U.danach) + '</p>' : '') + '</div>' +
         '<div class="merksatz"><h2><span aria-hidden="true">📝</span> ' + esc(A.merksatzUeberschrift) + '</h2>' +
         '<p class="merksatz-text">' + fmt(U.merksatz) + '</p>' +
-        '<p class="erster-versuch">' + esc(ersetze(A.ersterVersuch, { x: erster, y: n })) + '</p></div>';
+        '<p class="erster-versuch">' + esc(ersetze(A.ersterVersuch, { x: erster, y: n })) + '</p></div>' +
+        // Belohnung: Minispiel (nur nach ehrlichem Lösen; Bestleistung erscheint auf der Lehrerseite)
+        (U.belohnungsspiel ? '<div class="belohnung"><p>' + esc(A.spielText) + '</p>' +
+          '<a class="knopf" id="spiel-start" href="spiel.html?ab=' + encodeURIComponent(id) + '">' + esc(A.spielKnopf) + '</a></div>' : '');
       var l = lokal();
       if (l) {
         var geloest = lade(GELOEST, l) || {};
         geloest[id] = Date.now();
         speichere(GELOEST, geloest, l);
+        if (U.belohnungsspiel) { // schaltet spiel.html?ab=… für 12 Stunden frei („Noch einmal üben“ nimmt das nicht zurück)
+          var frei = lade(PRAEFIX + 'spiel-frei', l) || {};
+          frei[id] = Date.now();
+          speichere(PRAEFIX + 'spiel-frei', frei, l);
+        }
       }
     }
     if (frisch) {

@@ -3,6 +3,7 @@
 export const AUFBEWAHRUNG_MS = 12 * 60 * 60 * 1000; // nach 12 Stunden ohne Aktivität löschen
 export const MAX_GERAETE = 120;
 export const MAX_UEBUNGEN = 12;
+export const MAX_PUNKTE = 1000000; // Belohnungsspiel: höchste mögliche Punktzahl (Schutz vor Unsinn)
 
 // Raum = Klasse + Arbeitsblatt, z. B. 'k2-ab1' (k1 = 3BFP2/1, k2 = 3BFP2/2)
 const RAUM = /^k[1-9]-ab[1-9]$/;
@@ -42,6 +43,25 @@ export function pruefeEintrag(d) {
   };
 }
 
+// Prüft eine Bestleistung aus dem Belohnungsspiel. Gibt { fehler } oder { eintrag } zurück.
+export function pruefeSpiel(d) {
+  if (!d || typeof d !== 'object') return { fehler: 'keine Daten' };
+  if (!pruefeRaum(d.raum)) return { fehler: 'raum' };
+  if (typeof d.geraet !== 'string' || !GERAET.test(d.geraet)) return { fehler: 'geraet' };
+  if (!ganzzahl(d.punkte, 1, MAX_PUNKTE)) return { fehler: 'punkte' };
+  return { eintrag: { raum: d.raum, geraet: d.geraet, punkte: d.punkte } };
+}
+
+// Trägt die Bestleistung beim Namen ein – nur, wenn das Handy schon auf der Liste steht
+// (also die Übung bearbeitet hat). Höhere Werte ersetzen niedrigere. Gibt false zurück, wenn unbekannt.
+export function spielEintragen(daten, e, jetzt) {
+  const p = daten[e.geraet];
+  if (!p) return false;
+  if (!p.spiel || e.punkte > p.spiel.punkte) p.spiel = { punkte: e.punkte, t: jetzt };
+  p.t = jetzt;
+  return true;
+}
+
 // Entfernt Einträge, die älter als die Aufbewahrungszeit sind. Gibt true zurück, wenn sich etwas geändert hat.
 export function aufraeumen(daten, jetzt) {
   let geaendert = false;
@@ -69,7 +89,11 @@ export function eintragen(daten, e, jetzt, kurzId) {
 export function stand(daten, jetzt) {
   return {
     jetzt,
-    eintraege: Object.values(daten).map((p) => ({ id: p.id, name: p.name, t: p.t, uebungen: p.uebungen }))
+    eintraege: Object.values(daten).map((p) => {
+      const e = { id: p.id, name: p.name, t: p.t, uebungen: p.uebungen };
+      if (p.spiel) e.spiel = p.spiel.punkte; // Bestleistung im Belohnungsspiel
+      return e;
+    })
   };
 }
 

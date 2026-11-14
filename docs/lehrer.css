@@ -82,3 +82,7 @@ code { background: var(--hellblau); padding: 1px 5px; border-radius: 4px; }
 
 /* ↺ = wegen zu schneller Fehler neu gestartet */
 .l-neu .l-stand { color: #7A4300; }
+
+/* Bestleistung im Belohnungsspiel neben dem Namen */
+.l-spiel { font-weight: 700; color: #5A4A00; background: #FFF2C2; border-radius: 999px; padding: 1px 8px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.l-spiel.l-spitze { background: #F2B600; color: #1A1A1A; }

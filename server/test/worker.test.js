@@ -126,6 +126,35 @@ let letzte;
 for (let i = 0; i < 125; i++) letzte = await post(env3, '/fortschritt', eintrag({ geraet: i.toString(16).padStart(32, '0') }));
 pruefe(letzte.status === 429, 'Obergrenze von 120 Geräten pro Raum');
 
+// Belohnungsspiel: Bestleistung neben dem Namen (Woche 4, raum ab3)
+const env4 = umgebung();
+const sp = (o = {}) => Object.assign({ raum: 'k2-ab3', geraet: 'e'.repeat(32), punkte: 420 }, o);
+r = await post(env4, '/spiel', sp());
+pruefe(r.status === 404, 'Spiel: unbekanntes Handy (nicht auf der Liste) → 404');
+await post(env4, '/fortschritt', eintrag({ raum: 'k2-ab3', uebung: 'ab3a', geraet: 'e'.repeat(32), name: 'Ela E.', geloest: 10, gesamt: 10, erster: 9, falsch: ['4-OK'] }));
+r = await post(env4, '/spiel', sp());
+pruefe(r.status === 204 && r.headers.get('Access-Control-Allow-Origin') === '*', 'Spiel: Bestleistung angenommen (204, CORS)');
+s = await (await get(env4, '/stand?raum=k2-ab3')).json();
+pruefe(s.eintraege[0].spiel === 420 && s.eintraege[0].uebungen.ab3a.geloest === 10, 'Stand: Bestleistung neben Name und Fortschritt');
+await post(env4, '/spiel', sp({ punkte: 100 }));
+s = await (await get(env4, '/stand?raum=k2-ab3')).json();
+pruefe(s.eintraege[0].spiel === 420, 'niedrigere Punktzahl ersetzt die Bestleistung nicht');
+await post(env4, '/spiel', sp({ punkte: 777 }));
+s = await (await get(env4, '/stand?raum=k2-ab3')).json();
+pruefe(s.eintraege[0].spiel === 777, 'höhere Punktzahl ersetzt die Bestleistung');
+await post(env4, '/fortschritt', eintrag({ raum: 'k2-ab3', uebung: 'ab3a', geraet: 'e'.repeat(32), name: 'Ela E.', geloest: 10, gesamt: 10, erster: 9, falsch: [] }));
+s = await (await get(env4, '/stand?raum=k2-ab3')).json();
+pruefe(s.eintraege[0].spiel === 777, 'neuer Fortschritt löscht die Bestleistung nicht');
+for (const [t, d] of [['Punkte 0', sp({ punkte: 0 })], ['Punkte negativ', sp({ punkte: -5 })], ['Punkte Kommazahl', sp({ punkte: 1.5 })],
+  ['Punkte zu hoch', sp({ punkte: 5000000 })], ['Punkte als Text', sp({ punkte: '99' })], ['Raum', sp({ raum: 'ab3' })], ['Gerät', sp({ geraet: 'x' })], ['kein JSON', 'xyz']]) {
+  r = await post(env4, '/spiel', d);
+  pruefe(r.status === 400, 'Spiel abgelehnt: ' + t + ' (' + r.status + ')');
+}
+s = await (await get(env4, '/stand?raum=k1-ab3')).json();
+pruefe(s.eintraege.length === 0, 'Spiel: Klassen getrennt');
+s = await (await get(env, '/stand?raum=k2-ab2')).json();
+pruefe(s.eintraege.every((e) => e.spiel === undefined), 'Ohne Spiel kein Feld „spiel“ im Stand');
+
 // Daten werden im Durable-Object-Speicher gesichert
 await post(env, '/fortschritt', eintrag({ name: 'Mia S.' }));
 const gespeichert = env._raeume.get('k2-ab1').speicher.get('daten');

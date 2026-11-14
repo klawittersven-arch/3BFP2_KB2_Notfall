@@ -1,13 +1,14 @@
 // Cloudflare Worker: nimmt den Fortschritt der Handys entgegen und liefert ihn an die Lehrerseite.
 //   POST /fortschritt   (Handy)          {raum, uebung, geraet, name, geloest, gesamt, erster, falsch}
 //   GET  /stand?raum=k2-ab1              (Lehrerseite)
+//   POST /spiel         (Handy)          {raum, geraet, punkte}  Bestleistung im Belohnungsspiel
 //   POST /entfernen     {raum, id}       (Lehrerseite: einen Namen entfernen)
 //   POST /leeren        {raum}           (Lehrerseite: neue Stunde)
 // Raum = Klasse + Arbeitsblatt, z. B. k2-ab1 (k1 = 3BFP2/1, k2 = 3BFP2/2).
 // Auf Wunsch ohne Lehrer-Kennwort: Die Lehrerseiten sind über ihre Adresse erreichbar.
 // Pro Raum gibt es ein Durable Object, das die Daten hält.
 
-import { pruefeEintrag, pruefeRaum, aufraeumen, eintragen, stand, entfernen } from './logik.js';
+import { pruefeEintrag, pruefeRaum, pruefeSpiel, aufraeumen, eintragen, spielEintragen, stand, entfernen } from './logik.js';
 
 const KOPF = {
   'Access-Control-Allow-Origin': '*',
@@ -55,6 +56,14 @@ export default {
       if (p.fehler) return antwort(400, { fehler: p.fehler });
       const r = await anRaum(env, p.eintrag.raum, 'eintragen', p.eintrag);
       return antwort(r.status === 200 ? 204 : 429);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/spiel') {
+      const d = await leseJson(request);
+      const p = pruefeSpiel(d);
+      if (p.fehler) return antwort(400, { fehler: p.fehler });
+      const r = await anRaum(env, p.eintrag.raum, 'spiel', p.eintrag);
+      return r.status === 200 ? antwort(204) : antwort(404, { fehler: 'nicht auf der Liste' });
     }
 
     if (request.method === 'GET' && url.pathname === '/stand') {
@@ -107,6 +116,8 @@ export class Raum {
     if (aktion === 'eintragen') {
       const ok = eintragen(daten, nutzlast, jetzt, () => crypto.randomUUID().replace(/-/g, '').slice(0, 10));
       if (ok) geaendert = true; else status = 429;
+    } else if (aktion === 'spiel') {
+      if (spielEintragen(daten, nutzlast, jetzt)) geaendert = true; else status = 404;
     } else if (aktion === 'stand') {
       ergebnis = stand(daten, jetzt);
     } else if (aktion === 'entfernen') {

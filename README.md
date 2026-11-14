@@ -24,6 +24,19 @@ Die SuS gelangen **nur über die QR-Codes** zu den Übungen. Die Startseite
 |---|---|---|
 | Informationen geben in Krisen (raum `ab3`) | Übung (für die Schnellen): Hilfreich oder ungünstig? | `…/ab3a.html` |
 
+### Belohnungsspiel „Diabetes Run!“ (nach der Übung `ab3a`)
+
+- Wer die Übung **ehrlich löst** (nicht durchklickt), sieht unter „Das Wichtigste in Kürze“ den Kasten
+  „Super gemacht! Zur Belohnung …“ mit dem Knopf **🎮 Jetzt spielen** → `spiel.html?ab=ab3a`.
+  Es ist das Minispiel aus dem AB zur Beratung (Repository `kb2-beratung`): Endless Runner mit der Pixel-Krankenschwester,
+  ein Lauf dauert selten länger als 2 Minuten, kein Ton.
+- Name und Klasse kommen aus der Übung – keine zweite Eingabe. Nach jedem Lauf geht die **Bestleistung** an den Worker.
+- Die **Lehrerseite** dieses Arbeitsblatts zeigt sie neben dem Namen: **🎮 340** · die höchste der Klasse mit **🏆**.
+- Freigeschaltet für 12 Stunden auf diesem Handy; „Noch einmal üben“ nimmt die Freischaltung nicht zurück.
+  Ohne gelöste Übung zeigt `spiel.html` nur „Lösen Sie zuerst die Übung …“.
+- Nach „Game over“ erscheint zufällig ein Satz „Schon gewusst?“ – eine der sechs Regeln (Texte in `inhalte.js`, `spiel`).
+- Ein Spiel an eine andere Übung hängen: in `inhalte.js` bei der Übung `belohnungsspiel: true` eintragen.
+
 ## Lehrerseiten für den Beamer (ohne Kennwort)
 
 Je Klasse und Arbeitsblatt ein eigener Link – am besten als Lesezeichen auf dem Schul-Laptop speichern:
@@ -88,7 +101,8 @@ nur die Lehrerseite zeigt dann „Keine Verbindung zum Server“.
 
 - Übertragen werden nur: der eingegebene Name („Lena K.“), die Klasse, eine zufällige Geräte-Kennung, die Übung,
   die Zahl der gelösten Karten, die Zahl der Neustarts und die Nummern der Karten, die beim ersten Versuch falsch
-  waren. Keine Anmeldung, keine Cookies, keine Analyse, keine fremden Skripte.
+  waren – beim Belohnungsspiel zusätzlich die Bestleistung (eine Zahl). Keine Anmeldung, keine Cookies, keine
+  Analyse, keine fremden Skripte.
 - Die Lehrerseite zeigt Fehler nur zusammengefasst für die Klasse, nicht je Person.
 - Gelöscht wird automatisch nach 12 Stunden ohne Aktivität oder sofort mit „Liste leeren“.
 - Die Daten liegen bei Cloudflare (Durable Object). Bitte im Zweifel mit der/dem Datenschutzbeauftragten der Schule abstimmen.
@@ -111,9 +125,10 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
 ## Tests
 
 - `node tests/uebungen.test.js` prüft mit Playwright alle Übungen in Handygröße (360 px), Namenseingabe mit
-  Klassenwahl, Senden des Fortschritts, Schutz gegen Durchklicken und die Lehrerseiten je Klasse (mit nachgebildetem Server).
+  Klassenwahl, Senden des Fortschritts, Schutz gegen Durchklicken, die Lehrerseiten je Klasse und das Belohnungsspiel
+  (Freischaltung, Lauf, Bestleistung neben dem Namen) – mit nachgebildetem Server.
 - `cd server && node test/worker.test.js` prüft den Worker (Eingabeprüfung, Klassen-Räume, Entfernen, Leeren,
-  Löschen nach 12 Stunden, Obergrenzen).
+  Löschen nach 12 Stunden, Obergrenzen, Bestleistung im Belohnungsspiel).
 
 ## Dateien
 
@@ -124,6 +139,7 @@ docs/                    ← alles, was GitHub Pages veröffentlicht
   app.js, style.css      ← Übungen (Handy)
   lehrer.js, lehrer.css  ← Lehrerseiten (Beamer)
   index.html             ← Startseite (nur Hinweis auf den QR-Code)
+  spiel.html, spiel.js, spiel.css, pixel.js, logo-kbs.png   ← Belohnungsspiel „Diabetes Run!“
   ab1a.html … ab3a.html  ← die Übungen         (erzeugt mit werkzeuge/seiten_erzeugen.py)
   lehrer-3bfp2-1-ab1.html … lehrer-3bfp2-2-ab3.html   (ebenfalls erzeugt)
   sw.js                  ← Offline-Speicher (nach größeren Änderungen VERSION erhöhen)

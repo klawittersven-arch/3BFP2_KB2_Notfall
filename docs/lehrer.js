@@ -9,6 +9,8 @@
   var raum = document.body.getAttribute('data-raum');           // z. B. 'k2-ab1'
   var ab = raum.split('-')[1];                                   // z. B. 'ab1'
   var UEBUNGEN = Object.keys(INHALTE).filter(function (k) { return INHALTE[k].raum === ab; });
+  // Gibt es auf diesem Arbeitsblatt eine Übung mit Belohnungsspiel? Dann steht die Bestleistung neben dem Namen.
+  var MIT_SPIEL = UEBUNGEN.some(function (k) { return INHALTE[k].belohnungsspiel; });
 
   var inhalt = document.getElementById('l-inhalt');
   var status = document.getElementById('l-status');
@@ -59,6 +61,7 @@
   // ---------- Anzeige ----------
   function zeichne(daten) {
     var leute = daten.eintraege.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'de'); });
+    var spitze = MIT_SPIEL ? Math.max.apply(null, [0].concat(leute.map(function (p) { return Number(p.spiel) || 0; }))) : 0;
     inhalt.innerHTML = UEBUNGEN.map(function (uid) {
       var U = INHALTE[uid];
       var n = U.karten.length;
@@ -85,11 +88,16 @@
         // fertig: ✓ bzw. ⚠ mit der Zahl der Karten, die beim ERSTEN Versuch richtig waren; sonst: gelöst/gesamt
         var stand = z.fertig ? (z.klick ? '⚠ ' : '✓ ') + erster + '/' + n : (z.g >= 0 ? z.g + '/' + n : '–');
         if (neu) stand += ' ↺' + (neu > 1 ? neu : '');
+        var punkte = MIT_SPIEL ? Number(z.p.spiel) || 0 : 0;
         var titel = (z.fertig ? 'fertig – beim ersten Versuch richtig: ' + erster + ' von ' + n :
           (z.g >= 0 ? 'dabei – gelöst: ' + z.g + ' von ' + n : 'noch nicht begonnen')) +
-          (neu ? ' · ' + neu + '× wegen zu schneller Fehler neu gestartet' : '');
+          (neu ? ' · ' + neu + '× wegen zu schneller Fehler neu gestartet' : '') +
+          (punkte ? ' · Bestleistung im Spiel: ' + punkte + (punkte === spitze ? ' (höchste der Klasse)' : '') : '');
+        // Bestleistung im Belohnungsspiel (🏆 = höchste der Klasse)
+        var spielHtml = punkte ? '<span class="l-spiel' + (punkte === spitze ? ' l-spitze' : '') + '">' +
+          (punkte === spitze ? '🏆 ' : '🎮 ') + punkte.toLocaleString('de-DE') + '</span>' : '';
         return '<li class="' + art + (neu ? ' l-neu' : '') + '" style="--anteil:' + anteil + '%"' + (titel ? ' title="' + esc(titel) + '"' : '') + '>' +
-          '<span class="l-name">' + esc(z.p.name) + '</span><span class="l-stand">' + stand + '</span>' +
+          '<span class="l-name">' + esc(z.p.name) + '</span><span class="l-stand">' + stand + '</span>' + spielHtml +
           '<button type="button" class="l-weg" data-id="' + esc(z.p.id) + '" data-name="' + esc(z.p.name) + '" aria-label="' + esc(z.p.name) + ' entfernen">×</button></li>';
       }).join('');
       // Welche Karten waren beim ersten Versuch am häufigsten falsch – und welche Antwort wurde gewählt?
@@ -217,6 +225,7 @@
     fuss.innerHTML = '<button type="button" class="l-knopf l-zweit" id="l-leeren">Liste leeren (neue Stunde)</button>' +
       '<p class="l-hinweis">✓ 9/12 = fertig, 9 von 12 Karten beim ersten Versuch richtig · ⚠ = fertig, aber zu wenige beim ' +
       'ersten Versuch richtig (durchgeklickt?) · 6/12 = dabei · ↺ = wegen zu schneller Fehler neu gestartet. ' +
+      (MIT_SPIEL ? '🎮 = Bestleistung im Belohnungsspiel „Diabetes Run!“ (🏆 = höchste der Klasse). ' : '') +
       'Namen und Fortschritt werden nach spätestens 12 Stunden automatisch gelöscht.</p>';
     document.getElementById('l-leeren').addEventListener('click', function () {
       if (!window.confirm('Alle Namen und Fortschritte dieser Klasse für dieses Arbeitsblatt löschen?')) return;

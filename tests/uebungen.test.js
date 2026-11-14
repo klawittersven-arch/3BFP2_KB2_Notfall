@@ -5,6 +5,7 @@
  * Teil B: mit Fortschrittsanzeige – Namenseingabe mit Klassenwahl, Senden des Fortschritts (nachgebildeter Server).
  * Teil C: Lehrerseiten je Klasse – Anzeige der Namen und Zahlen, Besprechen, Entfernen, Leeren.
  * Teil D: Schutz gegen Durchklicken – Sperre nach Fehler, Neustart bei zu schnellen Fehlern, ↺ auf der Lehrerseite.
+ * Teil E: Belohnungsspiel nach Übung ab3a – Freischaltung, Spiel, Bestleistung auf der Lehrerseite neben dem Namen.
  * In Teil A–C sind Sperre und Neustart ausgeschaltet (sonst würden die schnellen Testklicks sie auslösen). */
 const { chromium } = require('playwright');
 const http = require('http');
@@ -43,10 +44,11 @@ function webserver() {
 function fortschrittsServer() {
   const raeume = {};
   const posts = [];
+  const spielPosts = [];
   let nr = 0;
   const kopf = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
   return {
-    posts, raeume,
+    posts, raeume, spielPosts,
     async route(route) {
       const req = route.request();
       const url = new URL(req.url());
@@ -57,6 +59,14 @@ function fortschrittsServer() {
         const p = r[d.geraet] = r[d.geraet] || { id: 'id' + (++nr), uebungen: {} };
         p.name = d.name; p.t = Date.now();
         p.uebungen[d.uebung] = { geloest: d.geloest, gesamt: d.gesamt, erster: d.erster, neu: d.neu || 0, falsch: d.falsch, t: Date.now() };
+        return route.fulfill({ status: 204, headers: kopf });
+      }
+      if (req.method() === 'POST' && url.pathname === '/spiel') {
+        const d = JSON.parse(req.postData());
+        spielPosts.push(d);
+        const p = (raeume[d.raum] || {})[d.geraet];
+        if (!p) return route.fulfill({ status: 404, headers: kopf, body: '{"fehler":"nicht auf der Liste"}' });
+        p.spiel = Math.max(p.spiel || 0, d.punkte);
         return route.fulfill({ status: 204, headers: kopf });
       }
       if (req.method() === 'GET' && url.pathname === '/stand') {
@@ -397,6 +407,126 @@ function fortschrittsServer() {
     pruefe((await ben.innerText()).includes('↺') && (await ben.getAttribute('title')).includes('neu gestartet'), 'D: Lehrerseite zeigt ↺ beim Namen: ' + (await ben.innerText()) + ' / ' + (await ben.getAttribute('title')));
     await p2.screenshot({ path: path.join(__dirname, 'lehrer-neustart.png') });
     await c2.close();
+  }
+
+  /* ---------------- Teil E: Belohnungsspiel nach ab3a ---------------- */
+  {
+    const U = I.ab3a;
+    const loesen = async (page, mitFehler) => {
+      const karten = page.locator('.karte');
+      for (let i = 0; i < U.karten.length; i++) {
+        const richtige = [].concat(U.karten[i].richtig);
+        if (mitFehler) {
+          for (const b of U.knoepfe.map(x => x.kuerzel)) {
+            if (richtige.includes(b)) continue;
+            const btn = karten.nth(i).locator(`button[data-kuerzel="${b}"]`);
+            if (await btn.isEnabled()) await btn.click();
+          }
+        }
+        await karten.nth(i).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
+      }
+    };
+    const ctx = await kontextMitServer({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+    const page = await ctx.newPage();
+    const fehler = [];
+    beobachte(page, fehler, SERVER);
+    // Ohne gelöste Übung: gesperrt
+    await page.goto(basis + 'spiel.html?ab=ab3a');
+    pruefe((await page.locator('#panel').innerText()).includes('Lösen Sie zuerst die Übung „Hilfreich oder ungünstig?“') &&
+      await page.locator('#knopf-los').count() === 0, 'E: Spiel ohne gelöste Übung gesperrt');
+    pruefe(await page.locator('#panel a.knopf[href="ab3a.html"]').count() === 1, 'E: gesperrt → Knopf „Zur Übung“');
+    await page.goto(basis + 'spiel.html?ab=ab1a');
+    pruefe((await page.locator('#panel').innerText()).includes('QR-Code'), 'E: Übung ohne Belohnungsspiel → kein Spiel');
+    // Übung lösen (ehrlich) → Belohnung
+    await page.goto(basis + 'ab3a.html');
+    await anmelden(page, 'Ela Engel', 'k2');
+    await loesen(page, false);
+    const bel = page.locator('.belohnung');
+    pruefe(await bel.isVisible() && (await bel.innerText()).includes('Diabetes Run!'), 'E: nach dem Lösen erscheint die Belohnung');
+    pruefe(await page.locator('#spiel-start').getAttribute('href') === 'spiel.html?ab=ab3a', 'E: Knopf führt zu spiel.html?ab=ab3a');
+    const reihenfolge = await page.evaluate(() => { const m = document.querySelector('.abschluss .merksatz'), b = document.querySelector('.belohnung'); return !!(m && b && (m.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)); });
+    pruefe(reihenfolge, 'E: Belohnung steht unter „Das Wichtigste in Kürze“');
+    await page.waitForTimeout(800);
+    await page.evaluate(() => document.querySelector('.belohnung').scrollIntoView({ block: 'end' }));
+    await page.screenshot({ path: path.join(__dirname, 'handy-ab3a-belohnung.png') });
+    await page.click('#spiel-start');
+    await page.waitForSelector('#knopf-los');
+    pruefe((await page.locator('#panel').innerText()).includes('Ela E. · 3BFP2/2'), 'E: Startbildschirm zeigt Name und Klasse aus der Übung');
+    pruefe((await page.locator('#spiel-status').innerText()).includes('Beamer'), 'E: Hinweis, dass die Bestleistung auf dem Beamer erscheint');
+    await page.screenshot({ path: path.join(__dirname, 'handy-spiel-start.png') });
+    // Ein Lauf ohne Eingaben endet am ersten Hindernis
+    await page.click('#knopf-los');
+    pruefe(await page.locator('#steuerung').isVisible(), 'E: Lauf startet, Steuerknöpfe sichtbar');
+    pruefe(fs1.spielPosts.length === 0, 'E: vor dem ersten Lauf wird nichts gesendet');
+    await page.waitForFunction(() => window.PflegeSprint.zustand().bildschirm === 'ende', null, { timeout: 30000 });
+    const punkte = await page.evaluate(() => window.PflegeSprint.diag.letztePunkte);
+    pruefe(punkte > 0 && (await page.locator('#ergebnis-punkte').innerText()).includes(String(punkte)), 'E: Game over mit Punkten: ' + punkte);
+    pruefe((await page.locator('.wusstest').innerText()).includes('Schon gewusst?'), 'E: „Schon gewusst?“ mit einer Regel');
+    await page.waitForTimeout(400);
+    const sp = fs1.spielPosts[fs1.spielPosts.length - 1];
+    pruefe(sp && sp.punkte === punkte && sp.raum === 'k2-ab3' && /^[a-f0-9]{32}$/.test(sp.geraet) && Object.keys(sp).length === 3,
+      'E: nur Raum, Geräte-Kennung und Bestleistung gesendet: ' + JSON.stringify(sp));
+    pruefe((await page.locator('#spiel-status').innerText()).includes('steht auf dem Beamer'), 'E: Status „steht auf dem Beamer“');
+    await page.screenshot({ path: path.join(__dirname, 'handy-spiel-ende.png') });
+    // „Noch einmal üben“ nimmt die Freischaltung nicht zurück
+    await page.goto(basis + 'ab3a.html');
+    await page.click('#noch-einmal');
+    await page.goto(basis + 'spiel.html?ab=ab3a');
+    pruefe(await page.locator('#knopf-los').count() === 1 && (await page.locator('#panel').innerText()).includes('Ihre Bestleistung: ' + punkte), 'E: nach „Noch einmal üben“ weiter spielbar, Bestleistung bleibt');
+    const breit = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
+    pruefe(breit, 'E: Spiel ohne waagerechtes Scrollen');
+    pruefe(fehler.length === 0, 'Teil E (Handy): keine Konsolenfehler / fremden Anfragen: ' + fehler.join(' | '));
+    await ctx.close();
+
+    // Durchgeklickt → keine Belohnung, Spiel bleibt gesperrt
+    const c3 = await kontextMitServer({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+    const p3 = await c3.newPage();
+    await p3.goto(basis + 'ab3a.html');
+    await anmelden(p3, 'Max M.', 'k2');
+    await loesen(p3, true);
+    pruefe((await p3.locator('#merksatz-bereich').innerText()).includes('nicht einfach durchklicken') && await p3.locator('.belohnung').count() === 0, 'E: durchgeklickt → keine Belohnung');
+    await p3.goto(basis + 'spiel.html?ab=ab3a');
+    pruefe(await p3.locator('#knopf-los').count() === 0, 'E: durchgeklickt → Spiel gesperrt');
+    await c3.close();
+
+    // Lehrerseite: Bestleistung neben dem Namen, 🏆 bei der höchsten
+    const ela = Object.values(fs1.raeume['k2-ab3']).find(p => p.name === 'Ela E.');
+    pruefe(ela && ela.spiel === punkte, 'E: Bestleistung beim Namen gespeichert');
+    fs1.raeume['k2-ab3']['9'.repeat(32)] = { id: 'spitze1', name: 'Tom T.', t: Date.now(), spiel: punkte + 500,
+      uebungen: { ab3a: { geloest: 10, gesamt: 10, erster: 9, neu: 0, falsch: ['4-OK'], t: Date.now() } } };
+    const c4 = await kontextMitServer({ viewport: { width: 1280, height: 720 } });
+    const p4 = await c4.newPage();
+    const f4 = [];
+    beobachte(p4, f4, SERVER);
+    await p4.goto(basis + 'lehrer-3bfp2-2-ab3.html');
+    await p4.waitForSelector('.l-karte[data-uebung="ab3a"] .l-pille');
+    const elaPille = p4.locator('.l-pille', { hasText: 'Ela E.' });
+    const tomPille = p4.locator('.l-pille', { hasText: 'Tom T.' });
+    pruefe((await elaPille.locator('.l-spiel').innerText()).includes('🎮 ' + punkte.toLocaleString('de-DE')), 'E: Lehrerseite zeigt 🎮 + Bestleistung bei Ela E.: ' + await elaPille.innerText());
+    pruefe((await tomPille.locator('.l-spiel').innerText()).includes('🏆'), 'E: höchste Bestleistung mit 🏆');
+    pruefe(await p4.locator('.l-pille', { hasText: 'Max M.' }).locator('.l-spiel').count() === 0, 'E: ohne Spiel keine Punktzahl');
+    pruefe((await tomPille.getAttribute('title')).includes('höchste der Klasse'), 'E: Erklärung beim Darüberfahren');
+    pruefe((await p4.locator('#l-fuss').innerText()).includes('Belohnungsspiel'), 'E: Fußzeile erklärt 🎮 und 🏆');
+    await p4.screenshot({ path: path.join(__dirname, 'lehrer-ab3-spiel.png') });
+    await p4.goto(basis + 'lehrer-3bfp2-2-ab1.html');
+    await p4.waitForSelector('.l-karte');
+    pruefe(!(await p4.locator('#l-fuss').innerText()).includes('Belohnungsspiel'), 'E: AB ohne Spiel – kein Hinweis auf das Spiel');
+    pruefe(f4.length === 0, 'Teil E (Lehrerseite): keine Konsolenfehler: ' + f4.join(' | '));
+    await c4.close();
+
+    // Name nicht (mehr) auf der Liste (z. B. nach „Liste leeren“) → Hinweis statt Fehler
+    const c5 = await kontextMitServer({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+    const p5 = await c5.newPage();
+    await p5.goto(basis + 'ab3a.html');
+    await anmelden(p5, 'Ida I.', 'k2');
+    await loesen(p5, false);
+    delete fs1.raeume['k2-ab3'][Object.keys(fs1.raeume['k2-ab3']).find(g => fs1.raeume['k2-ab3'][g].name === 'Ida I.')];
+    await p5.click('#spiel-start');
+    await p5.click('#knopf-los');
+    await p5.waitForFunction(() => window.PflegeSprint.zustand().bildschirm === 'ende', null, { timeout: 30000 });
+    await p5.waitForTimeout(400);
+    pruefe((await p5.locator('#spiel-status').innerText()).includes('nicht auf der Liste'), 'E: nicht auf der Liste → Hinweis „Übung noch einmal öffnen“');
+    await c5.close();
   }
 
   await browser.close();

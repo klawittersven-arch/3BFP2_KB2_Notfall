@@ -172,3 +172,8 @@ a { color: var(--petrol); }
 .zu-schnell { margin: 0 0 16px; padding: 14px 16px; border-radius: 12px; background: var(--bernstein-hell); border: 3px solid var(--bernstein-rand); }
 .zu-schnell h2 { margin: 0 0 6px; font-size: 20px; color: var(--bernstein); }
 .zu-schnell p { margin: 0; }
+
+/* ---------- Belohnung: Minispiel nach dem Lösen ---------- */
+.belohnung { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; background: #FFF6D6; border: 3px solid #F2B600; }
+.belohnung p { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--dunkelpetrol); }
+.belohnung .knopf { display: block; width: 100%; text-align: center; font-size: 20px; }
