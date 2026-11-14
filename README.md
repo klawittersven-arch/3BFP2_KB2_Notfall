@@ -88,6 +88,11 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
 2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was haben Sie getan? Wie sicher haben Sie sich gefühlt (1–5)?
 3. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
    *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).
+   Station 1: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.
+   Station 5: die Schritte der Wiederbelebung **in die richtige Reihenfolge** tippen (Reihenfolge nach den
+   Reanimationsleitlinien 2025: Notruf vor der Atemkontrolle). Ergebnis = Reihenfolge der Klasse nach Durchschnittsplatz,
+   Auflösung = richtige Reihenfolge daneben und „ganz richtig sortiert: x von y“; die Handys zeigen ✓/✗ je Platz.
+   Die richtige Reihenfolge steht in `fall-inhalte.js` (Reihenfolge der `optionen` bei `s5`).
 4. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
 5. **Perspektiven-Runde:** Jede Gruppe wählt eine Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft,
    die Angehörigen, Frau Maler): „Was hätte diese Person gebraucht?“ + Lernfrage. Auf dem Beamer je Person eine Spalte;

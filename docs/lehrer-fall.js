@@ -53,7 +53,7 @@
   function schritt(i) { return F.schritte[Math.max(0, Math.min(i, F.schritte.length - 1))]; }
   // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
   // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
-  function hatPassung(q) { return !!(q && q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })); }
+  function hatPassung(q) { return !!(q && (q.reihenfolge || (q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })))); }
   function phasen(s) {
     var bild = s.bild ? ['bild'] : [];
     if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
@@ -118,7 +118,7 @@
       if (naechste === 'satz') return 'Satz zeigen';
       if (naechste === 'countdown') return '10 Sekunden starten';
       if (naechste === 'frage') return 'Abschnitt zeigen';
-      if (naechste === 'aufloesung') return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : 'Auflösen: Was passt?';
+      if (naechste === 'aufloesung') return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : (s.frage.reihenfolge ? 'Auflösen: richtige Reihenfolge' : 'Auflösen: Was passt?');
       return 'Ergebnis zeigen';
     }
     if (ansicht.schritt >= F.schritte.length - 1) return '';
@@ -220,7 +220,48 @@
   }
 
   // Ergebnis einer Frage als Balken (Anteil der Personen, die diese Antwort gewählt haben)
+  // Reihenfolge-Frage: Durchschnittsplatz je Schritt (= Reihenfolge der Klasse); bei der Auflösung daneben die richtige
+  function reihenfolgeErgebnisHtml(q, aufgeloest) {
+    var erg = (stand && stand.ergebnisse[q.id]) || {};
+    var n = (stand && stand.anzahl[q.id]) || 0;
+    var v = vergleich();
+    var ve = v ? (v.ergebnisse[q.id] || {}) : null, vn = v ? (v.anzahl[q.id] || 0) : 0;
+    var richtig = q.optionen.map(function (o) { return o.kuerzel; });
+    var schnitt = q.optionen.map(function (o) {
+      var summe = 0, zahl = 0;
+      Object.keys(erg).forEach(function (c) {
+        var m = c.match(/^(\d+)(.+)$/);
+        if (m && m[2] === o.kuerzel) { summe += Number(m[1]) * erg[c]; zahl += erg[c]; }
+      });
+      return { o: o, schnitt: zahl ? summe / zahl : null };
+    }).sort(function (a, b) { return (a.schnitt === null) - (b.schnitt === null) || a.schnitt - b.schnitt; });
+    var klasse = '<ol class="z-folge">' + schnitt.map(function (x, i) {
+      var ok = aufgeloest && richtig[i] === x.o.kuerzel;
+      return '<li class="' + (aufgeloest ? (ok ? 'z-folge-ok' : 'z-folge-falsch') : '') + '">' + (aufgeloest ? (ok ? '✓ ' : '✗ ') : '') + esc(x.o.text) +
+        ' <small>Ø ' + (x.schnitt === null ? '–' : x.schnitt.toFixed(1).replace('.', ',')) + '</small></li>';
+    }).join('') + '</ol>';
+    var ganz = erg.OK || 0;
+    var kopf = '<p class="z-ergebnis-kopf">' + esc(q.text) + ' <small>· ' + antworten(n) + '</small></p>';
+    if (!aufgeloest) {
+      return '<div class="z-ergebnis">' + kopf + '<p class="z-folge-titel">So hat die Klasse sortiert (Durchschnittsplatz):</p>' + klasse + '</div>';
+    }
+    var platzKlasse = {};
+    schnitt.forEach(function (x, i) { platzKlasse[x.o.kuerzel] = x.schnitt === null ? null : i + 1; });
+    return '<div class="z-ergebnis">' + kopf +
+      '<p class="z-folge-ganz">Ganz richtig sortiert: <strong>' + ganz + ' von ' + n + '</strong> (' + prozent(ganz, n) + '\u00a0%)' +
+      (ve && vn ? ' <span class="z-vgl-text">· SW 6: ' + prozent(ve.OK || 0, vn) + '\u00a0%</span>' : '') + '</p>' +
+      '<p class="z-folge-titel">Richtige Reihenfolge – daneben der Platz der Klasse:</p><ol class="z-folge z-folge-richtig">' +
+      q.optionen.map(function (o, i) {
+        var pk = platzKlasse[o.kuerzel], ok = pk === i + 1;
+        var x = schnitt.filter(function (y) { return y.o.kuerzel === o.kuerzel; })[0];
+        return '<li class="' + (ok ? 'z-folge-ok' : 'z-folge-falsch') + '">' + esc(o.text) + ' <small>' + (ok ? '✓' : '✗') +
+          ' Klasse: ' + (pk ? 'Platz ' + pk + ' (Ø ' + x.schnitt.toFixed(1).replace('.', ',') + ')' : '–') + '</small></li>';
+      }).join('') + '</ol>' +
+      (q.quelle ? '<p class="z-quelle">' + esc(q.quelle) + '</p>' : '') + '</div>';
+  }
+
   function ergebnisHtml(q, mitChristin, mitPassung) {
+    if (q.reihenfolge) return reihenfolgeErgebnisHtml(q, mitPassung);
     var erg = (stand && stand.ergebnisse[q.id]) || {};
     var n = (stand && stand.anzahl[q.id]) || 0;
     var v = vergleich();
@@ -293,10 +334,14 @@
     if (!nach) {
       return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
     }
-    return rahmen(text +
-      (auf && abschnitte(s.id, 'aufloesung').length ? '<div class="z-aufloesung"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
-        falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '') +
-      ergebnisHtml(s.frage, auf ? s.christin : null, auf));
+    var aufText = abschnitte(s.id, 'aufloesung');
+    var lang = aufText.map(function (t) { return t.text; }).join(' ').length > 400;
+    var box = auf && aufText.length ? '<div class="z-aufloesung' + (lang ? ' z-lang' : '') + '"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
+      falltextHtml(aufText) + '</div></div>' : '';
+    if (auf && lang) {   // langer Text (Station 5): Text links, Ergebnis rechts statt Bild – passt ohne Scrollen
+      return kopf + text + '<div class="z-auf-zwei">' + box + ergebnisHtml(s.frage, s.christin, true) + '</div>';
+    }
+    return rahmen(text + box + ergebnisHtml(s.frage, auf ? s.christin : null, auf));
   }
 
   // Zeitstrahl: alle Stationen nebeneinander mit dem Klassen-Ergebnis und Christins Handeln
@@ -314,6 +359,8 @@
           return '<span class="z-nw">' + o.zeichen + ' ' + prozent(erg[o.kuerzel] || 0, n) + '\u00a0%</span>';
         }).join(' ') + '</span>' +
           (x.christin ? '<span class="z-christin-zs">Christin: ' + F.ampel.filter(function (o) { return o.kuerzel === x.christin.ampel; })[0].zeichen + ' ' + esc(x.christin.kurz) + '</span>' : '');
+      } else if (q.reihenfolge) {
+        inhalt = '<span class="z-mini-legende">richtig sortiert: ' + prozent(erg.OK || 0, n) + '\u00a0%</span>';
       } else {
         var oben = optionen(q).slice().sort(function (a, b) { return (erg[b.kuerzel] || 0) - (erg[a.kuerzel] || 0); })
           .filter(function (o) { return erg[o.kuerzel]; }).slice(0, 2);

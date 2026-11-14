@@ -75,7 +75,7 @@
   }
   // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
   // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
-  function hatPassung(q) { return !!(q && q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })); }
+  function hatPassung(q) { return !!(q && (q.reihenfolge || (q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })))); }
   function phasen(s) {
     var bild = s.bild ? ['bild'] : [];
     if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
@@ -134,7 +134,7 @@
         verbunden = true;
         var neueSitzung = !stand || stand.sitzung !== z.sitzung;
         stand = z;
-        if (neueSitzung) { ladeMeine(); auswahl = {}; }
+        if (neueSitzung) { ladeMeine(); auswahl = {}; folge = {}; }
         zeichne();
       })
       .catch(function () { verbunden = false; zeigeLeiste(); });
@@ -218,7 +218,73 @@
 
   // Eine Frage: Ampel, Auswahl (eine Antwort), Mehrfachauswahl oder Skala
   function optionen(q) { return q.ampel ? F.ampel : q.optionen; }
+  // ---------- Reihenfolge-Fragen ----------
+  // Gesendet wird die Reihenfolge als Liste „Platz + Kürzel“ (z. B. '1ANSP', '2RUF' …) und 'OK', wenn alles stimmt.
+  // So zählt der Server ohne Änderung, wie oft welcher Schritt auf welchem Platz steht.
+  var folge = {};       // Frage → angetippte Kürzel in Reihenfolge (noch nicht gesendet)
+  var mischung = {};    // Frage → gemischte Anzeige-Reihenfolge (bleibt, solange die Seite offen ist)
+  function folgeAusWert(wert) {
+    return (Array.isArray(wert) ? wert : []).filter(function (c) { return /^\d/.test(c); })
+      .sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); })
+      .map(function (c) { return c.replace(/^\d+/, ''); });
+  }
+  function folgeAlsWert(q, liste) {
+    var richtig = q.optionen.map(function (o) { return o.kuerzel; });
+    var wert = liste.map(function (k, i) { return (i + 1) + k; });
+    if (liste.join() === richtig.join()) wert.push('OK');
+    return wert;
+  }
+  function gemischt(q) {
+    if (mischung[q.id]) return mischung[q.id];
+    var a = q.optionen.slice(), richtig = a.map(function (o) { return o.kuerzel; }).join();
+    for (var n = 0; n < 20; n++) {          // nie zufällig schon richtig sortiert anzeigen
+      for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+      if (a.map(function (o) { return o.kuerzel; }).join() !== richtig) break;
+    }
+    return (mischung[q.id] = a);
+  }
+  function reihenfolgeHtml(q, gesperrt, aufgeloest) {
+    var gesendet = folgeAusWert(meine.antworten[q.id]);
+    if (!folge[q.id]) folge[q.id] = gesendet.slice();
+    var liste = gesperrt ? gesendet : folge[q.id];
+    var richtig = q.optionen.map(function (o) { return o.kuerzel; });
+    var text = function (k) { return q.optionen.filter(function (o) { return o.kuerzel === k; })[0].text; };
+    var html;
+    if (!aufgeloest) {
+      html = '<div class="f-folge" role="group" aria-label="' + esc(q.text) + '">' + gemischt(q).map(function (o) {
+        var platz = liste.indexOf(o.kuerzel);
+        return '<button type="button" class="f-opt f-folge-opt' + (platz >= 0 ? ' f-an' : '') + '" data-folge="' + esc(q.id) +
+          '" data-kuerzel="' + esc(o.kuerzel) + '"' + (gesperrt ? ' disabled' : '') + '>' +
+          '<span class="f-platz" aria-hidden="true">' + (platz >= 0 ? platz + 1 : '') + '</span><span>' + esc(o.text) + '</span></button>';
+      }).join('') + '</div>';
+      if (liste.length) {
+        html += '<p class="f-unter">' + esc(H.ihreReihenfolge) + '</p><ol class="f-folge-liste">' +
+          liste.map(function (k) { return '<li>' + esc(text(k)) + '</li>'; }).join('') + '</ol>';
+      }
+    } else {
+      // Auflösung: eigene Reihenfolge mit ✓/✗ und die richtige Reihenfolge
+      html = '<p class="f-unter">' + esc(H.ihreReihenfolge) + '</p><ol class="f-folge-liste">' + (gesendet.length ? gesendet.map(function (k, i) {
+        var ok = richtig[i] === k;
+        return '<li class="' + (ok ? 'f-folge-ok' : 'f-folge-falsch') + '">' + (ok ? '✓ ' : '✗ ') + esc(text(k)) +
+          (ok ? '' : ' <small>(richtig: Platz ' + (richtig.indexOf(k) + 1) + ')</small>') + '</li>';
+      }).join('') : '<li>' + esc(H.keineAntwort) + '</li>') + '</ol>' +
+        '<p class="f-unter">' + esc(H.richtigeReihenfolge) + '</p><ol class="f-folge-liste f-folge-richtig">' +
+        richtig.map(function (k) { return '<li>' + esc(text(k)) + '</li>'; }).join('') + '</ol>' +
+        (q.quelle ? '<p class="f-hilfe">' + esc(q.quelle) + '</p>' : '');
+    }
+    var status = '';
+    if (gesperrt && !aufgeloest) status = '<p class="f-status">' + esc(H.gesperrt) + (gesendet.length ? '' : ' ' + esc(H.keineAntwort)) + '</p>';
+    else if (!gesperrt && gesendet.length && gesendet.join() === liste.join()) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
+    return '<section class="f-frage" data-frage="' + esc(q.id) + '"><h3>' + esc(q.text) + '</h3>' +
+      (q.hilfe && !gesperrt ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') + html +
+      (!gesperrt ? '<button type="button" class="knopf f-senden" data-senden-folge="' + esc(q.id) + '"' +
+        (liste.length === q.optionen.length ? '' : ' disabled') + '>' + esc(H.senden) +
+        (liste.length < q.optionen.length ? ' (' + liste.length + ' von ' + q.optionen.length + ')' : '') + '</button>' : '') +
+      status + '</section>';
+  }
+
   function frageHtml(q, gesperrt, aufgeloest) {
+    if (q.reihenfolge) return reihenfolgeHtml(q, gesperrt, aufgeloest);
     var gewaehlt = meine.antworten[q.id];
     var liste = gewaehlt === undefined ? [] : (Array.isArray(gewaehlt) ? gewaehlt : [gewaehlt]);
     if (q.mehrfach && !auswahl[q.id]) auswahl[q.id] = liste.slice();
@@ -270,6 +336,27 @@
         } else {
           sendeAntwort(q.id, k);
         }
+        var y = window.scrollY;
+        neuZeichnen();
+        window.scrollTo(0, y);
+      });
+    });
+    Array.prototype.forEach.call(inhalt.querySelectorAll('[data-folge]'), function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-folge'), k = b.getAttribute('data-kuerzel');
+        if (abgestimmt()) return;
+        var a = folge[id], i = a.indexOf(k);
+        if (i >= 0) a.splice(i, 1); else a.push(k);   // noch einmal tippen = herausnehmen, die anderen rücken nach
+        var y = window.scrollY;
+        neuZeichnen();
+        window.scrollTo(0, y);
+      });
+    });
+    Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden-folge]'), function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-senden-folge'), q = sucheFrage(id);
+        if (!q || folge[id].length !== q.optionen.length) return;
+        sendeAntwort(id, folgeAlsWert(q, folge[id]));
         var y = window.scrollY;
         neuZeichnen();
         window.scrollTo(0, y);

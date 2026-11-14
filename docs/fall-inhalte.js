@@ -23,6 +23,9 @@
      perspektiven  – Gruppen: „Was hätte diese Person gebraucht?“ + Lernfrage
      ende          – Begriffsparkplatz, Ausblick, Ergebnis sichern
 
+   Reihenfolge-Fragen (reihenfolge: true): Die Antworten stehen hier in der RICHTIGEN Reihenfolge,
+   die Handys zeigen sie gemischt. Die SuS tippen sie nacheinander an (1., 2., 3. …).
+
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
    kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
 
@@ -152,17 +155,19 @@ var FALL = {
 
     { id: 's5', art: 'station', nummer: 5, kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
       bild: { datei: 'bilder/kaltstart.jpg', alt: 'Das Bild vom Anfang: Frau Maler liegt reglos im Bett, im Vordergrund das Tablett mit Mittagessen.' },
-      frage: { id: 's5',
-        text: 'Was tun Sie als Erstes?',
+      // Reihenfolge nach den Reanimationsleitlinien des ERC 2025 (Basismaßnahmen, außerhalb des Krankenhauses):
+      // Notruf VOR der Atemkontrolle (neu seit 2025). Kürzel höchstens 4 Zeichen.
+      frage: { id: 's5', reihenfolge: true,
+        text: 'Was tun Sie? Bringen Sie die Schritte in die richtige Reihenfolge.',
+        hilfe: 'Tippen Sie die Schritte nacheinander an: zuerst Schritt 1, dann Schritt 2 … Noch einmal tippen nimmt einen Schritt wieder heraus.',
+        quelle: 'Reihenfolge nach den Reanimationsleitlinien 2025 (ERC/GRC)',
         optionen: [
-          { kuerzel: 'ANSP', text: 'Frau Maler ansprechen oder anfassen' },
+          { kuerzel: 'ANSP', text: 'Ansprechen und an den Schultern rütteln' },
           { kuerzel: 'RUF', text: 'Laut um Hilfe rufen' },
-          { kuerzel: 'ATEM', text: 'Die Atmung prüfen' },
-          { kuerzel: 'PULS', text: 'Den Puls fühlen' },
-          { kuerzel: 'NOT', text: 'Den Notruf wählen' },
-          { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen' },
-          { kuerzel: 'HOL', text: 'Jemanden holen' },
-          { kuerzel: 'WEISS', text: 'Ich weiß es nicht' }
+          { kuerzel: 'NOT', text: 'Notruf 112 wählen (Handy auf laut)' },
+          { kuerzel: 'ATEM', text: 'Atemwege frei machen, Atmung prüfen' },
+          { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen (30 : 2)' },
+          { kuerzel: 'AED', text: 'Defibrillator (AED) holen lassen und anlegen' }
         ] } },
 
     { id: 's6', art: 'station', nummer: 6, kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',
@@ -251,6 +256,8 @@ var FALL = {
   handy: {
     warten: 'Hören Sie zu. Gleich geht es weiter.',
     nachVorn: 'Schauen Sie nach vorn.',
+    ihreReihenfolge: 'Ihre Reihenfolge:',
+    richtigeReihenfolge: 'Richtige Reihenfolge:',
     gesendet: 'Gesendet. Sie können Ihre Antwort noch ändern.',
     gesperrt: 'Die Abstimmung ist beendet.',
     ihreAntwort: 'Ihre Antwort:',
