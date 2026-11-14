@@ -169,6 +169,7 @@ function umgebung(Raum) {
   await lehrer.waitForSelector('.z-qr img');
   pruefe(await lehrer.evaluate(() => { const i = document.querySelector('.z-qr img'); return i.complete && i.naturalWidth > 100; }), 'Beamer: QR-Code wird angezeigt');
   pruefe((await lehrer.textContent('.z-hinweis')).includes('kurz rausgehen'), 'Beamer: Hinweis auf Belastung');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Jetzt am Smartphone: Beantworten Sie die 2 Fragen'), 'Beamer: „Jetzt am Smartphone“ beim Anmelden');
   await h1.waitForSelector('.f-frage[data-frage="kalttat"]', { timeout: 8000 });
   await h1.click('.f-opt[data-frage="kalttat"][data-kuerzel="ANSP"]');
   await h1.click('.f-opt[data-frage="kalttat"][data-kuerzel="RUF"]');
@@ -254,8 +255,12 @@ function umgebung(Raum) {
   await h1.click('.f-opt[data-kuerzel="UNTERZ"]');
   await h1.click('[data-senden="s1"]');
   await warte(400);
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3a0_station1_frage.png') });
+  console.log('  (Info) Station 1 Abstimmung: Seitenhöhe ' + (await lehrer.evaluate(() => document.documentElement.scrollHeight + ' / Fenster ' + window.innerHeight)));
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie alle Risiken') && (await lehrer.textContent('.z-handy-auftrag')).includes('„Senden“'), 'Beamer: Station 1 sagt, was am Smartphone zu tun ist');
   await lehrer.click('#z-weiter'); // Ergebnis
   pruefe((await lehrer.textContent('#z-weiter')).includes('Auflösen: Was passt?'), 'Beamer: Station 1 hat eine Auflösung');
+  pruefe(!(await lehrer.$('.z-handy-auftrag')), 'Beamer: nach dem Abstimmen kein Smartphone-Auftrag mehr');
   pruefe(!(await lehrer.$('.z-passt-nicht')), 'Beamer: bei „Ergebnis zeigen“ noch nicht aufgelöst');
   await lehrer.click('#z-weiter'); // Auflösen
   await lehrer.waitForSelector('.z-passt-nicht');
@@ -340,6 +345,8 @@ function umgebung(Raum) {
   await lehrer.waitForSelector('.z-vollbild');
   await lehrer.keyboard.press('ArrowRight');
   await h1.waitForSelector('.f-frage[data-frage="s7"] .f-opt', { timeout: 8000 });
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie genau 3 Dinge aus'), 'Beamer: Station 7 – „Wählen Sie genau 3 Dinge aus“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3d_handyauftrag.png') });
   for (const k of ['REDEN', 'TEAM']) await h1.click(`.f-opt[data-kuerzel="${k}"]`);
   pruefe(await h1.isDisabled('[data-senden="s7"]') && (await h1.textContent('[data-senden="s7"]')).includes('2 von 3'), 'Handy: Senden erst bei genau 3');
   await h1.click('.f-opt[data-kuerzel="PROFI"]');
@@ -365,6 +372,7 @@ function umgebung(Raum) {
   await lehrer.click(`[data-gehe="${zurueckIndex}"]`);
   await lehrer.waitForSelector('.z-zeitstrahl');
   pruefe((await lehrer.$$('.z-zeitstrahl li')).length === 7, 'Beamer: Zeitstrahl mit 7 Stationen');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie eine Station'), 'Beamer: Zurückspulen mit Smartphone-Auftrag');
   await lehrer.waitForFunction(() => [...document.querySelectorAll('.z-zs-bild')].every((i) => i.complete && i.naturalWidth > 0));
   pruefe((await lehrer.$$('.z-zs-bild')).length === 5, 'Beamer: Zeitstrahl mit 5 Bildern');
   pruefe((await lehrer.textContent('.z-zeitstrahl')).includes('🔴 50\u00a0%'), 'Beamer: Zeitstrahl zeigt Ampel-Anteile');
@@ -443,6 +451,7 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await h1.waitForSelector('.f-frage[data-frage="s2"]', { timeout: 8000 });
   pruefe((await h1.getAttribute('.f-ampel .f-rot', 'aria-pressed')) === 'false', 'Handy: neue Sitzung – alte Antwort nicht mehr markiert');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie eine Farbe'), 'Beamer: Ampel mit Smartphone-Auftrag');
   await h1.click('.f-ampel .f-rot');
   await warte(2300);
   await lehrer.click('#z-weiter');

@@ -111,6 +111,11 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
    in der kleinsten Gruppe. Unpassende Einträge entfernt × am Eintrag.
 7. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
 
+**Jetzt am Smartphone:** Solange abgestimmt oder geschrieben wird, steht auf dem Beamer ein dunkler Balken mit 📱 und
+dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus. Tippen Sie dann auf „Senden“.“). Bei langen Abschnitten bleibt er
+beim Vorlesen unten sichtbar. Nach *Ergebnis zeigen* verschwindet er. Die Sätze stehen in `fall-inhalte.js` bei
+`handyAuftrag`.
+
 **Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;
 ein Tipp auf das Wort daneben nimmt es dazu (z. B. „lebensverlängernden Maßnahmen“, höchstens 4 Wörter), noch einmal
 tippen nimmt es wieder weg. Geparkte Wörter sind im Text gepunktet unterstrichen. Eintippen geht weiterhin. Auf dem

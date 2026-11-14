@@ -28,6 +28,10 @@
    die Handys zeigen sie gemischt. Die SuS tippen sie nacheinander an (1., 2., 3. …).
    Mit „anzahl: 3“ werden nur die ersten 3 gesucht – die übrigen Antworten passen nicht (mit „grund“).
 
+   Auftrag fürs Smartphone (handyAuftrag): steht während der Abstimmung groß auf dem Beamer
+   („📱 Jetzt am Smartphone: …“), damit klar ist, dass die SuS etwas tun müssen. Ohne Angabe
+   erzeugt die Beamer-Seite einen passenden Satz zur Frageart.
+
    Mehrfachauswahl mit „waehlen: 3“: Die SuS müssen genau 3 Antworten wählen (eine echte Entscheidung).
 
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
@@ -103,7 +107,8 @@ var FALL = {
 
     { id: 'anmelden', art: 'fragen', kurz: 'Ihre 10 Sekunden',
       titel: 'Ihre 10 Sekunden',
-      beamerText: 'Scannen Sie den QR-Code. Beantworten Sie die Fragen mit Ihrem Zettel.',
+      beamerText: 'Scannen Sie den QR-Code und melden Sie sich mit Ihrem Namen an.',
+      handyAuftrag: 'Beantworten Sie die 2 Fragen. Nehmen Sie Ihren Zettel dazu.',
       hinweis: 'Der Fall ist belastend. Wenn es Ihnen zu viel wird, dürfen Sie kurz rausgehen.',
       fragen: [
         { id: 'kalttat', mehrfach: true,
@@ -146,6 +151,7 @@ var FALL = {
     { id: 's1', art: 'station', nummer: 1, kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
       frage: { id: 's1', mehrfach: true,
+        handyAuftrag: 'Wählen Sie alle Risiken, die Sie im Text finden. Tippen Sie dann auf „Senden“.',
         text: 'Welche Risiken hat Frau Maler?',
         hilfe: 'Wählen Sie nur, was zum Text passt. Mehrere Antworten sind möglich.',
         optionen: [
@@ -162,16 +168,16 @@ var FALL = {
 
     { id: 's2', art: 'station', nummer: 2, kurz: 'Am Morgen', zeitstrahl: 'Wade dick, Schmerzen',
       bild: { datei: 'bilder/station2.jpg', alt: 'Frau Maler sitzt auf der Bettkante und zeigt auf ihre rechte Wade. Die Auszubildende hockt neben ihr.' },
-      frage: { id: 's2', ampel: true, text: 'Wie schätzen Sie das ein?' },
+      frage: { id: 's2', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'G', kurz: 'nicht weitergegeben' } },
 
     { id: 's3', art: 'station', nummer: 3, kurz: 'Beim Frühstück', zeitstrahl: 'verschluckt, hustet',
-      frage: { id: 's3', ampel: true, text: 'Wie schätzen Sie das ein?' },
+      frage: { id: 's3', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'Y', kurz: 'husten lassen' } },
 
     { id: 's4', art: 'station', nummer: 4, kurz: 'Gegen elf Uhr', zeitstrahl: 'Atemnot, Puls 118',
       bild: { datei: 'bilder/station4.jpg', alt: 'Frau Maler liegt halb aufrecht im Bett, atmet mit offenem Mund und hält eine Hand auf der Brust. Die Auszubildende fühlt den Puls.' },
-      frage: { id: 's4', ampel: true, text: 'Wie schätzen Sie das ein?' },
+      frage: { id: 's4', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'G', kurz: 'dachte: nur aufgeregt' } },
 
     { id: 's5', art: 'station', nummer: 5, kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
@@ -180,6 +186,7 @@ var FALL = {
       // Die ersten 3 Antworten sind die richtigen (in der richtigen Reihenfolge), die übrigen passen nicht.
       // Die Handys zeigen alle gemischt. Kürzel höchstens 4 Zeichen.
       frage: { id: 's5', reihenfolge: true, anzahl: 3,
+        handyAuftrag: 'Tippen Sie die 3 wichtigsten Schritte in der richtigen Reihenfolge an. Tippen Sie dann auf „Senden“.',
         text: 'Was sind die 3 wichtigsten Schritte? Tippen Sie sie in der richtigen Reihenfolge an.',
         hilfe: 'Tippen Sie zuerst Schritt 1, dann Schritt 2, dann Schritt 3. Noch einmal tippen nimmt einen Schritt wieder heraus.',
         merksatz: 'Prüfen – Rufen – Drücken',
@@ -198,6 +205,7 @@ var FALL = {
     { id: 's6', art: 'station', nummer: 6, kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',
       frage: { id: 's6',
         text: 'War die Reanimation erlaubt?',
+        handyAuftrag: 'Wählen Sie eine Antwort.',
         optionen: [
           { kuerzel: 'JA', text: 'Ja' },
           { kuerzel: 'NEIN', text: 'Nein' },
@@ -210,6 +218,7 @@ var FALL = {
       // 3 helfen nicht (passt: false). Welche 3 am wichtigsten sind, ist Gesprächsanlass (hinweis bei der Auflösung).
       frage: { id: 's7', mehrfach: true, waehlen: 3,
         text: 'Welche 3 Dinge würden Christin jetzt am meisten helfen?',
+        handyAuftrag: 'Wählen Sie genau 3 Dinge aus. Tippen Sie dann auf „Senden“.',
         hilfe: 'Wählen Sie genau 3.',
         hinweis: 'Alle grünen Antworten können helfen. Welche zuerst? Das hängt von Christin ab – darüber lohnt sich das Gespräch.',
         optionen: [
@@ -229,6 +238,7 @@ var FALL = {
       vorspann: 'Frau Maler hatte wohl eine Lungenembolie.',
       frage: { id: 'zurueck',
         text: 'Ab welcher Station hätte man den Notfall vielleicht verhindern können?',
+        handyAuftrag: 'Wählen Sie eine Station.',
         optionen: [
           { kuerzel: 'S1', text: '1 · Die Übergabe' },
           { kuerzel: 'S2', text: '2 · Am Morgen' },
@@ -242,7 +252,8 @@ var FALL = {
       titel: 'Was hätte diese Person gebraucht?',
       // Die Beamer-Seite teilt alle Angemeldeten automatisch und gleichmäßig auf die Personen auf (eine Gruppe je Person).
       auftrag: 'Besprechen Sie in Ihrer Gruppe: Was hätte diese Person gebraucht? Jede und jeder schickt **mindestens einen Eintrag** – mit einer Lernfrage: Was müssen wir dafür lernen?',
-      beamerAuftrag: 'Jede Gruppe bearbeitet eine Person. Jede und jeder schickt mindestens einen Eintrag.',
+      beamerAuftrag: 'Jede Gruppe bearbeitet eine Person.',
+      handyAuftrag: 'Schreiben Sie: Was hätte Ihre Person gebraucht? Dazu eine Lernfrage. Jede und jeder schickt mindestens einen Eintrag.',
       gruppeTitel: 'Ihre Gruppe bearbeitet:',
       gruppeMit: 'In Ihrer Gruppe:',
       gruppeWarten: 'Ihre Lehrkraft teilt gleich die Gruppen ein …',

@@ -208,6 +208,21 @@
     }, 1000);
   }
 
+  // Auftrag fürs Smartphone: groß auf dem Beamer, solange abgestimmt wird
+  function handyText(q) {
+    if (q.handyAuftrag) return q.handyAuftrag;
+    var senden = ' Tippen Sie dann auf „Senden“.';
+    if (q.reihenfolge) return 'Tippen Sie ' + (q.anzahl ? 'die ' + q.anzahl + ' wichtigsten Antworten' : 'alle Antworten') + ' in der richtigen Reihenfolge an.' + senden;
+    if (q.waehlen) return 'Wählen Sie genau ' + q.waehlen + ' Antworten aus.' + senden;
+    if (q.mehrfach) return 'Wählen Sie alles, was passt.' + senden;
+    if (q.ampel) return 'Wählen Sie eine Farbe: 🟢 🟡 🔴';
+    return 'Wählen Sie eine Antwort.';
+  }
+  function handyAuftragHtml(text, zusatz) {
+    return '<div class="z-handy-auftrag"><span class="z-handy-zeichen" aria-hidden="true">📱</span>' +
+      '<p><strong>Jetzt am Smartphone:</strong> ' + esc(text) + '</p>' + (zusatz ? '<p class="z-handy-zusatz">' + zusatz + '</p>' : '') + '</div>';
+  }
+
   // Namen mit ✓, wenn die Frage(n) dieses Schritts beantwortet sind
   function namenHtml(frageIds) {
     if (!stand) return '';
@@ -353,6 +368,7 @@
       return '<section class="z-zwei"><div class="z-qr"><img src="qr_fall.png" alt="QR-Code zur Fall-Einführung">' +
         '<p class="z-adresse">' + esc(HANDY_ADRESSE.replace(/^https?:\/\//, '')) + '</p></div>' +
         '<div><h2 class="z-titel">' + esc(s.titel) + '</h2><p class="z-gross">' + esc(s.beamerText) + '</p>' +
+        (s.handyAuftrag ? handyAuftragHtml(s.handyAuftrag) : '') +
         '<p class="z-hinweis">' + esc(s.hinweis) + '</p>' + namenHtml(ids) + '</div></section>';
     }
     return '<h2 class="z-titel">' + esc(s.titel) + '</h2><div class="z-raster">' +
@@ -378,7 +394,7 @@
       return kopf + '<div class="z-station' + (nach ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
     };
     if (!nach) {
-      return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
+      return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + handyAuftragHtml(handyText(s.frage)) + namenHtml([s.frage.id]));
     }
     var aufText = abschnitte(s.id, 'aufloesung');
     var lang = aufText.map(function (t) { return t.text; }).join(' ').length > 400;
@@ -421,7 +437,7 @@
   function zurueckHtml(s) {
     return '<h2 class="z-titel">' + esc(s.titel) + '</h2>' + zeitstrahlHtml() +
       '<p class="z-frage"><span class="z-vorspann">' + esc(s.vorspann) + '</span> ' + esc(s.frage.text) + '</p>' +
-      (ansicht.stufe === 0 ? namenHtml([s.frage.id]) : ergebnisHtml(s.frage));
+      (ansicht.stufe === 0 ? handyAuftragHtml(handyText(s.frage)) + namenHtml([s.frage.id]) : ergebnisHtml(s.frage));
   }
 
   // ---------- Gruppen der Perspektiven-Runde ----------
@@ -497,7 +513,8 @@
     var mitEintrag = stand ? stand.leute.filter(function (p) { return p.eintraege; }).length : 0;
     return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2><span class="z-persp-knoepfe">' +
       '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen" title="Klick auf einen Namen setzt ihn in die nächste Gruppe">Gruppen neu einteilen</button></span></div>' +
-      '<p class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' + (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</p>' +
+      handyAuftragHtml(s.handyAuftrag || s.beamerAuftrag || '', '<span class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' +
+        (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</span>') +
       '<div class="z-spalten">' + spalten + '</div>';
   }
 
