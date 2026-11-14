@@ -442,7 +442,7 @@ function fortschrittsServer() {
     await anmelden(page, 'Ela Engel', 'k2');
     await loesen(page, false);
     const bel = page.locator('.belohnung');
-    pruefe(await bel.isVisible() && (await bel.innerText()).includes('Diabetes Run!'), 'E: nach dem Lösen erscheint die Belohnung');
+    pruefe(await bel.isVisible() && (await bel.innerText()).includes('Notfall-Run!'), 'E: nach dem Lösen erscheint die Belohnung');
     pruefe(await page.locator('#spiel-start').getAttribute('href') === 'spiel.html?ab=ab3a', 'E: Knopf führt zu spiel.html?ab=ab3a');
     const reihenfolge = await page.evaluate(() => { const m = document.querySelector('.abschluss .merksatz'), b = document.querySelector('.belohnung'); return !!(m && b && (m.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)); });
     pruefe(reihenfolge, 'E: Belohnung steht unter „Das Wichtigste in Kürze“');

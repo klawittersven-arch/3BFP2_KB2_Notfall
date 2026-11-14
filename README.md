@@ -24,12 +24,14 @@ Die SuS gelangen **nur über die QR-Codes** zu den Übungen. Die Startseite
 |---|---|---|
 | Informationen geben in Krisen (raum `ab3`) | Übung (für die Schnellen): Hilfreich oder ungünstig? | `…/ab3a.html` |
 
-### Belohnungsspiel „Diabetes Run!“ (nach der Übung `ab3a`)
+### Belohnungsspiel „Notfall-Run!“ (nach der Übung `ab3a`)
 
 - Wer die Übung **ehrlich löst** (nicht durchklickt), sieht unter „Das Wichtigste in Kürze“ den Kasten
   „Super gemacht! Zur Belohnung …“ mit dem Knopf **🎮 Jetzt spielen** → `spiel.html?ab=ab3a`.
-  Es ist das Minispiel aus dem AB zur Beratung (Repository `kb2-beratung`): Endless Runner mit der Pixel-Krankenschwester,
-  ein Lauf dauert selten länger als 2 Minuten, kein Ton.
+  Es ist der Endless Runner „Diabetes Run!“ aus dem AB zur Beratung (Repository `kb2-beratung`) mit derselben
+  Pixel-Krankenschwester – neu gestaltet für den Themenblock Notfall: Notfallkoffer, Defi-Koffer, Leitkegel und
+  Notfallwagen überspringen, unter Rauch ducken („Rauch steigt nach oben“), Doppelsprung über den Rettungswagen („112“),
+  im Hintergrund ein Krankenhaus. Ein Lauf dauert selten länger als 2 Minuten, kein Ton.
 - Name und Klasse kommen aus der Übung – keine zweite Eingabe. Nach jedem Lauf geht die **Bestleistung** an den Worker.
 - Die **Lehrerseite** dieses Arbeitsblatts zeigt sie neben dem Namen: **🎮 340** · die höchste der Klasse mit **🏆**.
 - Freigeschaltet für 12 Stunden auf diesem Handy; „Noch einmal üben“ nimmt die Freischaltung nicht zurück.
@@ -139,7 +141,7 @@ docs/                    ← alles, was GitHub Pages veröffentlicht
   app.js, style.css      ← Übungen (Handy)
   lehrer.js, lehrer.css  ← Lehrerseiten (Beamer)
   index.html             ← Startseite (nur Hinweis auf den QR-Code)
-  spiel.html, spiel.js, spiel.css, pixel.js, logo-kbs.png   ← Belohnungsspiel „Diabetes Run!“
+  spiel.html, spiel.js, spiel.css, pixel.js, logo-kbs.png   ← Belohnungsspiel „Notfall-Run!“
   ab1a.html … ab3a.html  ← die Übungen         (erzeugt mit werkzeuge/seiten_erzeugen.py)
   lehrer-3bfp2-1-ab1.html … lehrer-3bfp2-2-ab3.html   (ebenfalls erzeugt)
   sw.js                  ← Offline-Speicher (nach größeren Änderungen VERSION erhöhen)

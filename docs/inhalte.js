@@ -85,7 +85,7 @@ var INHALTE = {
     nameAendern: 'ändern',
 
     // Belohnung nach dem Lösen (nur bei Übungen mit „belohnungsspiel: true“, nicht nach dem Durchklicken)
-    spielText: 'Super gemacht! Zur Belohnung dürfen Sie jetzt „Diabetes Run!“ spielen.',
+    spielText: 'Super gemacht! Zur Belohnung dürfen Sie jetzt „Notfall-Run!“ spielen.',
     spielKnopf: '🎮 Jetzt spielen'
   },
 
@@ -446,7 +446,7 @@ var INHALTE = {
   ab3a: {
     ab: 'Informationen geben in Krisen',
     raum: 'ab3',
-    // Wer die Übung löst (nicht durchklickt), darf zur Belohnung „Diabetes Run!“ spielen.
+    // Wer die Übung löst (nicht durchklickt), darf zur Belohnung „Notfall-Run!“ spielen.
     // Die Bestleistung erscheint auf der Lehrerseite neben dem Namen. false = kein Spiel.
     belohnungsspiel: true,
     titel: 'Übung: Hilfreich oder ungünstig?',
@@ -528,11 +528,11 @@ var INHALTE = {
   },
 
   /* ========================================================================
-     BELOHNUNGSSPIEL „Diabetes Run!“ (spiel.html) – übernommen aus dem AB zur Beratung
+     BELOHNUNGSSPIEL „Notfall-Run!“ (spiel.html) – Endless Runner aus „Diabetes Run!“, neu gestaltet für Notfallsituationen
      ======================================================================== */
 
   spiel: {
-    titel: 'KBS Diabetes Run!',
+    titel: 'KBS Notfall-Run!',
     logoAlt: 'Logo der Schule',
     // {titel} = Titel der Übung ohne „Übung:“
     gesperrt: 'Das Spiel ist eine Belohnung: Lösen Sie zuerst die Übung „{titel}“.',
@@ -552,7 +552,7 @@ var INHALTE = {
 
     steuerungHandy: 'Tippen Sie unten auf „⬆ Springen“ oder „⬇ Ducken“. In der Luft noch einmal springen = Doppelsprung.',
     steuerungTastatur: 'Tastatur: Leertaste oder Pfeil hoch = springen, Pfeil runter = ducken.',
-    spielidee: 'Diese Hohenloher Pflegekraft ist auf Tour durchs schöne Ländle, doch der Zeitplan ist eng – und es lauern zahlreiche Gefahren, nicht nur für ihren Blutzucker! Verlockende Kuchen, Weinkisten, Rollatoren, Pflegewagen und Schlaglöcher überspringen, unter Wespenschwärmen durchducken, und für den Lkw braucht es einen Doppelsprung. Ab 30 Sekunden geht’s erst richtig los!',
+    spielidee: 'Notfall! Die Hohenloher Pflegekraft eilt zum Einsatz – doch unterwegs liegt einiges im Weg. Notfallkoffer, Defi-Koffer, Leitkegel, Notfallwagen und Schlaglöcher überspringen. Bei Rauch ducken – Rauch steigt nach oben! Und für den Rettungswagen braucht es einen Doppelsprung. Ab 30 Sekunden geht’s erst richtig los!',
     knopfDucken: '⬇ Ducken',
     knopfSpringen: '⬆ Springen',
 

@@ -1,4 +1,4 @@
-/* Pixel-Grafiken für „Diabetes Run!“ – alles selbst gezeichnet, keine Bilddateien.
+/* Pixel-Grafiken für „Notfall-Run!“ (Figur aus „Diabetes Run!“ übernommen) – alles selbst gezeichnet, keine Bilddateien.
  * Jede Grafik ist ein Raster aus Zeichen; jedes Zeichen steht für eine Farbe,
  * „.“ ist durchsichtig. Beim Start wird jede Grafik einmal in eine kleine
  * Offscreen-Leinwand gezeichnet und danach nur noch kopiert (drawImage). */
@@ -13,15 +13,15 @@
     K: '#F76892', k: '#D34677',          // Kreuz, Kragen, Gürtel und Schuhe rosa; hinterer Schuh
     H: '#964536', h: '#702F26',          // Haare, Haarschatten
     F: '#FCD2B5', c: '#FAA2A8',          // Haut, Wangen
-    E: '#1A1A1A',                        // Augen der Wespe
-    // Hindernisse
-    G: '#D9A35E', g: '#B07C3C',          // Kuchenteig
-    C: '#FFF4E2', R: '#C8283C',          // Sahne, Kirsche
-    L: '#8B5A2B', l: '#6A4220',          // Holz
-    V: '#5E2B71', v: '#8A4FA0', N: '#4E8A3A', // Trauben, Blatt
-    M: '#5C6B70', m: '#2B2B2B', r: '#9AA7AB', // Metall, Reifen, Griff
-    P: '#E3EAEC', p: '#AEBBBE', T: '#3F6C72', // Pflegewagen
-    Y: '#F2C200', Z: '#202020', X: '#D6EEF6'  // Wespe
+    // Hindernisse (Notfall- und Krisensituationen)
+    A: '#D7262F', a: '#A3161F',          // Notfallrot, dunkles Rot
+    D: '#1F8A4C', d: '#13643A',          // Defi-Koffer grün
+    Y: '#F2C200',                        // Blitz, Scheinwerfer
+    Q: '#F26B1D', q: '#B84A12',          // Leitkegel orange
+    U: '#2F6BFF', u: '#A9C2FF',          // Blaulicht
+    J: '#9AA0A5', j: '#C9CDD1', I: '#767D82', // Rauch
+    M: '#5C6B70', m: '#2B2B2B',          // Metall, Reifen
+    P: '#E3EAEC', X: '#D6EEF6'           // helles Metall, Fensterglas
   };
 
   /* ---------- Figur: Krankenschwester mit Haube (wie in „Gipfelsprint“) ---------- */
@@ -208,112 +208,113 @@
     return FIGUR[pose] || FIGUR.lauf2;
   }
 
-  /* ---------- Hindernisse und Sammelobjekt ---------- */
+  /* ---------- Hindernisse: Notfallkoffer, Defi, Leitkegel, Notfallwagen, Rauch, Rettungswagen ---------- */
   var GRAFIK = {
-    kuchen: [
-      '..........R.',
-      '.......CCCCC',
-      '....CCCCCCCC',
-      '.CCCCCCCCCCC',
-      'GGGGGGGGGGGG',
-      'CCCCCCCCCCCC',
-      'GGGGGGGGGGGG',
-      'GGGGGGGGGGGG',
-      'gggggggggggg'
+    notfallkoffer: [
+      '.....mmmm.....',
+      '....m....m....',
+      'aAAAAAAAAAAAAa',
+      'AAAAAAWWAAAAAA',
+      'AAAAAAWWAAAAAA',
+      'AAAAWWWWWWAAAA',
+      'AAAAWWWWWWAAAA',
+      'AAAAAAWWAAAAAA',
+      'AAAAAAWWAAAAAA',
+      'AAAAAAAAAAAAAA',
+      'aaaaaaaaaaaaaa'
     ],
-    weinkiste: [
-      '...VvV.NN.VvV...',
-      '..VvVvVNVVvVvV..',
-      '.VVvVvVVvVVvVvV.',
-      'LLLLLLLLLLLLLLLL',
-      'LllllllllllllllL',
-      'LLLLLLLLLLLLLLLL',
-      'LL............LL',
-      'LLLLLLLLLLLLLLLL',
-      'LllllllllllllllL',
-      'LLLLLLLLLLLLLLLL',
-      'Ll............lL',
-      'LLLLLLLLLLLLLLLL'
+    defi: [
+      '......mmmm......',
+      '.....m....m.....',
+      'dDDDDDDDDDDDDDDd',
+      'DDDDDWWDDWWDDDDD',
+      'DDDDWWWWWWWWDDDD',
+      'DDDDWWWYWWWWDDDD',
+      'DDDDWWYYWWWWDDDD',
+      'DDDDDWWYYWWDDDDD',
+      'DDDDDDWWYWDDDDDD',
+      'DDDDDDDWWDDDDDDD',
+      'DDDDDDDDDDDDDDDD',
+      'dddddddddddddddd'
     ],
-    rollator: [
-      '.rr.............',
-      '.rM.............',
-      '..M.............',
-      '..M.............',
-      '..MMMMMMMMMMMM..',
-      '..M.TTTTTTTT.M..',
-      '..M.TTTTTTTT.M..',
-      '..M..........M..',
-      '...M........M...',
-      '...M........M...',
-      '...MMMMMMMMMM...',
-      '....M......M....',
-      '....M......M....',
-      '....M......M....',
-      '..mmm.....mmm...',
-      '.mmMmm...mmMmm..',
-      '..mmm.....mmm...'
+    leitkegel: [
+      '.....qQ.....',
+      '.....QQ.....',
+      '....qQQQ....',
+      '....QQQQ....',
+      '....WWWW....',
+      '...WWWWWW...',
+      '...qQQQQQ...',
+      '...QQQQQQ...',
+      '..qQQQQQQQ..',
+      '..WWWWWWWW..',
+      '..WWWWWWWW..',
+      '.qQQQQQQQQQ.',
+      '.QQQQQQQQQQ.',
+      '.QQQQQQQQQQ.',
+      'mmmmmmmmmmmm',
+      'mmmmmmmmmmmm',
+      'mmmmmmmmmmmm'
     ],
-    pflegewagen: [
+    notfallwagen: [
       'MMMMMMMMMMMMMMMMMM',
       'MPPPPPPPPPPPPPPPPM',
-      'MPPPPPPPPPPPPPPPPM',
-      'MppppppppppppppppM',
-      'MPPPPPPPPPPPPPPPPM',
-      'MPPPPPPTTTTPPPPPPM',
-      'MppppppppppppppppM',
-      'MPPPPPPPPPPPPPPPPM',
-      'MPPPPPPTTTTPPPPPPM',
-      'MppppppppppppppppM',
-      'MPPPPPPPPPPPPPPPPM',
-      'MPPPPPPTTTTPPPPPPM',
-      'MppppppppppppppppM',
+      'MAAAAAAAWWAAAAAAAM',
+      'MAAAAAWWWWWWAAAAAM',
+      'MAAAAAWWWWWWAAAAAM',
+      'MAAAAAAAWWAAAAAAAM',
+      'MaaaaaaaaaaaaaaaaM',
+      'MAAAAAAAAAAAAAAAAM',
+      'MAAAAAAPPPPAAAAAAM',
+      'MaaaaaaaaaaaaaaaaM',
+      'MAAAAAAAAAAAAAAAAM',
+      'MAAAAAAPPPPAAAAAAM',
+      'MaaaaaaaaaaaaaaaaM',
       'MMMMMMMMMMMMMMMMMM',
       '..M............M..',
       '.mmm..........mmm.',
       '.mMm..........mMm.',
       '.mmm..........mmm.'
     ],
-    // Lkw (wird im Spiel aus Fahrerhaus, Kofferaufbau, Rädern und Schriftzug zusammengesetzt)
-    lkwKabine: [
-      '....mmmmmmmmmmmmmmmm',
-      '...mTTTTTTTTTTTTTTTm',
-      '..mTTTTTTTTTTTTTTTTm',
-      '.mTTTTTTTTTTTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTXXXXXXXXXXTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTPPTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mYYTTTTTTTTTTTTTTTTm',
-      'mYYTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
-      'mTTTTTTTTTTTTTTTTTTm',
+    rtwKabine: [
+      '....mmmmmmmmmUUUuumm',
+      '...mWWWWWWWWWUUUuuWm',
+      '..mWWWWWWWWWWWWWWWWm',
+      '.mWWWWWWWWWWWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWXXXXXXXXXXWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWPPWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mAAAAAAAAAAAAAAAAAAm',
+      'mAAAAAAAAAAAAAAAAAAm',
+      'mAAAAAAAAAAAAAAAAAAm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mYYWWWWWWWWWWWWWWWWm',
+      'mYYWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
+      'mWWWWWWWWWWWWWWWWWWm',
       'mmmmmmmmmmmmmmmmmmmm',
       'mmmmmmmmmmmmmmmmmmmm',
       'mmmmmmmmmmmmmmmmmmmm'
     ],
-    lkwRad: [
+    rtwRad: [
       '..mmmmmm..',
       '.mmmmmmmm.',
       'mmmmPPmmmm',
@@ -325,32 +326,36 @@
       '.mmmmmmmm.',
       '..mmmmmm..'
     ],
-    lkwSchrift: [
-      'T...T.TTTT...TTT.',
-      'T..T..T...T.T...T',
-      'T.T...T...T.T....',
-      'TT....TTTT...TTT.',
-      'T.T...T...T.....T',
-      'T..T..T...T.T...T',
-      'T...T.TTTT...TTT.'
+    rtwSchrift: [
+      '..A.....A....AAA.',
+      '.AA....AA...A...A',
+      'A.A...A.A.......A',
+      '..A.....A......A.',
+      '..A.....A.....A..',
+      '..A.....A....A...',
+      'AAAAA.AAAAA.AAAAA'
     ],
-    wespe1: [
-      '...XX..XX...',
-      '..XXXXXXXX..',
-      '...XX..XX...',
-      '.ZYYZZYYZZE.',
-      'ZYYZZYYZZYYE',
-      '.ZYYZZYYZZ..',
-      '..Z.....Z...'
+    rauch1: [
+      '....jjjj......',
+      '..jjJJJJjj....',
+      '.jJJJJJJJJj...',
+      'jJJJJJJIJJJjj.',
+      'jJJJJJIIJJJJJj',
+      'jJJJJJJJJJJJJj',
+      '.jJJJIJJJJJJj.',
+      '..jjJJJJJJjj..',
+      '....jjjjjj....'
     ],
-    wespe2: [
-      '............',
-      '............',
-      '..XXX..XXX..',
-      '.ZYYZXXYZZE.',
-      'ZYYZZYYZZYYE',
-      '.ZYYZZYYZZ..',
-      '...Z...Z....'
+    rauch2: [
+      '......jjjj....',
+      '....jjJJJJjj..',
+      '...jJJJJJJJJj.',
+      '.jjJJJIJJJJJJj',
+      'jJJJJJJIIJJJJj',
+      'jJJJJJJJJJJJJj',
+      '.jJJJJJJJIJJj.',
+      '..jjJJJJJJjj..',
+      '....jjjjjj....'
     ]
   };
 

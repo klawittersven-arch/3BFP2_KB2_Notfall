@@ -1,4 +1,5 @@
-/* „Diabetes Run!“ – Belohnungsspiel nach einer Übung (Programmlogik).
+/* „Notfall-Run!“ – Belohnungsspiel nach einer Übung (Programmlogik).
+ * Endless Runner aus „Diabetes Run!“ (kb2-beratung), Hindernisse passend zum Themenblock Notfall- und Krisensituationen.
  * Aufruf: spiel.html?ab=ab3a – nur freigeschaltet, wenn die Übung auf diesem Handy gelöst wurde
  * (nicht durchgeklickt). Welche Übung ein Spiel freischaltet, steht in inhalte.js (belohnungsspiel: true).
  * Name und Klasse kommen aus der Übung. Die Bestleistung erscheint auf der Lehrerseite (Beamer) neben dem Namen.
@@ -285,26 +286,26 @@
   function grafikenBauen() {
     Object.keys(PIXEL.GRAFIK).forEach(function (n) { bilder[n] = PIXEL.rasterZeichnen(PIXEL.GRAFIK[n], 1); });
     bilder.ziffern = PIXEL.ziffernblatt('#16262A');
-    bilder.schwarm1 = schwarmBauen(bilder.wespe1, bilder.wespe2);
-    bilder.schwarm2 = schwarmBauen(bilder.wespe2, bilder.wespe1);
-    bilder.schwarm = bilder.schwarm1;
+    bilder.rauchSaeule1 = rauchBauen(bilder.rauch1, bilder.rauch2);
+    bilder.rauchSaeule2 = rauchBauen(bilder.rauch2, bilder.rauch1);
+    bilder.rauch = bilder.rauchSaeule1;
     bilder.hintergrund = hintergrundBauen();
     bilder.strasse = strasseBauen();
   }
 
-  // Wespenschwarm: senkrechte Säule von Kopfhöhe bis über die höchste Sprunghöhe
-  // (auch mit Doppelsprung) – man kann nicht darüberspringen, nur darunter ducken.
-  function schwarmBauen(a, b) {
+  // Rauch: senkrechte Säule von Kopfhöhe bis über die höchste Sprunghöhe (auch mit Doppelsprung) –
+  // man kann nicht darüberspringen, nur darunter ducken. Wie im Brandfall: Rauch steigt nach oben.
+  function rauchBauen(a, b) {
     var hoehe = BODEN - 19 - 8;          // von 8 px unter dem oberen Rand bis Kopfhöhe
-    var c = PIXEL.leinwand(16, hoehe);
+    var c = PIXEL.leinwand(18, hoehe);
     var g = c.getContext('2d');
-    for (var y = hoehe - 7, i = 0; y >= 0; y -= 11, i++) {
-      g.drawImage(i % 2 ? b : a, i % 2 ? 4 : 0, y);
+    for (var y = hoehe - 9, i = 0; y >= 0; y -= 6, i++) {
+      g.drawImage(i % 2 ? b : a, [0, 4, 2][i % 3], y);
     }
     return c;
   }
 
-  // Hintergrund (Himmel, Hügel mit Weinbergen, Dörfer) einmal vorzeichnen.
+  // Hintergrund (Himmel, Hügel mit Weinbergen, Dörfer, Krankenhaus) einmal vorzeichnen.
   // 640 px breit und nach 320 px wiederholend, damit er nur verschoben wird.
   function hintergrundBauen() {
     var bb = 640, hh = 150;
@@ -341,6 +342,13 @@
         for (var yr = 0; yr < 3; yr++) for (var xr = yr; xr < 7 - yr; xr++) setzen(hx + xr, basis - 5 - yr, DACH);
         if (hs[1]) for (var yt = 0; yt < 6; yt++) { setzen(hx + 3, basis - 8 - yt, WAND); }
       });
+      // Krankenhaus mit rotem Kreuz
+      var KREUZ = rgb('#D7262F'), FENSTER = rgb('#9DB5BD');
+      var kx = 194 + k * 320;
+      var kb = Math.round(78 + 10 * Math.sin(kx * P) + 6 * Math.sin(kx * P * 3 + 1)) + 4;
+      for (var y1 = 0; y1 < 12; y1++) for (var x1 = 0; x1 < 19; x1++) setzen(kx + x1, kb - y1, WAND);
+      for (var fy = 2; fy < 11; fy += 3) for (var fx = 2; fx < 17; fx += 3) if (fx < 6 || fx > 12) setzen(kx + fx, kb - fy, FENSTER);
+      for (var c1 = 0; c1 < 7; c1++) { setzen(kx + 9, kb - 3 - c1, KREUZ); setzen(kx + 6 + c1, kb - 6, KREUZ); }
     }
     g.putImageData(bild, 0, 0);
     return c;
@@ -367,11 +375,11 @@
 
   var ARTEN = [
     // name, Wahrscheinlichkeit, in der Luft?
-    { name: 'kuchen', anteil: 0.24, luft: false, rand: 1 },
-    { name: 'weinkiste', anteil: 0.2, luft: false, rand: 1 },
-    { name: 'rollator', anteil: 0.18, luft: false, rand: 2 },
-    { name: 'pflegewagen', anteil: 0.14, luft: false, rand: 1 },
-    { name: 'schwarm', anteil: 0.24, luft: true, rand: 1 }
+    { name: 'notfallkoffer', anteil: 0.24, luft: false, rand: 1 },
+    { name: 'defi', anteil: 0.2, luft: false, rand: 1 },
+    { name: 'leitkegel', anteil: 0.18, luft: false, rand: 2 },
+    { name: 'notfallwagen', anteil: 0.14, luft: false, rand: 1 },
+    { name: 'rauch', anteil: 0.24, luft: true, rand: 1 }
   ];
 
   /* ---------- Spielzustand (keine neuen Objekte während des Laufs) ---------- */
@@ -418,11 +426,11 @@
     o.y = BODEN - 4;
   }
 
-  // KBS-Lkw: lang und hoch. Ein einfacher Sprung reicht bei keinem Tempo,
+  // Rettungswagen: lang und hoch. Ein einfacher Sprung reicht bei keinem Tempo,
   // ein Doppelsprung am höchsten Punkt schon (Länge wächst mit dem Tempo).
-  function lkwSetzen(o, x) {
+  function rtwSetzen(o, x) {
     o.aktiv = true;
-    o.art = 'lkw';
+    o.art = 'rtw';
     o.b = Math.max(72, Math.round(sp.v * 0.5));
     o.h = 42;
     o.rand = 2;
@@ -437,17 +445,17 @@
     var x = B + 4;
     sp.anzahl++;
 
-    // Schlussphase: Bodenhindernis mit Wespenschwarm direkt dahinter – im Sprung
-    // trifft man den Schwarm, geduckt das Hindernis. So endet jeder Lauf vor 2 Minuten.
+    // Schlussphase: Bodenhindernis mit Rauch direkt dahinter – im Sprung
+    // trifft man den Rauch, geduckt das Hindernis. So endet jeder Lauf vor 2 Minuten.
     if (sp.zeit >= SCHLUSS_AB) {
-      objektSetzen(o, 'weinkiste', x, false, 1);
+      objektSetzen(o, 'defi', x, false, 1);
       var w = freiesObjekt();
       if (w) {
-        objektSetzen(w, 'schwarm', o.x + o.b + sp.v * 0.1, true, 1);
+        objektSetzen(w, 'rauch', o.x + o.b + sp.v * 0.1, true, 1);
         o = w;
       }
     } else if (sp.zeit >= LEICHT_BIS && Math.random() < 0.14) {
-      lkwSetzen(o, x);
+      rtwSetzen(o, x);
     } else if (sp.zeit >= LEICHT_BIS && Math.random() < 0.15 + 0.25 * h) {
       lochSetzen(o, x, Math.round(26 + Math.random() * (14 + 46 * h)));
     } else {
@@ -462,12 +470,12 @@
       }
       objektSetzen(o, art.name, x, art.luft, art.rand);
 
-      // Ab 30 Sekunden: gemeine Kombinationen (Hindernis + Wespe oder Loch direkt dahinter)
+      // Ab 30 Sekunden: gemeine Kombinationen (Hindernis + Rauch oder Loch direkt dahinter)
       if (!art.luft && sp.zeit >= LEICHT_BIS && Math.random() < 0.15 + 0.35 * h) {
         var k = freiesObjekt();
         if (k) {
           var nah = o.x + o.b + sp.v * (0.42 - 0.12 * h);
-          if (Math.random() < 0.5) objektSetzen(k, 'schwarm', nah + sp.v * 0.08, true, 1);
+          if (Math.random() < 0.5) objektSetzen(k, 'rauch', nah + sp.v * 0.08, true, 1);
           else lochSetzen(k, nah, Math.round(24 + Math.random() * 20));
           o = k;
         }
@@ -556,21 +564,24 @@
     } while (zahl > 0);
   }
 
-  function lkwZeichnen(o) {
+  // Rettungswagen: Fahrerhaus (Grafik) + weißer Kofferaufbau mit rotem Streifen, Blaulicht und „112“
+  function rtwZeichnen(o, blink) {
     var lx = Math.round(o.x), oben = BODEN - 42, kasten = o.b - 20;
-    ctx.drawImage(bilder.lkwKabine, lx, oben);
+    ctx.drawImage(bilder.rtwKabine, lx, oben);
     ctx.fillStyle = '#2B2B2B';
     ctx.fillRect(lx + 20, oben, kasten, 36);
-    ctx.fillStyle = '#F4F6F7';
+    ctx.fillStyle = '#F7F8F9';
     ctx.fillRect(lx + 20, oben + 1, kasten - 1, 34);
-    ctx.fillStyle = '#3F6C72';
-    ctx.fillRect(lx + 20, oben + 28, kasten - 1, 4);
+    ctx.fillStyle = '#D7262F';
+    ctx.fillRect(lx + 20, oben + 22, kasten - 1, 3);
+    ctx.fillStyle = blink ? '#A9C2FF' : '#2F6BFF';
+    ctx.fillRect(lx + o.b - 10, oben + 1, 7, 3);
     if (kasten >= 40) {
-      ctx.drawImage(bilder.lkwSchrift, 0, 0, 17, 7, lx + 20 + ((kasten - 34) >> 1), oben + 8, 34, 14);
+      ctx.drawImage(bilder.rtwSchrift, 0, 0, 17, 7, lx + 20 + ((kasten - 34) >> 1), oben + 5, 34, 14);
     }
-    ctx.drawImage(bilder.lkwRad, lx + 4, BODEN - 10);
-    ctx.drawImage(bilder.lkwRad, lx + o.b - 14, BODEN - 10);
-    if (o.b > 120) ctx.drawImage(bilder.lkwRad, lx + o.b - 26, BODEN - 10);
+    ctx.drawImage(bilder.rtwRad, lx + 4, BODEN - 10);
+    ctx.drawImage(bilder.rtwRad, lx + o.b - 14, BODEN - 10);
+    if (o.b > 120) ctx.drawImage(bilder.rtwRad, lx + o.b - 26, BODEN - 10);
   }
 
   function zeichnen() {
@@ -578,7 +589,7 @@
     ctx.drawImage(bilder.hintergrund, hgX, 0, B, 150, 0, 0, B, 150);
     ctx.drawImage(bilder.strasse, Math.floor(sp.strecke) % 40, 0, B, 30, 0, 150, B, 30);
 
-    var fluegel = !sparmodus && (Math.floor(sp.zeit * 12) & 1) === 1;
+    var wabern = !sparmodus && (Math.floor(sp.zeit * 4) & 1) === 1;   // Rauch und Blaulicht
     for (var i = 0; i < MAX_OBJEKTE; i++) {
       var o = objekte[i];
       if (!o.aktiv) continue;
@@ -593,8 +604,8 @@
         ctx.fillRect(lx + o.b + 1, 150, 2, 6);
         continue;
       }
-      if (o.art === 'lkw') { lkwZeichnen(o); continue; }
-      var bild = o.art === 'schwarm' ? (fluegel ? bilder.schwarm2 : bilder.schwarm1) : bilder[o.art];
+      if (o.art === 'rtw') { rtwZeichnen(o, wabern); continue; }
+      var bild = o.art === 'rauch' ? (wabern ? bilder.rauchSaeule2 : bilder.rauchSaeule1) : bilder[o.art];
       ctx.drawImage(bild, Math.round(o.x), Math.round(o.y));
     }
 
@@ -624,8 +635,8 @@
     ctx.drawImage(bilder.strasse, 0, 0, B, 30, 0, 150, B, 30);
     if (bildschirm === 'ende') { zeichnen(); return; }
     ctx.drawImage(figurBilder.lauf2, SPIELER_X, BODEN - figurBilder.lauf2.height);
-    ctx.drawImage(bilder.kuchen, 150, BODEN - bilder.kuchen.height);
-    ctx.drawImage(bilder.schwarm1, 262, BODEN - 19 - bilder.schwarm1.height);
+    ctx.drawImage(bilder.notfallkoffer, 150, BODEN - bilder.notfallkoffer.height);
+    ctx.drawImage(bilder.rauchSaeule1, 262, BODEN - 19 - bilder.rauchSaeule1.height);
   }
 
   /* =====================================================================
@@ -899,14 +910,14 @@
       };
     },
     tempo: tempoBei,
-    // Nur für Tests: Lkw in Abstand vorlauf·4 px vor die Figur setzen, sofort springen
+    // Nur für Tests: Rettungswagen in Abstand vorlauf·4 px vor die Figur setzen, sofort springen
     // (optional Doppelsprung am höchsten Punkt) und prüfen, ob die Figur heil darüber kommt.
-    lkwTest: function (sekunde, doppelt, vorlauf) {
+    rtwTest: function (sekunde, doppelt, vorlauf) {
       laufZuruecksetzen();
       sp.zeit = sekunde;
       sp.v = tempoBei(sekunde);
       sp.naechstes = 1e9;
-      lkwSetzen(objekte[0], SPIELER_X + 12 + vorlauf * 4);
+      rtwSetzen(objekte[0], SPIELER_X + 12 + vorlauf * 4);
       eingabe.springen = true;
       eingabe.springenNeu = true;
       var doppel = false;

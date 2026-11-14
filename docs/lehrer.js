@@ -225,7 +225,7 @@
     fuss.innerHTML = '<button type="button" class="l-knopf l-zweit" id="l-leeren">Liste leeren (neue Stunde)</button>' +
       '<p class="l-hinweis">✓ 9/12 = fertig, 9 von 12 Karten beim ersten Versuch richtig · ⚠ = fertig, aber zu wenige beim ' +
       'ersten Versuch richtig (durchgeklickt?) · 6/12 = dabei · ↺ = wegen zu schneller Fehler neu gestartet. ' +
-      (MIT_SPIEL ? '🎮 = Bestleistung im Belohnungsspiel „Diabetes Run!“ (🏆 = höchste der Klasse). ' : '') +
+      (MIT_SPIEL ? '🎮 = Bestleistung im Belohnungsspiel „Notfall-Run!“ (🏆 = höchste der Klasse). ' : '') +
       'Namen und Fortschritt werden nach spätestens 12 Stunden automatisch gelöscht.</p>';
     document.getElementById('l-leeren').addEventListener('click', function () {
       if (!window.confirm('Alle Namen und Fortschritte dieser Klasse für dieses Arbeitsblatt löschen?')) return;
