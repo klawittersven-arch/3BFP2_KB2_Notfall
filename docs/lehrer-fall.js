@@ -536,7 +536,7 @@
       '<section class="z-block"><h3>🅿️ ' + esc(F.begriffe.titel) + '</h3>' + begriffeHtml(texte) + '</section>' +
       (alteFragen.length ? '<section class="z-block"><h3>Ihre Lernfragen aus der Einführung (SW 6) – können Sie sie jetzt beantworten?</h3><ul class="z-alt">' +
         alteFragen.map(function (t) { return '<li>' + (t.kb ? '<span class="z-kb z-kb-an">' + esc(t.kb) + '</span> ' : '') + esc(t.b) + '</li>'; }).join('') + '</ul></section>' : '') +
-      '<section class="z-block"><h3>Ergebnis sichern</h3><p>Speichert die Ergebnisse dieser Stunde <strong>ohne Namen</strong> für den Vergleich in SW 13.</p>' +
+      '<section class="z-block"><h3>Ergebnis sichern</h3><p>Speichert die Ergebnisse dieser Stunde <strong>ohne Namen</strong> für einen späteren Vergleich.</p>' +
       '<button type="button" class="l-knopf" data-sichern="1">💾 Ergebnis sichern</button> <span class="z-gesichert">' + esc(archivZeile()) + '</span></section>';
   }
 
@@ -580,7 +580,7 @@
       '<button type="button" class="l-knopf l-zweit" id="l-leeren">Liste leeren (neue Stunde)</button></div>' +
       '<p class="l-hinweis">' + esc(archivZeile()) + ' · Weiter/Zurück auch mit den Pfeiltasten oder dem Presenter. ' +
       'Auf dem Beamer stehen Antworten nur zusammengezählt, Texte ohne Namen. Namen und Antworten werden nach spätestens 12 Stunden ' +
-      'automatisch gelöscht; gesicherte Ergebnisse (ohne Namen) bleiben für den Vergleich in SW 13.</p>';
+      'automatisch gelöscht; gesicherte Ergebnisse (ohne Namen) bleiben für einen späteren Vergleich.</p>';
     Array.prototype.forEach.call(fuss.querySelectorAll('input[name=durchgang]'), function (r) {
       r.onchange = function () {
         if (!window.confirm('Neuer Durchgang: Namen und Antworten dieser Runde werden gelöscht (gesicherte Ergebnisse bleiben). Haben Sie das Ergebnis gesichert?')) { zeichneFuss(); return; }

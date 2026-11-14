@@ -243,7 +243,7 @@ var FALL = {
 
     { id: 'ende', art: 'ende', kurz: 'Ausblick',
       titel: 'Wie geht es weiter?',
-      beamerText: 'In den nächsten Wochen lernen wir in allen Fächern, was Christin gebraucht hätte. In SW 13 spielen wir die Zeitlupe noch einmal.',
+      beamerText: 'In den nächsten Wochen lernen wir in allen Fächern, was Christin gebraucht hätte.',
       handy: 'Danke! Sie bekommen jetzt das Arbeitsblatt mit dem ganzen Fall.' }
   ],
 
