@@ -114,3 +114,12 @@
 body:has(.f-parkleiste:not([hidden])) .inhalt { padding-bottom: 130px; }
 .f-bild { display: block; width: 100%; height: auto; margin: 0 0 12px; border-radius: 12px; }
 .f-opt.f-passt:disabled, .f-opt.f-passt-nicht:disabled { opacity: 1; }
+
+/* Vorstellung: Christin und Frau Maler */
+.f-vorstellung { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 2px solid var(--rand); font-size: 18px; }
+.f-vorstellung p { margin: 0; }
+.f-vorstellung-name { font-size: 22px; font-weight: 800; color: var(--dunkelpetrol); margin-bottom: 4px !important; }
+
+/* Automatisch senden: Hinweis unter der Frage; Perspektiven: Text noch nicht gesendet */
+.f-auto { color: var(--petrol); font-weight: 600; }
+.f-noch-offen { color: var(--bernstein); font-weight: 700; }

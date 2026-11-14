@@ -197,6 +197,15 @@ pruefe(fs1.ergebnisse.s1.THROMB === 2 && fs1.ergebnisse.s1.STURZ === 1 && fs1.an
 pruefe(fs1.leute.length === 3 && fs1.leute.find((p) => p.name === 'Lena K.').beantwortet.sort().join() === 's1,s2', 'Fall: Namen mit beantworteten Fragen');
 pruefe(!JSON.stringify(fs1).includes('f'.repeat(32)), 'Fall: Stand ohne Geräte-Kennungen');
 pruefe(!JSON.stringify(fs1.leute).includes('"R"'), 'Fall: keine Einzelantworten je Name');
+// Leere Liste = Antwort zurückziehen (automatisches Senden: Auswahl wieder unvollständig)
+await post(envF, '/fall/antwort', fa({ geraet: '2'.repeat(32), name: 'Ela E.', frage: 's7', wert: ['REDEN', 'TEAM', 'PA'] }));
+fs1 = await fst();
+pruefe(fs1.anzahl.s7 === 1 && fs1.leute.find((p) => p.name === 'Ela E.').beantwortet.includes('s7'), 'Fall: Auswahl s7 gezählt');
+r = await post(envF, '/fall/antwort', fa({ geraet: '2'.repeat(32), name: 'Ela E.', frage: 's7', wert: [] }));
+fs1 = await fst();
+pruefe(r.status === 204 && !fs1.anzahl.s7 && !fs1.ergebnisse.s7 && !fs1.leute.find((p) => p.name === 'Ela E.').beantwortet.includes('s7'), 'Fall: leere Liste zieht die Antwort zurück');
+r = await post(envF, '/fall/antwort', fa({ geraet: '2'.repeat(32), name: 'Ela E.', frage: 's6', wert: [] }));
+pruefe(r.status === 204 && !(await fst()).leute.find((p) => p.name === 'Ela E.').beantwortet.includes('s6'), 'Fall: Zurückziehen ohne vorherige Antwort schadet nicht');
 for (const [t, d] of [['Frage', fa({ frage: 'S 2' })], ['Wert HTML', fa({ wert: '<b>' })], ['Wert Zahl', fa({ wert: 3 })], ['Liste zu lang', fa({ wert: Array(13).fill('A') })],
   ['Name', fa({ name: 'x' })], ['Gerät', fa({ geraet: 'zz' })], ['Raum', fa({ raum: 'k2-ab1' })], ['kein JSON', 'xyz']]) {
   r = await post(envF, '/fall/antwort', d);

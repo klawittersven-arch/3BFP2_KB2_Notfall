@@ -84,26 +84,48 @@ Handy: https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/fall.html – der 
 Jedes Bild erscheint zuerst **im Vollbild** (Klick aufs Bild, Pfeiltaste oder Presenter = weiter); danach steht es
 klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schauen Sie nach vorn.“
 
-1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
-2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was haben Sie getan? Wie sicher haben Sie sich gefühlt (1–5)?
-3. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
+1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ + „Schreiben Sie Ihre
+   ersten Ideen sofort in Stichworten auf Ihren Zettel.“ → *10 Sekunden starten* → Countdown mit „Aufschreiben!“ → „Stopp!“
+   (Stift und Zettel vorher bereitlegen lassen – so kann später niemand Antworten „übernehmen“, die erst danach gezeigt werden.)
+2. **Ihre 10 Sekunden:** QR-Code, Namen mit ✓. Fragen: Was steht auf Ihrem Zettel? Wie sicher haben Sie sich gefühlt (1–5)?
+3. **Vorstellung:** „Genau diese Situation hat Christin erlebt.“ – zwei Namenskarten (Christin, Frau Maler) mit Angaben
+   aus dem Falltext, dann „Wir gehen zurück an den Anfang dieses Tages.“ Bewusst erst **nach** dem Kaltstart: Dort sollen
+   die SuS selbst handeln, nicht Christin zuschauen. Mit Bild (`bild:` beim Schritt `personen`) erst Vollbild, dann
+   das Bild links neben den Karten.
+4. **Stationen 1–10:** 7 Abschnitte des Falls und 3 **zusätzliche Situationen**, in denen alles normal ist (🟢; nach
+   „Am Morgen“, dann „Gegen neun“ und „Gegen zehn Uhr“). Sie stehen nicht im Fallbeispiel und ändern nichts am Fall –
+   die SuS sollen nicht bei jeder Ampel „beobachten“ wählen. Sie sehen aus wie die anderen Stationen; beim Auflösen
+   erscheint „Einschätzung: 🟢 Alles normal“ mit Begründung. Nicht im Zeitstrahl, nicht in „Den Fall bis hier lesen“.
+   Die Stationen werden automatisch durchnummeriert. Ablauf je Station: Abschnitt groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
    *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).
-   Station 1: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.
-   Station 5: aus 8 Aktionen die **3 wichtigsten Schritte in der richtigen Reihenfolge** antippen – Merkregel der
+   Die Übergabe: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.
+   Zum Mittagessen: aus 8 Aktionen die **3 wichtigsten Schritte in der richtigen Reihenfolge** antippen – Merkregel der
    Reanimationsleitlinien 2025: *Prüfen – Rufen – Drücken*. Ergebnis = je Platz, was die Klasse gewählt hat; Auflösung =
    ✓/✗, Merksatz, „ganz richtig: x von y“ und die gewählten unpassenden Aktionen mit Grund; die Handys zeigen ✓/✗ je Platz.
    Richtige Schritte und Ablenker stehen in `fall-inhalte.js` (`s5`: die ersten `anzahl` Antworten sind die richtigen;
    ohne `anzahl` werden alle Antworten sortiert).
-   Station 7: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
+   Später: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
    Rangfolge der Klasse; Auflösung = ✓/✗ mit Grund und der Hinweis, dass die Rangfolge Gesprächsanlass ist.
-4. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
-5. **Perspektiven-Runde:** Die Beamer-Seite teilt alle Angemeldeten **automatisch und gleichmäßig in 5 Gruppen** ein – eine
+5. **Zurückspulen:** Zeitstrahl der 7 Stationen des Fallbeispiels mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab wann hätte man den Notfall vielleicht verhindern können?
+6. **Perspektiven-Runde:** Die Beamer-Seite teilt alle Angemeldeten **automatisch und gleichmäßig in 5 Gruppen** ein – eine
    je Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft, die Angehörigen, Frau Maler). Das Handy zeigt
    „Ihre Gruppe bearbeitet: …“ und die Namen der Gruppe. Auf dem Beamer stehen die Namen bei jeder Gruppe, mit ✓ und Zahl,
    sobald jemand einen Eintrag geschickt hat („2 von 22 haben schon etwas geschickt“) – die Einträge selbst bleiben ohne Namen.
    Klick auf einen Namen setzt die Person in die nächste Gruppe; *Gruppen neu einteilen* mischt neu; wer später kommt, landet
    in der kleinsten Gruppe. Unpassende Einträge entfernt × am Eintrag.
-6. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
+7. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
+
+**Jetzt am Smartphone:** Solange abgestimmt oder geschrieben wird, steht auf dem Beamer ein dunkler Balken mit 📱 und
+dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus.“). Bei langen Abschnitten bleibt er beim Vorlesen unten
+sichtbar. Nach *Ergebnis zeigen* verschwindet er. Die Sätze stehen in `fall-inhalte.js` bei `handyAuftrag`.
+
+**Automatisch senden:** Antworten brauchen keinen „Senden“-Knopf. Einzelwahl und Ampel zählen beim Tippen,
+Mehrfachauswahl kurz nach dem letzten Tippen. Bei „genau 3 wählen“ und bei der Reihenfolge wird gesendet, sobald die
+Auswahl vollständig ist („Noch 1 wählen – dann wird Ihre Antwort automatisch gesendet.“); wird sie wieder
+unvollständig, wird die Antwort zurückgezogen (der ✓ beim Namen verschwindet). Schaltet die Lehrkraft weiter, schicken
+die Handys noch Ausstehendes mit. Nur die Perspektiven-Texte haben weiter „Senden“ (halbe Sätze sollen nicht auf dem
+Beamer erscheinen); steht dort noch ungesendeter Text, zeigt das Handy „Noch nicht gesendet“, und beim Weiterschalten
+wird er automatisch mitgeschickt.
 
 **Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;
 ein Tipp auf das Wort daneben nimmt es dazu (z. B. „lebensverlängernden Maßnahmen“, höchstens 4 Wörter), noch einmal
@@ -118,7 +140,7 @@ Lernfragen aus SW 6 („Können Sie sie jetzt beantworten?“).
 - **Ergebnis sichern** speichert nur Zahlen und Texte **ohne Namen** – dauerhaft, bis es überschrieben wird. Namen und
   Einzelantworten werden wie bei den Übungen nach 12 Stunden gelöscht (oder mit *Liste leeren*).
 - Ein neuer Durchgang beginnt immer mit einer leeren Liste – vorher sichern!
-- **Bilder** (Kaltstart, Stationen 1, 2, 4, 5 und 7) liegen in `docs/bilder/` – je groß für den Beamer (1600 px) und
+- **Bilder** (Kaltstart, Vorstellung und die Stationen Übergabe, Am Morgen, Gegen elf Uhr, Zum Mittagessen, Später) liegen in `docs/bilder/` – je groß für den Beamer (1600 px) und
   `-klein` für die Handys (800 px). Beamer: Kaltstart abgedunkelt im Hintergrund, bei den Stationen rechts neben dem Text,
   im Zeitstrahl als kleine Vorschau. Ein Bild tauschen: beide Dateien gleichen Namens ersetzen; welche Station welches
   Bild zeigt, steht in `fall-inhalte.js` (`bild:`). Die Bilder sind KI-erzeugt und zeigen keine echten Personen.
@@ -196,7 +218,7 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
   Klassenwahl, Senden des Fortschritts, Schutz gegen Durchklicken, die Lehrerseiten je Klasse und das Belohnungsspiel
   (Freischaltung, Lauf, Bestleistung neben dem Namen) – mit nachgebildetem Server.
 - `node tests/fall.test.js` prüft die Fall-Einführung: Falltext unverändert (Prüfsumme), Ablauf mit Beamer und zwei Handys
-  mit dem echten Worker (Kaltstart, Ampel, Auflösen, Zurückspulen, Perspektiven mit KB, Begriffsparkplatz, Sichern, SW 13 mit Vergleich).
+  mit dem echten Worker (Kaltstart, Vorstellung, Ampel, Auflösen, Zurückspulen, Perspektiven mit KB, Begriffsparkplatz, Sichern, SW 13 mit Vergleich).
 - `cd server && node test/worker.test.js` prüft den Worker (Eingabeprüfung, Klassen-Räume, Entfernen, Leeren,
   Löschen nach 12 Stunden, Obergrenzen, Bestleistung im Belohnungsspiel).
 

@@ -75,7 +75,10 @@ function umgebung(Raum) {
   pruefe(absaetze.length === 7, 'Falltext: 7 Absätze');
   pruefe(FALL.titel === '„Reanimation und nicht nur ich war hilflos“', 'Titel wie auf dem Arbeitsblatt');
   const stationen = FALL.schritte.filter((s) => s.art === 'station');
-  pruefe(stationen.length === 7 && stationen.every((s) => FALL.text.some((t) => t.teil === s.id && t.art === 'frage')), 'jede Station hat einen Abschnitt des Falls');
+  const fallStationen = stationen.filter((s) => !s.extra), extra = stationen.filter((s) => s.extra);
+  pruefe(fallStationen.length === 7 && fallStationen.every((s) => FALL.text.some((t) => t.teil === s.id && t.art === 'frage')), 'jede Station des Fallbeispiels hat einen Abschnitt des Falls');
+  pruefe(extra.length === 3 && extra.every((s) => s.text && s.frage.ampel && s.loesung && !FALL.text.some((t) => t.teil === s.id)), 'zusätzliche Situationen: eigener Text, Ampel, Einschätzung – nicht im Falltext');
+  pruefe(extra.every((s) => s.loesung.ampel === 'G'), 'zusätzliche Situationen: alle 🟢 (alles normal)');
   const kuerzel = new Set();
   FALL.schritte.forEach((s) => (s.fragen || (s.frage ? [s.frage] : [])).forEach((q) => {
     pruefe(!kuerzel.has(q.id), 'Frage-Kennung eindeutig: ' + q.id); kuerzel.add(q.id);
@@ -132,6 +135,7 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-kalt-satz');
   pruefe((await lehrer.textContent('.z-kalt-satz')).includes('Frau Maler reagiert nicht'), 'Beamer: Kaltstart-Satz');
+  pruefe((await lehrer.textContent('.z-kalt-notiz')).includes('Stichworten auf Ihren Zettel'), 'Beamer: Kaltstart fordert zum Aufschreiben auf');
   pruefe(await lehrer.evaluate(() => document.body.classList.contains('z-dunkel')), 'Beamer: Kaltstart dunkel');
   pruefe((await lehrer.getAttribute('.z-kalt', 'style') || '').includes('bilder/kaltstart.jpg'), 'Beamer: Kaltstart-Bild als Hintergrund');
   pruefe(await lehrer.evaluate(async () => (await fetch('bilder/kaltstart.jpg')).ok), 'Beamer: Kaltstart-Bild ladbar');
@@ -141,6 +145,8 @@ function umgebung(Raum) {
   pruefe((await lehrer.textContent('.z-countdown')).trim() === '10', 'Beamer: Countdown beginnt bei 10');
   await warte(1300);
   pruefe(Number((await lehrer.textContent('.z-countdown')).trim()) <= 9, 'Beamer: Countdown läuft');
+  pruefe((await lehrer.textContent('.z-kalt-notiz')).includes('Aufschreiben'), 'Beamer: während des Countdowns „Aufschreiben!“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_1b_countdown.png') });
 
   // Zwei Handys
   async function handy(vorname, klasseText) {
@@ -165,15 +171,18 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-qr img');
   pruefe(await lehrer.evaluate(() => { const i = document.querySelector('.z-qr img'); return i.complete && i.naturalWidth > 100; }), 'Beamer: QR-Code wird angezeigt');
-  pruefe((await lehrer.textContent('.z-hinweis')).includes('kurz rausgehen'), 'Beamer: Hinweis auf Belastung');
+  pruefe(!(await lehrer.$('.z-hinweis')) && !(await lehrer.textContent('.z-buehne')).includes('rausgehen'), 'Beamer: kein Hinweis „kurz rausgehen“');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Jetzt am Smartphone: Beantworten Sie die 2 Fragen'), 'Beamer: „Jetzt am Smartphone“ beim Anmelden');
   await h1.waitForSelector('.f-frage[data-frage="kalttat"]', { timeout: 8000 });
   await h1.click('.f-opt[data-frage="kalttat"][data-kuerzel="ANSP"]');
   await h1.click('.f-opt[data-frage="kalttat"][data-kuerzel="RUF"]');
-  await h1.click('[data-senden="kalttat"]');
+  pruefe(!(await h1.$('.f-frage[data-frage="kalttat"] .f-senden')), 'Handy: Mehrfachauswahl ohne „Senden“-Knopf');
+  await h1.waitForSelector('.f-frage[data-frage="kalttat"] .f-ok', { timeout: 3000 });
+  pruefe(true, 'Handy: Mehrfachauswahl wird automatisch gesendet');
   await h1.click('.f-opt[data-frage="kaltsicher"][data-kuerzel="2"]');
   await h2.waitForSelector('.f-frage[data-frage="kalttat"]', { timeout: 8000 });
   await h2.click('.f-opt[data-frage="kalttat"][data-kuerzel="NICHTS"]');
-  await h2.click('[data-senden="kalttat"]');
+  await h2.waitForSelector('.f-frage[data-frage="kalttat"] .f-ok', { timeout: 3000 });
   await h2.click('.f-opt[data-frage="kaltsicher"][data-kuerzel="1"]');
   await warte(2600);
   const pillen = await lehrer.$$eval('.l-pille.l-fertig .l-name', (e) => e.map((x) => x.textContent));
@@ -187,6 +196,31 @@ function umgebung(Raum) {
   await h1.waitForSelector('.f-opt:disabled', { timeout: 8000 });
   pruefe((await h1.textContent('#f-inhalt')).includes('Die Abstimmung ist beendet'), 'Handy: nach „Ergebnis zeigen“ gesperrt');
 
+  // Vorstellung: Christin und Frau Maler (nach dem Kaltstart, vor Station 1)
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Vorstellung'), 'Beamer: nach „Ihre 10 Sekunden“ kommt die Vorstellung');
+  await lehrer.keyboard.press('ArrowRight');
+  const personenSchritt = FALL.schritte.find((x) => x.id === 'personen');
+  if (personenSchritt.bild) {
+    await lehrer.waitForSelector('.z-vollbild');
+    pruefe((await lehrer.textContent('.z-vollbild-titel')) === 'Vorstellung', 'Beamer: Vorstellung beginnt mit dem Bild im Vollbild');
+    await lehrer.click('.z-vollbild');
+    await lehrer.waitForSelector('.z-personen.z-mit-bild .z-bild img');
+    pruefe(true, 'Beamer: Bild steht danach neben den Namenskarten');
+  }
+  await lehrer.waitForSelector('.z-person');
+  const personenNamen = await lehrer.$$eval('.z-person-name', (e) => e.map((x) => x.textContent));
+  pruefe(JSON.stringify(personenNamen) === JSON.stringify(['Christin', 'Frau Maler']), 'Beamer: Vorstellung zeigt Christin und Frau Maler');
+  pruefe((await lehrer.textContent('.z-buehne')).includes('Genau diese Situation hat Christin erlebt.'), 'Beamer: Vorstellung knüpft an den Kaltstart an');
+  pruefe(!(await lehrer.$('.z-vollbild')), 'Beamer: Namenskarten ohne Vollbild darüber');
+  await h1.waitForSelector('#f-inhalt .f-vorstellung', { timeout: 8000 });
+  pruefe((await h1.$$('#f-inhalt .f-vorstellung')).length === 2 && (await h1.textContent('#f-inhalt')).includes('Schauen Sie nach vorn'), 'Handy: Vorstellung mit 2 Karten, Blick nach vorn');
+  pruefe((await h1.textContent('#f-leiste')).includes('Vorstellung'), 'Handy: Kopfzeile „Vorstellung“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_2b_personen.png') });
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_personen.png'), fullPage: true });
+  // Angaben auf den Karten stehen so auch im Falltext (keine erfundenen Fakten)
+  const falltextGesamt = await lehrer.evaluate(() => window.FALL.text.map((t) => t.text).join(' '));
+  pruefe(falltextGesamt.includes('71 Jahre') && falltextGesamt.includes('neu im Pflegeheim') && falltextGesamt.includes('Christin von ihren Erlebnissen im letzten pflegepraktischen Einsatz'), 'Vorstellung: Angaben stehen im Falltext');
+
   // Station 1 und 2 – jede beginnt mit dem Bild im Vollbild
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-vollbild');
@@ -198,7 +232,8 @@ function umgebung(Raum) {
   pruefe(await lehrer.$('.z-bild img') !== null, 'Beamer: danach steht das Bild klein neben dem Text');
   pruefe((await lehrer.textContent('.z-falltext')).includes('Frau Maler ist seit gestern Nachmittag neu im Pflegeheim.'), 'Beamer: Station 1 zeigt den Falltext');
   await h1.waitForSelector('.f-frage[data-frage="s1"]', { timeout: 8000 });
-  pruefe((await h1.textContent('#f-leiste')).includes('Station 1 von 7'), 'Handy: „Station 1 von 7“');
+  const stationenGesamt = FALL.schritte.filter((x) => x.art === 'station').length;
+  pruefe(stationenGesamt === 10 && (await h1.textContent('#f-leiste')).includes('Station 1 von 10'), 'Handy: „Station 1 von 10“ (mit den zusätzlichen Situationen)');
 
   // Wörter im Falltext antippen → Begriffsparkplatz (der Text bleibt Zeichen für Zeichen gleich)
   const s1Absaetze = await h1.$$eval('#f-inhalt .f-falltext p', (ps) => ps.map((x) => x.textContent));
@@ -224,10 +259,14 @@ function umgebung(Raum) {
   pruefe((await h1.$$('.f-frage[data-frage="s1"] .f-opt')).length === 9, 'Station 1: 9 Risiken zur Auswahl');
   await h1.click('.f-opt[data-kuerzel="THROMB"]');
   await h1.click('.f-opt[data-kuerzel="UNTERZ"]');
-  await h1.click('[data-senden="s1"]');
+  await h1.waitForSelector('.f-frage[data-frage="s1"] .f-ok', { timeout: 3000 });
   await warte(400);
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3a0_station1_frage.png') });
+  console.log('  (Info) Station 1 Abstimmung: Seitenhöhe ' + (await lehrer.evaluate(() => document.documentElement.scrollHeight + ' / Fenster ' + window.innerHeight)));
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie alle Risiken') && !(await lehrer.textContent('.z-handy-auftrag')).includes('Senden'), 'Beamer: Station 1 sagt, was am Smartphone zu tun ist');
   await lehrer.click('#z-weiter'); // Ergebnis
   pruefe((await lehrer.textContent('#z-weiter')).includes('Auflösen: Was passt?'), 'Beamer: Station 1 hat eine Auflösung');
+  pruefe(!(await lehrer.$('.z-handy-auftrag')), 'Beamer: nach dem Abstimmen kein Smartphone-Auftrag mehr');
   pruefe(!(await lehrer.$('.z-passt-nicht')), 'Beamer: bei „Ergebnis zeigen“ noch nicht aufgelöst');
   await lehrer.click('#z-weiter'); // Auflösen
   await lehrer.waitForSelector('.z-passt-nicht');
@@ -266,6 +305,31 @@ function umgebung(Raum) {
   pruefe((await h1.textContent('.f-aufloesung')).includes('habe es nicht weitergegeben'), 'Handy: Auflösung erscheint');
   pruefe((await h1.getAttribute('.f-ampel .f-rot', 'aria-pressed')) === 'true', 'Handy: eigene Antwort bleibt sichtbar');
 
+  // Zusätzliche Situation (nicht im Fallbeispiel): alles normal → Einschätzung beim Auflösen
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Station 3 · Nach der Körperpflege'), 'Beamer: nach Station 2 folgt die zusätzliche Situation als Station 3');
+  await lehrer.click('#z-weiter');
+  await lehrer.waitForSelector('.z-falltext');
+  pruefe(!(await lehrer.$('.z-vollbild')), 'Beamer: zusätzliche Situation ohne Bild');
+  pruefe((await lehrer.textContent('.z-titel')).includes('3') && (await lehrer.textContent('.z-falltext')).includes('erzählte mir von ihrem Garten'), 'Beamer: zusätzliche Situation sieht aus wie eine Station');
+  await h1.waitForSelector('.f-frage[data-frage="z1"]', { timeout: 8000 });
+  pruefe((await h1.textContent('#f-leiste')).includes('Station 3 von 10'), 'Handy: „Station 3 von 10“');
+  pruefe(!(await h1.textContent('#f-bisher-text')).includes('Garten'), 'Handy: zusätzliche Situation nicht bei „Den Fall bis hier lesen“');
+  await h1.click('.f-ampel .f-gelb');
+  await h2.waitForSelector('.f-frage[data-frage="z1"]', { timeout: 8000 });
+  await h2.click('.f-ampel .f-gruen');
+  await warte(2300);
+  await lehrer.click('#z-weiter'); // Ergebnis
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Auflösen: Was passt?'), 'Beamer: zusätzliche Situation hat eine Auflösung');
+  await lehrer.click('#z-weiter'); // Auflösen
+  await lehrer.waitForSelector('.z-einschaetzung');
+  pruefe((await lehrer.textContent('.z-einschaetzung')).includes('🟢 Alles normal') && (await lehrer.textContent('.z-einschaetzung')).includes('nichts zu melden'), 'Beamer: Einschätzung „🟢 Alles normal“ mit Begründung');
+  pruefe(!(await lehrer.$('.z-christin')), 'Beamer: keine „Christin“-Markierung bei der zusätzlichen Situation');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3e_extra.png') });
+  await h1.waitForSelector('.f-aufloesung', { timeout: 8000 });
+  pruefe((await h1.textContent('.f-aufloesung')).includes('Einschätzung') && (await h1.textContent('.f-aufloesung')).includes('Alles normal'), 'Handy: Einschätzung erscheint');
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_extra.png'), fullPage: true });
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Station 4 · Beim Frühstück'), 'Beamer: danach geht es mit dem Fall weiter (Station 4)');
+
   // Station 5: die 3 wichtigsten Schritte aus 8 in der richtigen Reihenfolge antippen
   const s5Index = FALL.schritte.findIndex((x) => x.id === 's5');
   const s5 = FALL.schritte[s5Index].frage;
@@ -281,14 +345,15 @@ function umgebung(Raum) {
   pruefe((await h1.textContent(`.f-folge-opt[data-kuerzel="${richtig[0]}"] .f-platz`)) === '2', 'Handy: angetippte Schritte bekommen ihre Platznummer');
   await tippe(h1, richtig[1]);   // wieder herausnehmen
   pruefe((await h1.textContent(`.f-folge-opt[data-kuerzel="${richtig[0]}"] .f-platz`)) === '1', 'Handy: herausnehmen – die anderen rücken nach');
-  pruefe(await h1.isDisabled('[data-senden-folge="s5"]'), 'Handy: Senden erst bei 3 Schritten');
+  pruefe((await h1.textContent('.f-frage[data-frage="s5"] .f-auto')).includes('Noch 2 antippen'), 'Handy: „Noch 2 antippen – dann wird … automatisch gesendet“');
   await tippe(h1, richtig[1]); await tippe(h1, richtig[2]);
   pruefe(await h1.isDisabled('.f-folge-opt[data-kuerzel="PULS"]'), 'Handy: nach 3 Schritten sind die übrigen gesperrt');
-  await h1.click('[data-senden-folge="s5"]');
+  await h1.waitForSelector('.f-frage[data-frage="s5"] .f-ok', { timeout: 3000 });
+  pruefe(true, 'Handy: Reihenfolge wird nach dem 3. Schritt automatisch gesendet');
   await h1.screenshot({ path: path.join(__dirname, 'fall_h_station5.png'), fullPage: true });
   await h2.waitForSelector('.f-frage[data-frage="s5"] .f-folge-opt', { timeout: 8000 });
   for (const k of ['ANSP', 'PULS', 'RUF']) await tippe(h2, k);   // Puls fühlen passt nicht
-  await h2.click('[data-senden-folge="s5"]');
+  await h2.waitForSelector('.f-frage[data-frage="s5"] .f-ok', { timeout: 3000 });
   await warte(2300);
   await lehrer.click('#z-weiter'); // Ergebnis
   await lehrer.waitForSelector('.z-platz');
@@ -312,14 +377,25 @@ function umgebung(Raum) {
   await lehrer.waitForSelector('.z-vollbild');
   await lehrer.keyboard.press('ArrowRight');
   await h1.waitForSelector('.f-frage[data-frage="s7"] .f-opt', { timeout: 8000 });
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie genau 3 Dinge aus'), 'Beamer: Station 7 – „Wählen Sie genau 3 Dinge aus“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3d_handyauftrag.png') });
   for (const k of ['REDEN', 'TEAM']) await h1.click(`.f-opt[data-kuerzel="${k}"]`);
-  pruefe(await h1.isDisabled('[data-senden="s7"]') && (await h1.textContent('[data-senden="s7"]')).includes('2 von 3'), 'Handy: Senden erst bei genau 3');
+  pruefe((await h1.textContent('.f-frage[data-frage="s7"] .f-auto')).includes('Noch 1 wählen'), 'Handy: „Noch 1 wählen – dann … automatisch gesendet“');
+  await warte(900);
+  pruefe(!(await h1.$('.f-frage[data-frage="s7"] .f-ok')), 'Handy: bei 2 von 3 wird nichts gesendet');
   await h1.click('.f-opt[data-kuerzel="PROFI"]');
   pruefe(await h1.isDisabled('.f-opt[data-kuerzel="NIX"]'), 'Handy: nach 3 gewählten sind die übrigen gesperrt');
-  await h1.click('[data-senden="s7"]');
+  await h1.waitForSelector('.f-frage[data-frage="s7"] .f-ok', { timeout: 3000 });
+  await lehrer.waitForSelector('.l-pille.l-fertig:has-text("Lena K.")', { timeout: 6000 });
+  pruefe(true, 'Beamer: ✓ bei Lena nach der 3. Auswahl');
+  await h1.click('.f-opt[data-kuerzel="PROFI"]');   // wieder abwählen → Antwort wird zurückgezogen
+  await lehrer.waitForSelector('.l-pille.l-offen:has-text("Lena K.")', { timeout: 6000 });
+  pruefe((await h1.textContent('.f-frage[data-frage="s7"] .f-auto')).includes('Noch 1 wählen'), 'Handy + Beamer: nur 2 von 3 → Antwort zurückgezogen, ✓ weg');
+  await h1.click('.f-opt[data-kuerzel="PROFI"]');
+  await h1.waitForSelector('.f-frage[data-frage="s7"] .f-ok', { timeout: 3000 });
   await h2.waitForSelector('.f-frage[data-frage="s7"] .f-opt', { timeout: 8000 });
   for (const k of ['NIX', 'REDEN', 'SCHULD']) await h2.click(`.f-opt[data-kuerzel="${k}"]`);
-  await h2.click('[data-senden="s7"]');
+  await h2.waitForSelector('.f-frage[data-frage="s7"] .f-ok', { timeout: 3000 });
   await warte(2300);
   await lehrer.click('#z-weiter'); // Ergebnis
   await lehrer.waitForSelector('.z-ergebnis .z-zeile');
@@ -336,7 +412,10 @@ function umgebung(Raum) {
   const zurueckIndex = FALL.schritte.findIndex((s) => s.id === 'zurueck');
   await lehrer.click(`[data-gehe="${zurueckIndex}"]`);
   await lehrer.waitForSelector('.z-zeitstrahl');
-  pruefe((await lehrer.$$('.z-zeitstrahl li')).length === 7, 'Beamer: Zeitstrahl mit 7 Stationen');
+  pruefe((await lehrer.$$('.z-zeitstrahl li')).length === 7, 'Beamer: Zeitstrahl mit den 7 Stationen des Fallbeispiels');
+  pruefe(!(await lehrer.textContent('.z-zeitstrahl')).includes('Gegen neun Uhr'), 'Beamer: zusätzliche Situationen nicht im Zeitstrahl');
+  pruefe(!(await h1.textContent('#f-bisher-text')).includes('Fernbedienung'), 'Handy: ganzer Fall ohne zusätzliche Situationen');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie einen Zeitpunkt'), 'Beamer: Zurückspulen mit Smartphone-Auftrag');
   await lehrer.waitForFunction(() => [...document.querySelectorAll('.z-zs-bild')].every((i) => i.complete && i.naturalWidth > 0));
   pruefe((await lehrer.$$('.z-zs-bild')).length === 5, 'Beamer: Zeitstrahl mit 5 Bildern');
   pruefe((await lehrer.textContent('.z-zeitstrahl')).includes('🔴 50\u00a0%'), 'Beamer: Zeitstrahl zeigt Ampel-Anteile');
@@ -375,6 +454,10 @@ function umgebung(Raum) {
   await h2.fill('#f-b', 'Wie überbringe ich eine schlechte Nachricht?');
   await h2.click('#f-persp-form button[type=submit]');
   await h2.waitForSelector('.f-eigene li');
+  pruefe((await h2.inputValue('#f-b')) === '' && await h2.isHidden('#f-persp-offen'), 'Handy: nach dem Senden sind die Felder leer');
+  // Lena schreibt noch etwas, vergisst aber „Senden“
+  await h1.fill('#f-a', 'Ruhe und eine Pause');
+  pruefe(await h1.isVisible('#f-persp-offen') && (await h1.textContent('#f-persp-offen')).includes('Noch nicht gesendet'), 'Handy: Hinweis „Noch nicht gesendet“');
   await h1.screenshot({ path: path.join(__dirname, 'fall_h_perspektive.png'), fullPage: true });
   await warte(2300);
   const karten = await lehrer.$$eval('.z-pk', (e) => e.map((x) => x.textContent).join(' '));
@@ -390,6 +473,11 @@ function umgebung(Raum) {
   await h2.waitForSelector('#f-wort-status:has-text("Danke")');
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-woerter li', { timeout: 6000 });
+  await h1.waitForSelector('.f-gross:has-text("Arbeitsblatt")', { timeout: 8000 });
+  await warte(500);
+  const standNachher = await lehrer.evaluate((u) => fetch(u).then((r) => r.json()), SERVER + '/fall/stand?raum=k2-fall');
+  pruefe(standNachher.texte.some((t) => t.art === 'persp' && t.a === 'Ruhe und eine Pause'), 'Handy: vergessener Entwurf wird beim Weiterschalten automatisch gesendet');
+  pruefe(standNachher.texte.filter((t) => t.a === 'eine klare Anweisung').length === 1, 'Handy: gesendete Einträge werden nicht doppelt geschickt');
   pruefe((await lehrer.textContent('.z-woerter')).includes('Redon-Drainage'), 'Beamer: Begriffsparkplatz');
   await lehrer.click('.z-block [data-sichern]');
   await lehrer.waitForSelector('.z-gesichert:has-text("Teilnehmende")', { timeout: 6000 });
@@ -415,6 +503,7 @@ function umgebung(Raum) {
   await lehrer.keyboard.press('ArrowRight');
   await h1.waitForSelector('.f-frage[data-frage="s2"]', { timeout: 8000 });
   pruefe((await h1.getAttribute('.f-ampel .f-rot', 'aria-pressed')) === 'false', 'Handy: neue Sitzung – alte Antwort nicht mehr markiert');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie eine Farbe'), 'Beamer: Ampel mit Smartphone-Auftrag');
   await h1.click('.f-ampel .f-rot');
   await warte(2300);
   await lehrer.click('#z-weiter');

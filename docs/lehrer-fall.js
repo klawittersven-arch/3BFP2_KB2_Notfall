@@ -40,7 +40,21 @@
   }
   function prozent(n, gesamt) { return gesamt ? Math.round(100 * n / gesamt) : 0; }
   function antworten(n) { return n + (n === 1 ? ' Antwort' : ' Antworten'); }
-  function abschnitte(teil, art) { return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); }); }
+  // Stationen durchnummerieren (mit den zusätzlichen Situationen) und deren Text bereitlegen
+  var EXTRA = {};
+  (function () {
+    var nr = 0;
+    F.schritte.forEach(function (s) {
+      if (s.art === 'station') s.nummer = ++nr;
+      if (s.extra) EXTRA[s.id] = s;
+    });
+  })();
+  // Abschnitte des Falltexts; bei zusätzlichen Situationen deren eigener Text (nicht im Fallbeispiel)
+  function abschnitte(teil, art) {
+    if (EXTRA[teil]) return !art || art === 'frage' ? [{ teil: teil, art: 'frage', absatz: true, text: EXTRA[teil].text }] : [];
+    return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); });
+  }
+  function ampelOption(k) { return F.ampel.filter(function (o) { return o.kuerzel === k; })[0]; }
   function falltextHtml(teile) {
     var absaetze = [];
     teile.forEach(function (t, i) {
@@ -57,10 +71,11 @@
     var bild = s.bild ? ['bild'] : [];
     if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
     if (s.art === 'station') {
-      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage) || !!s.loesung;
       return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
     }
     if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    if (s.art === 'personen') return bild.concat(['frage']);
     return ['frage'];
   }
   function stufenAnzahl(s) { return phasen(s).length; }
@@ -140,6 +155,7 @@
     var html = '';
     if (phase() === 'bild') html = vollbildHtml(s.bild, (s.nummer ? s.nummer + ' · ' : '') + s.kurz);
     else if (s.art === 'fragen') html = fragenHtml(s);
+    else if (s.art === 'personen') html = personenHtml(s);
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = zurueckHtml(s);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
@@ -187,13 +203,16 @@
     if (countdown) { clearInterval(countdown); countdown = null; }
     if (phase() === 'bild') { buehne.innerHTML = vollbildHtml(s.bild, ''); return; }
     if (phase() === 'satz') {
-      buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p></div>';
+      buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p>' +
+        (s.notiz ? '<p class="z-kalt-notiz"><span aria-hidden="true">✍️</span> ' + esc(s.notiz) + '</p>' : '') + '</div>';
       return;
     }
     countdownRest = s.sekunden;
     var zeige = function () {
       buehne.innerHTML = kaltKopf(s, 0.7) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p>' +
-        (countdownRest > 0 ? '<p class="z-countdown" aria-live="off">' + countdownRest + '</p>' : '<p class="z-stopp" role="status">' + esc(s.stopp) + '</p>') + '</div>';
+        (countdownRest > 0 ? '<p class="z-countdown" aria-live="off">' + countdownRest + '</p>' +
+          (s.notizKurz ? '<p class="z-kalt-notiz"><span aria-hidden="true">✍️</span> ' + esc(s.notizKurz) + '</p>' : '') :
+          '<p class="z-stopp" role="status">' + esc(s.stopp) + '</p>') + '</div>';
     };
     zeige();
     countdown = setInterval(function () {
@@ -201,6 +220,20 @@
       zeige();
       if (countdownRest <= 0) { clearInterval(countdown); countdown = null; }
     }, 1000);
+  }
+
+  // Auftrag fürs Smartphone: groß auf dem Beamer, solange abgestimmt wird
+  function handyText(q) {
+    if (q.handyAuftrag) return q.handyAuftrag;
+    if (q.reihenfolge) return 'Tippen Sie ' + (q.anzahl ? 'die ' + q.anzahl + ' wichtigsten Antworten' : 'alle Antworten') + ' in der richtigen Reihenfolge an.';
+    if (q.waehlen) return 'Wählen Sie genau ' + q.waehlen + ' Antworten aus.';
+    if (q.mehrfach) return 'Wählen Sie alles, was passt.';
+    if (q.ampel) return 'Wählen Sie eine Farbe: 🟢 🟡 🔴';
+    return 'Wählen Sie eine Antwort.';
+  }
+  function handyAuftragHtml(text, zusatz) {
+    return '<div class="z-handy-auftrag"><span class="z-handy-zeichen" aria-hidden="true">📱</span>' +
+      '<p><strong>Jetzt am Smartphone:</strong> ' + esc(text) + '</p>' + (zusatz ? '<p class="z-handy-zusatz">' + zusatz + '</p>' : '') + '</div>';
   }
 
   // Namen mit ✓, wenn die Frage(n) dieses Schritts beantwortet sind
@@ -348,7 +381,8 @@
       return '<section class="z-zwei"><div class="z-qr"><img src="qr_fall.png" alt="QR-Code zur Fall-Einführung">' +
         '<p class="z-adresse">' + esc(HANDY_ADRESSE.replace(/^https?:\/\//, '')) + '</p></div>' +
         '<div><h2 class="z-titel">' + esc(s.titel) + '</h2><p class="z-gross">' + esc(s.beamerText) + '</p>' +
-        '<p class="z-hinweis">' + esc(s.hinweis) + '</p>' + namenHtml(ids) + '</div></section>';
+        (s.handyAuftrag ? handyAuftragHtml(s.handyAuftrag) : '') +
+        (s.hinweis ? '<p class="z-hinweis">' + esc(s.hinweis) + '</p>' : '') + namenHtml(ids) + '</div></section>';
     }
     return '<h2 class="z-titel">' + esc(s.titel) + '</h2><div class="z-raster">' +
       s.fragen.map(function (q) { return ergebnisHtml(q); }).join('') + '</div>';
@@ -373,12 +407,17 @@
       return kopf + '<div class="z-station' + (nach ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
     };
     if (!nach) {
-      return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
+      return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + handyAuftragHtml(handyText(s.frage)) + namenHtml([s.frage.id]));
     }
     var aufText = abschnitte(s.id, 'aufloesung');
     var lang = aufText.map(function (t) { return t.text; }).join(' ').length > 400;
     var box = auf && aufText.length ? '<div class="z-aufloesung' + (lang ? ' z-lang' : '') + '"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
       falltextHtml(aufText) + '</div></div>' : '';
+    if (auf && s.loesung) {   // zusätzliche Situation: Einschätzung statt Fortsetzung des Falls
+      var lo = ampelOption(s.loesung.ampel);
+      box = '<div class="z-aufloesung z-einschaetzung"><p class="z-auf-kopf">Einschätzung:</p><p class="z-gross">' + lo.zeichen + ' ' + esc(lo.text) +
+        '</p><p>' + esc(s.loesung.text) + '</p></div>';
+    }
     if (auf && lang) {   // langer Text (Station 5): Text links, Ergebnis rechts statt Bild – passt ohne Scrollen
       return kopf + text + '<div class="z-auf-zwei">' + box + ergebnisHtml(s.frage, s.christin, true) + '</div>';
     }
@@ -387,7 +426,7 @@
 
   // Zeitstrahl: alle Stationen nebeneinander mit dem Klassen-Ergebnis und Christins Handeln
   function zeitstrahlHtml() {
-    var stationen = F.schritte.filter(function (x) { return x.art === 'station'; });
+    var stationen = F.schritte.filter(function (x) { return x.art === 'station' && !x.extra; });
     return '<ol class="z-zeitstrahl">' + stationen.map(function (x) {
       var q = x.frage;
       var erg = (stand && stand.ergebnisse[q.id]) || {};
@@ -408,7 +447,7 @@
         inhalt = oben.length ? '<span class="z-mini-legende">' + oben.map(function (o) { return esc(o.text) + ': ' + prozent(erg[o.kuerzel], n) + '\u00a0%'; }).join('<br>') + '</span>' : '<span class="z-mini-legende">–</span>';
       }
       return '<li>' + (x.bild ? '<img class="z-zs-bild" src="' + esc(x.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="">' : '') +
-        '<span class="z-zs-nr">' + x.nummer + '</span><span class="z-zs-titel">' + esc(x.kurz) + '</span>' +
+        '<span class="z-zs-titel">' + esc(x.kurz) + '</span>' +
         '<span class="z-zs-was">' + esc(x.zeitstrahl || '') + '</span>' + inhalt + '</li>';
     }).join('') + '</ol>';
   }
@@ -416,7 +455,7 @@
   function zurueckHtml(s) {
     return '<h2 class="z-titel">' + esc(s.titel) + '</h2>' + zeitstrahlHtml() +
       '<p class="z-frage"><span class="z-vorspann">' + esc(s.vorspann) + '</span> ' + esc(s.frage.text) + '</p>' +
-      (ansicht.stufe === 0 ? namenHtml([s.frage.id]) : ergebnisHtml(s.frage));
+      (ansicht.stufe === 0 ? handyAuftragHtml(handyText(s.frage)) + namenHtml([s.frage.id]) : ergebnisHtml(s.frage));
   }
 
   // ---------- Gruppen der Perspektiven-Runde ----------
@@ -492,7 +531,8 @@
     var mitEintrag = stand ? stand.leute.filter(function (p) { return p.eintraege; }).length : 0;
     return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2><span class="z-persp-knoepfe">' +
       '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen" title="Klick auf einen Namen setzt ihn in die nächste Gruppe">Gruppen neu einteilen</button></span></div>' +
-      '<p class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' + (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</p>' +
+      handyAuftragHtml(s.handyAuftrag || s.beamerAuftrag || '', '<span class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' +
+        (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</span>') +
       '<div class="z-spalten">' + spalten + '</div>';
   }
 
@@ -526,6 +566,18 @@
     var d = stand.steuerung.durchgang;
     var a = stand.archiv[d];
     return a ? 'Gesichert: ' + datum(a.t) + ' (' + a.teilnehmende + ' Teilnehmende)' : 'Noch nicht gesichert.';
+  }
+
+  // Vorstellung: (Bild +) zwei Namenskarten
+  function personenHtml(s) {
+    var karten = '<div class="z-personen-karten">' + s.personen.map(function (p) {
+      return '<div class="z-person"><p class="z-person-name">' + esc(p.name) + '</p><p class="z-person-text">' + esc(p.text) + '</p></div>';
+    }).join('') + '</div>';
+    var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
+    return '<h2 class="z-titel">' + esc(s.titel) + '</h2>' +
+      (s.vorspann ? '<p class="z-gross">' + esc(s.vorspann) + '</p>' : '') +
+      (bild ? '<div class="z-personen z-mit-bild">' + bild + karten + '</div>' : '<div class="z-personen">' + karten + '</div>') +
+      (s.nachspann ? '<p class="z-gross z-personen-nach">' + esc(s.nachspann) + '</p>' : '');
   }
 
   function endeHtml(s) {
