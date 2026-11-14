@@ -114,3 +114,8 @@
 body:has(.f-parkleiste:not([hidden])) .inhalt { padding-bottom: 130px; }
 .f-bild { display: block; width: 100%; height: auto; margin: 0 0 12px; border-radius: 12px; }
 .f-opt.f-passt:disabled, .f-opt.f-passt-nicht:disabled { opacity: 1; }
+
+/* Vorstellung: Christin und Frau Maler */
+.f-person { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 2px solid var(--rand); font-size: 18px; }
+.f-person p { margin: 0; font-weight: 400; }
+.f-person-name { font-size: 22px; font-weight: 800; color: var(--dunkelpetrol); margin-bottom: 4px !important; }

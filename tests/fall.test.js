@@ -190,6 +190,31 @@ function umgebung(Raum) {
   await h1.waitForSelector('.f-opt:disabled', { timeout: 8000 });
   pruefe((await h1.textContent('#f-inhalt')).includes('Die Abstimmung ist beendet'), 'Handy: nach „Ergebnis zeigen“ gesperrt');
 
+  // Vorstellung: Christin und Frau Maler (nach dem Kaltstart, vor Station 1)
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Vorstellung'), 'Beamer: nach „Ihre 10 Sekunden“ kommt die Vorstellung');
+  await lehrer.keyboard.press('ArrowRight');
+  const personenSchritt = FALL.schritte.find((x) => x.id === 'personen');
+  if (personenSchritt.bild) {
+    await lehrer.waitForSelector('.z-vollbild');
+    pruefe((await lehrer.textContent('.z-vollbild-titel')) === 'Vorstellung', 'Beamer: Vorstellung beginnt mit dem Bild im Vollbild');
+    await lehrer.click('.z-vollbild');
+    await lehrer.waitForSelector('.z-personen.z-mit-bild .z-bild img');
+    pruefe(true, 'Beamer: Bild steht danach neben den Namenskarten');
+  }
+  await lehrer.waitForSelector('.z-person');
+  const personenNamen = await lehrer.$$eval('.z-person-name', (e) => e.map((x) => x.textContent));
+  pruefe(JSON.stringify(personenNamen) === JSON.stringify(['Christin', 'Frau Maler']), 'Beamer: Vorstellung zeigt Christin und Frau Maler');
+  pruefe((await lehrer.textContent('.z-buehne')).includes('Genau diese Situation hat Christin erlebt.'), 'Beamer: Vorstellung knüpft an den Kaltstart an');
+  pruefe(!(await lehrer.$('.z-vollbild')), 'Beamer: Namenskarten ohne Vollbild darüber');
+  await h1.waitForSelector('#f-inhalt .f-person', { timeout: 8000 });
+  pruefe((await h1.$$('#f-inhalt .f-person')).length === 2 && (await h1.textContent('#f-inhalt')).includes('Schauen Sie nach vorn'), 'Handy: Vorstellung mit 2 Karten, Blick nach vorn');
+  pruefe((await h1.textContent('#f-leiste')).includes('Vorstellung'), 'Handy: Kopfzeile „Vorstellung“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_2b_personen.png') });
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_personen.png'), fullPage: true });
+  // Angaben auf den Karten stehen so auch im Falltext (keine erfundenen Fakten)
+  const falltextGesamt = await lehrer.evaluate(() => window.FALL.text.map((t) => t.text).join(' '));
+  pruefe(falltextGesamt.includes('71 Jahre') && falltextGesamt.includes('neu im Pflegeheim') && falltextGesamt.includes('Christin von ihren Erlebnissen im letzten pflegepraktischen Einsatz'), 'Vorstellung: Angaben stehen im Falltext');
+
   // Station 1 und 2 – jede beginnt mit dem Bild im Vollbild
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-vollbild');

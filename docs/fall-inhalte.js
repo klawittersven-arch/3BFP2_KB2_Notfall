@@ -18,6 +18,7 @@
    Ablauf (die Lehrkraft schaltet mit „Weiter“ von Schritt zu Schritt):
      kaltstart     – nur Beamer: Satz + 10-Sekunden-Countdown (die Handys sind noch nicht dabei)
      fragen        – Anmelden per QR-Code, dann Fragen zum Kaltstart
+     personen      – Vorstellung: Das sind Christin und Frau Maler (optional mit Bild)
      station       – Abschnitt des Falls → Frage → Ergebnis → was Christin getan hat (aufloesung)
      zurueckspulen – Zeitstrahl aller Stationen + Frage „Ab wann hätte man …?“
      perspektiven  – Gruppen: „Was hätte diese Person gebraucht?“ + Lernfrage
@@ -32,7 +33,7 @@
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
    kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
 
-   Bilder (optional, bei kaltstart und station): bild: { datei: 'bilder/station2.jpg', alt: '…' }
+   Bilder (optional, bei kaltstart, personen und station): bild: { datei: 'bilder/station2.jpg', alt: '…' }
    Jedes Bild liegt zweimal in docs/bilder/: groß für den Beamer (1600 px breit) und mit „-klein“
    für die Handys (800 px), z. B. station2.jpg und station2-klein.jpg. Ein Bild darf nicht mehr
    zeigen als der Text bis zur Stopp-Stelle. alt = kurze Beschreibung (für Vorlese-Programme).
@@ -129,6 +130,18 @@ var FALL = {
             { kuerzel: '5', text: 'sehr sicher' }
           ] }
       ] },
+
+    // Vorstellung der beiden Personen – erst NACH dem Kaltstart, damit die SuS dort selbst handeln.
+    // Nur Angaben, die auch im Falltext stehen. Bild (optional): bild: { datei: 'bilder/personen.jpg', alt: '…' }
+    { id: 'personen', art: 'personen', kurz: 'Vorstellung',
+      titel: 'Das sind Christin und Frau Maler',
+      vorspann: 'Genau diese Situation hat Christin erlebt.',
+      personen: [
+        { name: 'Christin', text: 'Auszubildende in der Pflege. Sie macht einen Praxiseinsatz im Pflegeheim.' },
+        { name: 'Frau Maler', text: '71 Jahre alt. Sie ist seit gestern neu im Pflegeheim.' }
+      ],
+      nachspann: 'Wir gehen zurück an den Anfang dieses Tages.',
+      handy: 'Schauen Sie nach vorn.' },
 
     { id: 's1', art: 'station', nummer: 1, kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },

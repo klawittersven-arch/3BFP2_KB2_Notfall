@@ -84,6 +84,7 @@
       return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
     }
     if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    if (s.art === 'personen') return bild.concat(['frage']);
     return ['frage'];
   }
   function aktuellePhase() { var s = schritt(); var p = phasen(s); return p[Math.min(stand.stufe, p.length - 1)]; }
@@ -185,6 +186,7 @@
     var html = '';
     if (s.art === 'kaltstart') html = '<p class="f-gross">' + esc(s.handy) + '</p>';
     else if (s.art === 'fragen') html = fragenHtml(s);
+    else if (s.art === 'personen') html = personenHtml(s);
     else if (s.art === 'station' && aktuellePhase() === 'bild') html = '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
       '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' +
       '<p class="f-gross">' + esc(H.nachVorn) + '</p>';
@@ -204,6 +206,16 @@
   function fragenHtml(s) {
     return '<h2 class="f-titel">' + esc(s.titel) + '</h2>' +
       s.fragen.map(function (q) { return frageHtml(q, stand.stufe >= 1); }).join('');
+  }
+
+  // Vorstellung: (kleines Bild +) zwei Namenskarten, der Blick geht nach vorn
+  function personenHtml(s) {
+    return '<h2 class="f-titel">' + esc(s.titel) + '</h2>' +
+      (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
+      s.personen.map(function (p) {
+        return '<div class="f-person"><p class="f-person-name">' + esc(p.name) + '</p><p>' + esc(p.text) + '</p></div>';
+      }).join('') +
+      '<p class="f-gross">' + esc(s.handy) + '</p>';
   }
 
   function stationHtml(s) {

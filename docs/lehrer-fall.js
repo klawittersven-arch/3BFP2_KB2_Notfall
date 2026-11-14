@@ -61,6 +61,7 @@
       return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
     }
     if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    if (s.art === 'personen') return bild.concat(['frage']);
     return ['frage'];
   }
   function stufenAnzahl(s) { return phasen(s).length; }
@@ -140,6 +141,7 @@
     var html = '';
     if (phase() === 'bild') html = vollbildHtml(s.bild, (s.nummer ? s.nummer + ' · ' : '') + s.kurz);
     else if (s.art === 'fragen') html = fragenHtml(s);
+    else if (s.art === 'personen') html = personenHtml(s);
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = zurueckHtml(s);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
@@ -529,6 +531,18 @@
     var d = stand.steuerung.durchgang;
     var a = stand.archiv[d];
     return a ? 'Gesichert: ' + datum(a.t) + ' (' + a.teilnehmende + ' Teilnehmende)' : 'Noch nicht gesichert.';
+  }
+
+  // Vorstellung: (Bild +) zwei Namenskarten
+  function personenHtml(s) {
+    var karten = '<div class="z-personen-karten">' + s.personen.map(function (p) {
+      return '<div class="z-person"><p class="z-person-name">' + esc(p.name) + '</p><p class="z-person-text">' + esc(p.text) + '</p></div>';
+    }).join('') + '</div>';
+    var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
+    return '<h2 class="z-titel">' + esc(s.titel) + '</h2>' +
+      (s.vorspann ? '<p class="z-gross">' + esc(s.vorspann) + '</p>' : '') +
+      (bild ? '<div class="z-personen z-mit-bild">' + bild + karten + '</div>' : '<div class="z-personen">' + karten + '</div>') +
+      (s.nachspann ? '<p class="z-gross z-personen-nach">' + esc(s.nachspann) + '</p>' : '');
   }
 
   function endeHtml(s) {
