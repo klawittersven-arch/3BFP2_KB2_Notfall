@@ -242,3 +242,21 @@ body.z-liest .z-aufloesung .z-lesezeile { background: var(--bernstein-hell); }
 /* Einleitung vor dem Abschnitt (nicht Teil des Falltexts): wer spricht, wer ist „sie“ */
 .z-einleitung { margin: 0 0 6px; font-size: clamp(20px, 1.7vw, 26px); font-weight: 700; color: var(--petrol); }
 .z-einleitung.z-klein { font-size: 18px; margin-bottom: 2px; }
+
+/* Lernfragen drucken: nur die Liste aufs Papier */
+#z-druck { display: none; }
+@media print {
+  body.z-drucken { padding: 0 !important; background: #fff; }
+  body.z-drucken > *:not(#z-druck) { display: none !important; }
+  body.z-drucken #z-druck { display: block; font-size: 11.5pt; line-height: 1.4; color: #000; }
+  #z-druck h1 { margin: 0 0 2pt; font-size: 20pt; }
+  #z-druck .d-unter { margin: 0 0 8pt; font-size: 10pt; color: #444; }
+  #z-druck .d-frage { margin: 0 0 10pt; font-weight: 700; }
+  #z-druck h2 { margin: 12pt 0 4pt; padding-bottom: 2pt; font-size: 13pt; border-bottom: 1.5pt solid #3F6C72; break-after: avoid; }
+  #z-druck ul { margin: 0; padding-left: 16pt; }
+  #z-druck li { margin: 0 0 5pt; break-inside: avoid; }
+  #z-druck .d-b { display: block; font-weight: 700; }
+  #z-druck .d-a { display: block; color: #333; }
+  #z-druck .d-leer { color: #666; font-style: italic; }
+  @page { margin: 16mm 16mm 18mm; }
+}
