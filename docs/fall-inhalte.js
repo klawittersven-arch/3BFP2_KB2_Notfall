@@ -22,6 +22,11 @@
      zurueckspulen – Zeitstrahl aller Stationen + Frage „Ab wann hätte man …?“
      perspektiven  – Gruppen: „Was hätte diese Person gebraucht?“ + Lernfrage
      ende          – Begriffsparkplatz, Ausblick, Ergebnis sichern
+
+   Bilder (optional, bei kaltstart und station): bild: { datei: 'bilder/station2.jpg', alt: '…' }
+   Jedes Bild liegt zweimal in docs/bilder/: groß für den Beamer (1600 px breit) und mit „-klein“
+   für die Handys (800 px), z. B. station2.jpg und station2-klein.jpg. Ein Bild darf nicht mehr
+   zeigen als der Text bis zur Stopp-Stelle. alt = kurze Beschreibung (für Vorlese-Programme).
    ========================================================================== */
 
 var FALL = {
@@ -79,7 +84,8 @@ var FALL = {
       aufforderung: 'Sie haben 10 Sekunden: Was tun Sie?',
       sekunden: 10,
       stopp: 'Stopp!',
-      handy: 'Schauen Sie nach vorn.' },
+      handy: 'Schauen Sie nach vorn.',
+      bild: { datei: 'bilder/kaltstart.jpg', alt: 'Blick von der Tür ins Zimmer: Frau Maler liegt reglos im Bett, ein Arm hängt über die Bettkante. Im Vordergrund ein Tablett mit Mittagessen.' } },
 
     { id: 'anmelden', art: 'fragen', kurz: 'Ihre 10 Sekunden',
       titel: 'Ihre 10 Sekunden',
@@ -111,6 +117,7 @@ var FALL = {
       ] },
 
     { id: 's1', art: 'station', nummer: 1, kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
+      bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
       frage: { id: 's1', mehrfach: true,
         text: 'Welche Risiken sehen Sie bei Frau Maler?',
         hilfe: 'Mehrere Antworten sind möglich.',
@@ -125,6 +132,7 @@ var FALL = {
         ] } },
 
     { id: 's2', art: 'station', nummer: 2, kurz: 'Am Morgen', zeitstrahl: 'Wade dick, Schmerzen',
+      bild: { datei: 'bilder/station2.jpg', alt: 'Frau Maler sitzt auf der Bettkante und zeigt auf ihre rechte Wade. Die Auszubildende hockt neben ihr.' },
       frage: { id: 's2', ampel: true, text: 'Wie schätzen Sie das ein?' },
       christin: { ampel: 'G', kurz: 'nicht weitergegeben' } },
 
@@ -133,10 +141,12 @@ var FALL = {
       christin: { ampel: 'Y', kurz: 'husten lassen' } },
 
     { id: 's4', art: 'station', nummer: 4, kurz: 'Gegen elf Uhr', zeitstrahl: 'Atemnot, Puls 118',
+      bild: { datei: 'bilder/station4.jpg', alt: 'Frau Maler liegt halb aufrecht im Bett, atmet mit offenem Mund und hält eine Hand auf der Brust. Die Auszubildende fühlt den Puls.' },
       frage: { id: 's4', ampel: true, text: 'Wie schätzen Sie das ein?' },
       christin: { ampel: 'G', kurz: 'dachte: nur aufgeregt' } },
 
     { id: 's5', art: 'station', nummer: 5, kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
+      bild: { datei: 'bilder/kaltstart.jpg', alt: 'Das Bild vom Anfang: Frau Maler liegt reglos im Bett, im Vordergrund das Tablett mit Mittagessen.' },
       frage: { id: 's5',
         text: 'Was tun Sie als Erstes?',
         optionen: [
@@ -160,6 +170,7 @@ var FALL = {
         ] } },
 
     { id: 's7', art: 'station', nummer: 7, kurz: 'Später', zeitstrahl: 'Albträume',
+      bild: { datei: 'bilder/station7.jpg', alt: 'Eine junge Frau sitzt nachts wach auf ihrem Bett und umarmt ihre Knie.' },
       frage: { id: 's7', mehrfach: true,
         text: 'Was braucht Christin jetzt?',
         hilfe: 'Mehrere Antworten sind möglich.',

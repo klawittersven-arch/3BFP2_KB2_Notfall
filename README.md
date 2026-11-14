@@ -98,6 +98,10 @@ Lernfragen aus SW 6 („Können Sie sie jetzt beantworten?“).
 - **Ergebnis sichern** speichert nur Zahlen und Texte **ohne Namen** – dauerhaft, bis es überschrieben wird. Namen und
   Einzelantworten werden wie bei den Übungen nach 12 Stunden gelöscht (oder mit *Liste leeren*).
 - Ein neuer Durchgang beginnt immer mit einer leeren Liste – vorher sichern!
+- **Bilder** (Kaltstart, Stationen 1, 2, 4, 5 und 7) liegen in `docs/bilder/` – je groß für den Beamer (1600 px) und
+  `-klein` für die Handys (800 px). Beamer: Kaltstart abgedunkelt im Hintergrund, bei den Stationen rechts neben dem Text,
+  im Zeitstrahl als kleine Vorschau. Ein Bild tauschen: beide Dateien gleichen Namens ersetzen; welche Station welches
+  Bild zeigt, steht in `fall-inhalte.js` (`bild:`). Die Bilder sind KI-erzeugt und zeigen keine echten Personen.
 - Texte, Fragen und Antwortknöpfe stehen in **`docs/fall-inhalte.js`**. Die Kürzel (`kuerzel`) bitte nicht ändern, sonst
   passen die gesicherten Ergebnisse nicht mehr zu SW 13. Den **Falltext** dort nicht ändern.
 - Die Handys fragen alle 3 Sekunden nach, welcher Schritt dran ist (`fallAbfrageSekunden` in `einstellungen.js`).
@@ -188,6 +192,7 @@ docs/                    ← alles, was GitHub Pages veröffentlicht
   spiel.html, spiel.js, spiel.css, pixel.js, logo-kbs.png   ← Belohnungsspiel „Notfall-Run!“
   fall.html, fall.js, fall.css            ← Fall-Einführung „Zeitlupe“ (Handy)
   fall-inhalte.js                         ← Texte der Fall-Einführung (Falltext NICHT ändern)
+  bilder/                                 ← Bilder der Fall-Einführung (groß + „-klein“)
   lehrer-fall.js, lehrer-fall.css, qr_fall.png, lehrer-3bfp2-1-fall.html, lehrer-3bfp2-2-fall.html   ← Beamer
   ab1a.html … ab3a.html  ← die Übungen         (erzeugt mit werkzeuge/seiten_erzeugen.py)
   lehrer-3bfp2-1-ab1.html … lehrer-3bfp2-2-ab3.html   (ebenfalls erzeugt)
