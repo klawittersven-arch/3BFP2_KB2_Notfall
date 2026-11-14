@@ -24,6 +24,11 @@ var EINSTELLUNGEN = {
   // So oft (in Sekunden) holt die Lehrerseite den neuen Stand.
   aktualisierenSekunden: 5,
 
+  // Fall-Einführung „Zeitlupe“: So oft (in Sekunden) fragt jedes Handy nach, welcher Schritt dran ist.
+  // Kleiner = die Handys folgen schneller, aber mehr Anfragen an den Worker (bei 25 SuS und 3 s:
+  // rund 22 500 Anfragen in 45 Minuten – im kostenlosen Cloudflare-Tarif sind 100 000 pro Tag frei).
+  fallAbfrageSekunden: 3,
+
   // Gegen Durchklicken:
   // Nach einer falschen Antwort sind die Knöpfe dieser Karte so viele Sekunden gesperrt
   // (der Tipp soll gelesen werden). 0 = keine Sperre.

@@ -1,0 +1,76 @@
+/* Fall-Einführung „Zeitlupe“ – Handy (ergänzt style.css) */
+.f-leiste {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px;
+  padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--rand);
+  font-size: 16px; font-weight: 700; color: var(--dunkelpetrol); min-height: 44px;
+}
+.f-warnung { color: var(--bernstein); }
+.f-titel { display: flex; align-items: center; gap: 4px; margin: 6px 0 12px; font-size: 22px; color: var(--dunkelpetrol); }
+.f-gross { font-size: 22px; font-weight: 700; color: var(--dunkelpetrol); padding: 18px; border-radius: 12px; background: var(--hellblau); border: 2px solid var(--petrol); }
+.f-vorspann { font-size: 19px; font-weight: 600; }
+
+/* Falltext: wie ein Zitat, gut lesbar */
+.f-falltext { font-size: 19px; line-height: 1.55; }
+.f-falltext p { margin: 0 0 10px; }
+#f-inhalt > .f-falltext { padding: 12px 14px 4px; margin: 0 0 16px; border-left: 6px solid var(--petrol); background: #F4F6F7; border-radius: 0 10px 10px 0; }
+.f-aufloesung { margin: 16px 0; padding: 12px 14px 4px; border-radius: 12px; background: var(--bernstein-hell); border: 3px solid var(--bernstein-rand); }
+.f-auf-kopf { margin: 0 0 6px; font-weight: 800; color: var(--bernstein); }
+
+/* Fragen und Antwortknöpfe */
+.f-frage { margin: 0 0 18px; padding: 14px; border-radius: 12px; background: var(--hellblau); border: 2px solid var(--rand); }
+.f-frage h3 { margin: 0 0 8px; font-size: 20px; color: var(--dunkelpetrol); }
+.f-hilfe { margin: -4px 0 10px; font-size: 16px; color: #3D5257; }
+.f-ampel, .f-wahl, .f-skala { display: grid; gap: 8px; grid-template-columns: 1fr; }
+.f-opt {
+  display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 10px 12px;
+  border: 2px solid var(--petrol); border-radius: 10px; background: #fff; color: var(--dunkelpetrol);
+  font: inherit; font-size: 18px; font-weight: 700; line-height: 1.25; text-align: left;
+  cursor: pointer; touch-action: manipulation; min-width: 0; overflow-wrap: anywhere;
+}
+.f-opt:focus-visible { outline: 3px solid #0B5CAD; outline-offset: 2px; }
+.f-opt:disabled { cursor: default; opacity: .55; }
+.f-opt.f-an { background: var(--petrol); color: #fff; opacity: 1; }
+.f-haken { font-size: 22px; }
+.f-skala .f-opt strong { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; border-radius: 16px; background: var(--hellblau); color: var(--dunkelpetrol); font-size: 18px; }
+/* Ampel */
+.f-ampel .f-opt { min-height: 64px; font-size: 20px; }
+.f-ampel .f-opt span[aria-hidden] { font-size: 28px; }
+.f-ampel .f-gruen { border-color: #1B6E35; }
+.f-ampel .f-gelb { border-color: #B98100; }
+.f-ampel .f-rot { border-color: #B3261E; }
+.f-ampel .f-gruen.f-an { background: #1B6E35; }
+.f-ampel .f-gelb.f-an { background: #FFD24D; color: #2A2000; }
+.f-ampel .f-rot.f-an { background: #B3261E; }
+.f-senden { width: 100%; margin-top: 10px; }
+.f-senden:disabled { opacity: .5; cursor: default; }
+.f-status { margin: 10px 0 0; font-size: 16px; font-weight: 600; color: #3D5257; }
+.f-ok { color: var(--gruen); }
+
+/* Perspektiven */
+.f-personen { display: grid; gap: 8px; margin: 0 0 14px; }
+.f-person {
+  min-height: 52px; padding: 10px 12px; border: 2px solid var(--petrol); border-radius: 10px; background: #fff;
+  color: var(--dunkelpetrol); font: inherit; font-weight: 700; text-align: left; cursor: pointer;
+}
+.f-person.f-an { background: var(--petrol); color: #fff; }
+.f-persp-form { margin: 0 0 16px; padding: 14px; border-radius: 12px; background: var(--hellblau); border: 2px solid var(--petrol); }
+.f-persp-form label { display: block; margin: 6px 0 6px; font-weight: 700; color: var(--dunkelpetrol); }
+.f-persp-form textarea {
+  display: block; width: 100%; padding: 10px 12px; border: 2px solid var(--petrol); border-radius: 10px;
+  font: inherit; font-size: 18px; background: #fff; color: var(--text); resize: vertical;
+}
+.f-anfaenge { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.f-anfang { min-height: 40px; padding: 6px 10px; border: 2px solid var(--rand); border-radius: 18px; background: #fff; font: inherit; font-size: 16px; color: var(--dunkelpetrol); cursor: pointer; }
+.f-unter { margin: 18px 0 8px; font-size: 18px; color: var(--dunkelpetrol); }
+.f-eigene { margin: 0; padding-left: 20px; }
+.f-eigene li { margin: 0 0 8px; }
+
+/* Bisher gelesen, Begriffsparkplatz */
+.f-bisher { margin: 18px 0; }
+.f-bisher .f-falltext { padding: 10px 14px 2px; font-size: 17px; }
+.f-parkplatz { margin: 24px 0 0; padding: 14px; border-radius: 12px; border: 2px dashed var(--petrol); }
+.f-parkplatz h2 { margin: 0 0 4px; font-size: 19px; color: var(--dunkelpetrol); }
+.f-parkplatz p { margin: 0 0 8px; }
+.f-wort-form { display: flex; gap: 8px; }
+.f-wort-form input { flex: 1; min-width: 0; min-height: 50px; padding: 8px 12px; border: 2px solid var(--petrol); border-radius: 10px; font: inherit; }

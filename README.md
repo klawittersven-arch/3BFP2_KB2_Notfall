@@ -65,6 +65,44 @@ Woche 4 – Informationen geben in Krisen:
 - Die Seiten sind bewusst **ohne Kennwort** erreichbar (Wunsch der Lehrkräfte). Wer die Adresse kennt, sieht die
   Vornamen mit Initiale und den Stand – die Seiten werden von Suchmaschinen nicht erfasst (`noindex`).
 
+## Fall-Einführung „Zeitlupe“ (Einstieg in den Themenblock, SW 6 – und noch einmal in SW 13)
+
+Der Leitfall „Reanimation und nicht nur ich war hilflos“ wird **Abschnitt für Abschnitt** erlebt. Die Lehrkraft
+schaltet auf dem Beamer weiter, die Handys folgen automatisch. Der Falltext bleibt **Wort für Wort** wie auf dem
+Arbeitsblatt (der Test `tests/fall.test.js` prüft das mit einer Prüfsumme).
+
+| | Beamer (Lehrkraft, ohne Kennwort) |
+|---|---|
+| **3BFP2/1** | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-fall.html |
+| **3BFP2/2** | https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-fall.html |
+
+Handy: https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/fall.html – der QR-Code erscheint auf dem Beamer
+(Datei `qr/qr_fall.png`, z. B. auch für eine Folie).
+
+**Ablauf** (Weiter/Zurück mit den Knöpfen unten, den Pfeiltasten oder dem Presenter; die Punkte springen direkt zu einem Schritt):
+
+1. **Kaltstart** (dunkler Bildschirm): „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
+2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was haben Sie getan? Wie sicher haben Sie sich gefühlt (1–5)?
+3. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
+   *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).
+4. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
+5. **Perspektiven-Runde:** Jede Gruppe wählt eine Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft,
+   die Angehörigen, Frau Maler): „Was hätte diese Person gebraucht?“ + Lernfrage. Auf dem Beamer je Person eine Spalte;
+   die Lehrkraft tippt bei jedem Eintrag den passenden KB (I–V) an. *Nach Kompetenzbereichen ordnen* zeigt die Lernlandkarte.
+6. **Ausblick:** Begriffsparkplatz (unbekannte Wörter, von den Handys jederzeit „geparkt“) und **Ergebnis sichern**.
+
+**SW 13:** Unten auf der Beamer-Seite *Abschluss (SW 13) – mit Vergleich* wählen und die Zeitlupe noch einmal spielen.
+Alle Ergebnisse erscheinen dann neben denen der Einführung (z. B. Ampel bei der Wade: SW 6 → heute), am Ende stehen die
+Lernfragen aus SW 6 („Können Sie sie jetzt beantworten?“).
+
+- **Ergebnis sichern** speichert nur Zahlen und Texte **ohne Namen** – dauerhaft, bis es überschrieben wird. Namen und
+  Einzelantworten werden wie bei den Übungen nach 12 Stunden gelöscht (oder mit *Liste leeren*).
+- Ein neuer Durchgang beginnt immer mit einer leeren Liste – vorher sichern!
+- Texte, Fragen und Antwortknöpfe stehen in **`docs/fall-inhalte.js`**. Die Kürzel (`kuerzel`) bitte nicht ändern, sonst
+  passen die gesicherten Ergebnisse nicht mehr zu SW 13. Den **Falltext** dort nicht ändern.
+- Die Handys fragen alle 3 Sekunden nach, welcher Schritt dran ist (`fallAbfrageSekunden` in `einstellungen.js`).
+  Bei 25 SuS sind das rund 22 500 Anfragen in 45 Minuten (nur solange die Seite offen ist) – im kostenlosen Cloudflare-Tarif sind 100 000 pro Tag frei.
+
 ## So funktioniert eine Übung
 
 - Beim ersten Öffnen geben die SuS **Vorname + Anfangsbuchstaben des Nachnamens** ein („Lena K.“; aus „Lena Kraus“
@@ -108,6 +146,9 @@ nur die Lehrerseite zeigt dann „Keine Verbindung zum Server“.
   Analyse, keine fremden Skripte.
 - Die Lehrerseite zeigt Fehler nur zusammengefasst für die Klasse, nicht je Person.
 - Gelöscht wird automatisch nach 12 Stunden ohne Aktivität oder sofort mit „Liste leeren“.
+- Fall-Einführung: zusätzlich die gewählten Antworten und die geschriebenen Texte (Perspektiven, Begriffsparkplatz).
+  Der Beamer zeigt Antworten nur zusammengezählt und Texte ohne Namen. „Ergebnis sichern“ speichert nur Zahlen und Texte
+  ohne Namen.
 - Die Daten liegen bei Cloudflare (Durable Object). Bitte im Zweifel mit der/dem Datenschutzbeauftragten der Schule abstimmen.
 
 ## Texte ändern und Übungen ergänzen
@@ -130,6 +171,8 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
 - `node tests/uebungen.test.js` prüft mit Playwright alle Übungen in Handygröße (360 px), Namenseingabe mit
   Klassenwahl, Senden des Fortschritts, Schutz gegen Durchklicken, die Lehrerseiten je Klasse und das Belohnungsspiel
   (Freischaltung, Lauf, Bestleistung neben dem Namen) – mit nachgebildetem Server.
+- `node tests/fall.test.js` prüft die Fall-Einführung: Falltext unverändert (Prüfsumme), Ablauf mit Beamer und zwei Handys
+  mit dem echten Worker (Kaltstart, Ampel, Auflösen, Zurückspulen, Perspektiven mit KB, Begriffsparkplatz, Sichern, SW 13 mit Vergleich).
 - `cd server && node test/worker.test.js` prüft den Worker (Eingabeprüfung, Klassen-Räume, Entfernen, Leeren,
   Löschen nach 12 Stunden, Obergrenzen, Bestleistung im Belohnungsspiel).
 
@@ -143,10 +186,13 @@ docs/                    ← alles, was GitHub Pages veröffentlicht
   lehrer.js, lehrer.css  ← Lehrerseiten (Beamer)
   index.html             ← Startseite (nur Hinweis auf den QR-Code)
   spiel.html, spiel.js, spiel.css, pixel.js, logo-kbs.png   ← Belohnungsspiel „Notfall-Run!“
+  fall.html, fall.js, fall.css            ← Fall-Einführung „Zeitlupe“ (Handy)
+  fall-inhalte.js                         ← Texte der Fall-Einführung (Falltext NICHT ändern)
+  lehrer-fall.js, lehrer-fall.css, qr_fall.png, lehrer-3bfp2-1-fall.html, lehrer-3bfp2-2-fall.html   ← Beamer
   ab1a.html … ab3a.html  ← die Übungen         (erzeugt mit werkzeuge/seiten_erzeugen.py)
   lehrer-3bfp2-1-ab1.html … lehrer-3bfp2-2-ab3.html   (ebenfalls erzeugt)
   sw.js                  ← Offline-Speicher (nach größeren Änderungen VERSION erhöhen)
-server/                  ← Cloudflare Worker für die Fortschrittsanzeige
+server/                  ← Cloudflare Worker für die Fortschrittsanzeige (src/fall.js: Fall-Einführung)
 qr/                      ← QR-Codes
 werkzeuge/               ← QR-Codes und Seiten erzeugen
 tests/                   ← automatische Tests

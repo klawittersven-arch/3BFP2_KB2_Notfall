@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#25434B">
+<meta name="referrer" content="no-referrer">
+<title>Fall-Einführung – Themenblock 2</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="fall.css">
+</head>
+<body>
+<header class="kopf">
+  <p class="kopfzeile" id="kopfzeile"></p>
+  <h1 id="titel"></h1>
+</header>
+<div class="f-leiste" id="f-leiste" role="status"></div>
+<main class="inhalt">
+  <div id="name-bereich" class="name-bereich" hidden></div>
+  <div id="f-teil">
+    <p class="name-zeile" id="name-zeile" hidden></p>
+    <div id="f-inhalt"></div>
+    <details class="hilfe f-bisher" id="f-bisher" hidden><summary id="f-bisher-titel"></summary><div id="f-bisher-text" class="f-falltext"></div></details>
+    <section class="f-parkplatz" id="f-parkplatz" hidden></section>
+  </div>
+</main>
+<noscript><p class="inhalt">Bitte aktivieren Sie JavaScript.</p></noscript>
+<script src="einstellungen.js"></script>
+<script src="fall-inhalte.js"></script>
+<script src="fall.js"></script>
+</body>
+</html>

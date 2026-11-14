@@ -160,5 +160,114 @@ await post(env, '/fortschritt', eintrag({ name: 'Mia S.' }));
 const gespeichert = env._raeume.get('k2-ab1').speicher.get('daten');
 pruefe(gespeichert && Object.keys(gespeichert).length === 1, 'Daten im Speicher gesichert');
 
+// ---------- Fall-Einführung „Zeitlupe“ ----------
+const envF = umgebung();
+const fa = (o = {}) => Object.assign({ raum: 'k2-fall', geraet: 'f'.repeat(32), name: 'Lena K.', frage: 's2', wert: 'R' }, o);
+const zst = async (raum = 'k2-fall') => (await get(envF, '/fall/zustand?raum=' + raum)).json();
+const fst = async (raum = 'k2-fall') => (await get(envF, '/fall/stand?raum=' + raum)).json();
+
+let z = await zst();
+pruefe(z.schritt === 0 && z.stufe === 0 && z.durchgang === 'einf' && /^[a-z0-9]{4,16}$/.test(z.sitzung), 'Fall: Startzustand');
+r = await get(envF, '/fall/zustand?raum=k2-ab1');
+pruefe(r.status === 400, 'Fall: Arbeitsblatt-Raum wird abgelehnt');
+r = await post(envF, '/fortschritt', eintrag({ raum: 'k2-fall' }));
+pruefe(r.status === 400, 'Übungs-Fortschritt in Fall-Raum abgelehnt');
+
+// Steuerung
+r = await post(envF, '/fall/steuern', { raum: 'k2-fall', schritt: 3, stufe: 1 });
+z = await zst();
+pruefe(r.status === 204 && z.schritt === 3 && z.stufe === 1, 'Fall: Lehrerseite steuert Schritt und Stufe');
+for (const [t, d] of [['Schritt negativ', { schritt: -1, stufe: 0 }], ['Schritt zu groß', { schritt: 99, stufe: 0 }], ['Stufe', { schritt: 1, stufe: 7 }],
+  ['Durchgang', { schritt: 1, stufe: 0, durchgang: 'xyz' }], ['Raum', { raum: 'k2-ab1', schritt: 1, stufe: 0 }]]) {
+  r = await post(envF, '/fall/steuern', Object.assign({ raum: 'k2-fall' }, d));
+  pruefe(r.status === 400, 'Fall: Steuerung abgelehnt: ' + t);
+}
+
+// Antworten (einzeln und Mehrfachauswahl) und Zählung
+r = await post(envF, '/fall/antwort', fa());
+pruefe(r.status === 204 && r.headers.get('Access-Control-Allow-Origin') === '*', 'Fall: Antwort angenommen');
+await post(envF, '/fall/antwort', fa({ geraet: '1'.repeat(32), name: 'Tim B.', wert: 'Y' }));
+await post(envF, '/fall/antwort', fa({ geraet: '2'.repeat(32), name: 'Ela E.', wert: 'R' }));
+await post(envF, '/fall/antwort', fa({ frage: 's1', wert: ['STURZ', 'THROMB', 'THROMB'] }));
+await post(envF, '/fall/antwort', fa({ geraet: '1'.repeat(32), name: 'Tim B.', frage: 's1', wert: ['THROMB'] }));
+await post(envF, '/fall/antwort', fa({ wert: 'G' })); // Antwort ändern
+let fs1 = await fst();
+pruefe(fs1.ergebnisse.s2.R === 1 && fs1.ergebnisse.s2.Y === 1 && fs1.ergebnisse.s2.G === 1 && fs1.anzahl.s2 === 3, 'Fall: Ampel gezählt, geänderte Antwort ersetzt die alte');
+pruefe(fs1.ergebnisse.s1.THROMB === 2 && fs1.ergebnisse.s1.STURZ === 1 && fs1.anzahl.s1 === 2, 'Fall: Mehrfachauswahl gezählt (doppelte Kürzel nur einmal)');
+pruefe(fs1.leute.length === 3 && fs1.leute.find((p) => p.name === 'Lena K.').beantwortet.sort().join() === 's1,s2', 'Fall: Namen mit beantworteten Fragen');
+pruefe(!JSON.stringify(fs1).includes('f'.repeat(32)), 'Fall: Stand ohne Geräte-Kennungen');
+pruefe(!JSON.stringify(fs1.leute).includes('"R"'), 'Fall: keine Einzelantworten je Name');
+for (const [t, d] of [['Frage', fa({ frage: 'S 2' })], ['Wert HTML', fa({ wert: '<b>' })], ['Wert Zahl', fa({ wert: 3 })], ['Liste zu lang', fa({ wert: Array(13).fill('A') })],
+  ['Name', fa({ name: 'x' })], ['Gerät', fa({ geraet: 'zz' })], ['Raum', fa({ raum: 'k2-ab1' })], ['kein JSON', 'xyz']]) {
+  r = await post(envF, '/fall/antwort', d);
+  pruefe(r.status === 400, 'Fall: Antwort abgelehnt: ' + t);
+}
+
+// Texte: Perspektiven und Begriffsparkplatz
+const tx = (o = {}) => Object.assign({ raum: 'k2-fall', geraet: 'f'.repeat(32), name: 'Lena K.', art: 'persp', person: 'christin', a: 'eine klare  Anweisung', b: 'Wie gebe ich im Notfall klare Anweisungen?' }, o);
+r = await post(envF, '/fall/text', tx());
+pruefe(r.status === 204, 'Fall: Perspektive angenommen');
+await post(envF, '/fall/text', tx({ art: 'begriff', a: 'Redon-Drainage' }));
+await post(envF, '/fall/text', tx({ geraet: '1'.repeat(32), name: 'Tim B.', art: 'begriff', a: 'redon-drainage' }));
+await post(envF, '/fall/text', tx({ geraet: '1'.repeat(32), name: 'Tim B.', art: 'begriff', a: 'Luxation' }));
+for (const [t, d] of [['leer', tx({ a: '', b: ' ' })], ['zu lang', tx({ a: 'x'.repeat(201) })], ['Person', tx({ person: 'Christin!' })], ['Art', tx({ art: 'x' })],
+  ['Begriff leer', tx({ art: 'begriff', a: '' })], ['Begriff zu lang', tx({ art: 'begriff', a: 'y'.repeat(41) })]]) {
+  r = await post(envF, '/fall/text', d);
+  pruefe(r.status === 400, 'Fall: Text abgelehnt: ' + t);
+}
+fs1 = await fst();
+const persp = fs1.texte.find((x) => x.art === 'persp');
+pruefe(persp && persp.a === 'eine klare Anweisung' && persp.person === 'christin' && persp.kb === '' && !('name' in persp), 'Fall: Perspektive gesäubert, ohne Namen');
+r = await post(envF, '/fall/kb', { raum: 'k2-fall', id: persp.id, kb: 'II' });
+fs1 = await fst();
+pruefe(r.status === 204 && fs1.texte.find((x) => x.id === persp.id).kb === 'II', 'Fall: Lehrkraft ordnet KB zu');
+r = await post(envF, '/fall/kb', { raum: 'k2-fall', id: persp.id, kb: 'VI' });
+pruefe(r.status === 400, 'Fall: unbekannter KB abgelehnt');
+const redon = fs1.texte.find((x) => x.a === 'Redon-Drainage');
+await post(envF, '/fall/text-weg', { raum: 'k2-fall', id: redon.id });
+fs1 = await fst();
+pruefe(fs1.texte.filter((x) => x.art === 'begriff').map((x) => x.a).join() === 'Luxation', 'Fall: Begriff entfernen entfernt alle gleichen Wörter');
+let viele;
+for (let i = 0; i < 16; i++) viele = await post(envF, '/fall/text', tx({ geraet: '3'.repeat(32), name: 'Max M.', art: 'begriff', a: 'Wort' + i }));
+pruefe(viele.status === 429, 'Fall: höchstens 15 Texte je Handy');
+
+// Ergebnis sichern (ohne Namen), neuer Durchgang SW 13 beginnt leer, Archiv bleibt
+r = await post(envF, '/fall/sichern', { raum: 'k2-fall' });
+fs1 = await fst();
+const arch = fs1.archiv.einf;
+pruefe(r.status === 204 && arch && arch.ergebnisse.s2.R === 1 && arch.teilnehmende === 4 && arch.texte.some((x) => x.kb === 'II'), 'Fall: Ergebnis gesichert');
+pruefe(!JSON.stringify(fs1.archiv).includes('Lena') && !JSON.stringify(fs1.archiv).includes('f'.repeat(32)), 'Fall: gesichertes Ergebnis ohne Namen und Kennungen');
+const alteSitzung = (await zst()).sitzung;
+await post(envF, '/fall/steuern', { raum: 'k2-fall', schritt: 0, stufe: 0, durchgang: 'sw13' });
+fs1 = await fst();
+pruefe(fs1.steuerung.durchgang === 'sw13' && fs1.leute.length === 0 && fs1.texte.length === 0 && fs1.steuerung.sitzung !== alteSitzung, 'Fall: neuer Durchgang beginnt leer mit neuer Sitzung');
+pruefe(fs1.archiv.einf && fs1.archiv.einf.ergebnisse.s2.R === 1, 'Fall: Ergebnis der Einführung bleibt erhalten');
+
+// Person entfernen, Leeren, Klassen getrennt, 12 Stunden
+await post(envF, '/fall/antwort', fa({ wert: 'R' }));
+await post(envF, '/fall/text', tx());
+fs1 = await fst();
+r = await post(envF, '/fall/entfernen', { raum: 'k2-fall', id: fs1.leute[0].id });
+fs1 = await fst();
+pruefe(r.status === 204 && fs1.leute.length === 0 && fs1.texte.length === 0 && !fs1.anzahl.s2, 'Fall: Person mit Antworten und Texten entfernt');
+await post(envF, '/fall/antwort', fa({ raum: 'k1-fall', name: 'Mia S.' }));
+pruefe((await fst('k1-fall')).leute.length === 1 && (await fst()).leute.length === 0, 'Fall: Klassen getrennt');
+await post(envF, '/fall/antwort', fa());
+await post(envF, '/fall/steuern', { raum: 'k2-fall', schritt: 5, stufe: 2 });
+r = await post(envF, '/fall/leeren', { raum: 'k2-fall' });
+fs1 = await fst();
+pruefe(r.status === 204 && fs1.leute.length === 0 && fs1.steuerung.schritt === 0 && fs1.steuerung.durchgang === 'sw13' && fs1.archiv.einf, 'Fall: Leeren (Durchgang und Archiv bleiben)');
+await post(envF, '/fall/antwort', fa());
+Date.now = () => echtJetzt() + AUFBEWAHRUNG_MS + 1000;
+fs1 = await fst();
+Date.now = echtJetzt;
+pruefe(fs1.leute.length === 0 && fs1.archiv.einf, 'Fall: nach 12 Stunden gelöscht, gesichertes Ergebnis bleibt');
+r = await post(envF, '/fall/archiv-loeschen', { raum: 'k2-fall', durchgang: 'einf' });
+fs1 = await fst();
+pruefe(r.status === 204 && !fs1.archiv.einf, 'Fall: gesichertes Ergebnis löschen');
+pruefe(envF._raeume.get('k2-fall').speicher.get('fall') && envF._raeume.get('k2-fall').speicher.get('fallArchiv'), 'Fall: Daten im Durable-Object-Speicher');
+r = await get(envF, '/fall/unbekannt?raum=k2-fall');
+pruefe(r.status === 404, 'Fall: unbekannte Aktion → 404');
+
 console.log(`${ok} Prüfungen bestanden, ${nok} fehlgeschlagen`);
 process.exit(nok ? 1 : 0);

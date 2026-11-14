@@ -7,8 +7,22 @@
 // Raum = Klasse + Arbeitsblatt, z. B. k2-ab1 (k1 = 3BFP2/1, k2 = 3BFP2/2).
 // Auf Wunsch ohne Lehrer-Kennwort: Die Lehrerseiten sind über ihre Adresse erreichbar.
 // Pro Raum gibt es ein Durable Object, das die Daten hält.
+//
+// Fall-Einführung „Zeitlupe“ (fall.html), Raum = Klasse + '-fall', z. B. k2-fall:
+//   GET  /fall/zustand?raum=k2-fall      (Handy, alle paar Sekunden: welcher Schritt ist dran?)
+//   GET  /fall/stand?raum=k2-fall        (Lehrerseite)
+//   POST /fall/antwort  {raum, geraet, name, frage, wert}            (Handy)
+//   POST /fall/text     {raum, geraet, name, art, person, a, b}      (Handy: Perspektive oder Begriff)
+//   POST /fall/steuern  {raum, schritt, stufe, durchgang}            (Lehrerseite: Weiter/Zurück)
+//   POST /fall/text-weg {raum, id} · /fall/kb {raum, id, kb} · /fall/entfernen {raum, id}
+//   POST /fall/leeren {raum} · /fall/sichern {raum} · /fall/archiv-loeschen {raum, durchgang}
 
 import { pruefeEintrag, pruefeRaum, pruefeSpiel, aufraeumen, eintragen, spielEintragen, stand, entfernen } from './logik.js';
+import {
+  pruefeFallRaum, pruefeId, pruefeAntwort, pruefeText, pruefeSteuerung, pruefeKb, DURCHGAENGE,
+  leererFall, fallAufraeumen, fallLeeren, antwortEintragen, textEintragen, textEntfernen, begriffEntfernen, textKb,
+  personEntfernen, steuern, zustand, fallStand, schnappschuss
+} from './fall.js';
 
 const KOPF = {
   'Access-Control-Allow-Origin': '*',
@@ -73,6 +87,8 @@ export default {
       return antwort(200, await r.json());
     }
 
+    if (url.pathname.startsWith('/fall/')) return fallAnfrage(request, env, url);
+
     if (request.method === 'POST' && (url.pathname === '/leeren' || url.pathname === '/entfernen')) {
       const d = await leseJson(request);
       if (!d || !pruefeRaum(d.raum)) return antwort(400, { fehler: 'raum' });
@@ -87,12 +103,55 @@ export default {
   }
 };
 
+// ---------- Fall-Einführung „Zeitlupe“ ----------
+async function fallAnfrage(request, env, url) {
+  const aktion = url.pathname.slice('/fall/'.length);
+  if (request.method === 'GET' && (aktion === 'zustand' || aktion === 'stand')) {
+    const raum = url.searchParams.get('raum');
+    if (!pruefeFallRaum(raum)) return antwort(400, { fehler: 'raum' });
+    const r = await anRaum(env, raum, 'fall-' + aktion);
+    return antwort(200, await r.json());
+  }
+  if (request.method !== 'POST') return antwort(404, { fehler: 'unbekannt' });
+  const d = await leseJson(request);
+  let nutzlast = null;
+  if (aktion === 'antwort') {
+    const p = pruefeAntwort(d);
+    if (p.fehler) return antwort(400, { fehler: p.fehler });
+    nutzlast = p.eintrag;
+  } else if (aktion === 'text') {
+    const p = pruefeText(d);
+    if (p.fehler) return antwort(400, { fehler: p.fehler });
+    nutzlast = p.eintrag;
+  } else if (aktion === 'steuern') {
+    const p = pruefeSteuerung(d);
+    if (p.fehler) return antwort(400, { fehler: p.fehler });
+    nutzlast = Object.assign({ raum: d.raum }, p.eintrag);
+  } else if (aktion === 'text-weg' || aktion === 'entfernen' || aktion === 'kb') {
+    if (!d || !pruefeFallRaum(d.raum)) return antwort(400, { fehler: 'raum' });
+    if (!pruefeId(d.id)) return antwort(400, { fehler: 'id' });
+    if (aktion === 'kb' && !pruefeKb(d.kb)) return antwort(400, { fehler: 'kb' });
+    nutzlast = { raum: d.raum, id: d.id, kb: d.kb };
+  } else if (aktion === 'leeren' || aktion === 'sichern' || aktion === 'archiv-loeschen') {
+    if (!d || !pruefeFallRaum(d.raum)) return antwort(400, { fehler: 'raum' });
+    if (aktion === 'archiv-loeschen' && DURCHGAENGE.indexOf(d.durchgang) < 0) return antwort(400, { fehler: 'durchgang' });
+    nutzlast = { raum: d.raum, durchgang: d.durchgang };
+  } else {
+    return antwort(404, { fehler: 'unbekannt' });
+  }
+  const r = await anRaum(env, nutzlast.raum, 'fall-' + aktion, nutzlast);
+  if (r.status === 200) return antwort(204);
+  return antwort(r.status === 404 ? 404 : 429, { fehler: r.status === 404 ? 'nicht gefunden' : 'voll' });
+}
+
 // Ein Raum pro Klasse und Arbeitsblatt. Hält die Daten im Speicher und sichert sie im Durable-Object-Speicher.
 export class Raum {
   constructor(state, env) {
     this.state = state;
     this.env = env;
     this.daten = null;
+    this.fall = null;     // Fall-Einführung: Steuerung, Namen, Antworten, Texte (12 Stunden)
+    this.archiv = null;   // Fall-Einführung: gesicherte Ergebnisse ohne Namen (dauerhaft)
   }
 
   async lade() {
@@ -108,6 +167,7 @@ export class Raum {
     const aktion = new URL(request.url).pathname.slice(1);
     const nutzlast = await request.json();
     const jetzt = Date.now();
+    if (aktion.startsWith('fall-')) return this.fallAktion(aktion.slice(5), nutzlast, jetzt);
     const daten = await this.lade();
     let geaendert = aufraeumen(daten, jetzt);
     let status = 200;
@@ -129,6 +189,50 @@ export class Raum {
       status = 404;
     }
     if (geaendert) await this.sichere();
+    return new Response(JSON.stringify(ergebnis), { status, headers: { 'Content-Type': 'application/json' } });
+  }
+
+  async fallAktion(aktion, nutzlast, jetzt) {
+    const kurzId = () => crypto.randomUUID().replace(/-/g, '').slice(0, 10);
+    if (this.fall === null) this.fall = (await this.state.storage.get('fall')) || leererFall(kurzId);
+    if (this.archiv === null) this.archiv = (await this.state.storage.get('fallArchiv')) || {};
+    const f = this.fall;
+    let geaendert = fallAufraeumen(f, jetzt, kurzId);
+    let archivGeaendert = false;
+    let status = 200;
+    let ergebnis = {};
+
+    if (aktion === 'zustand') {
+      ergebnis = zustand(f);
+    } else if (aktion === 'stand') {
+      ergebnis = fallStand(f, this.archiv, jetzt);
+    } else if (aktion === 'antwort') {
+      if (antwortEintragen(f, nutzlast, jetzt, kurzId)) geaendert = true; else status = 429;
+    } else if (aktion === 'text') {
+      if (textEintragen(f, nutzlast, jetzt, kurzId)) geaendert = true; else status = 429;
+    } else if (aktion === 'steuern') {
+      steuern(f, nutzlast, jetzt, kurzId);
+      geaendert = true;
+    } else if (aktion === 'text-weg') {
+      if (begriffEntfernen(f, nutzlast.id)) geaendert = true;
+    } else if (aktion === 'kb') {
+      if (textKb(f, nutzlast.id, nutzlast.kb)) geaendert = true; else status = 404;
+    } else if (aktion === 'entfernen') {
+      if (personEntfernen(f, nutzlast.id)) geaendert = true;
+    } else if (aktion === 'leeren') {
+      fallLeeren(f, kurzId);
+      geaendert = true;
+    } else if (aktion === 'sichern') {
+      this.archiv[f.steuerung.durchgang] = schnappschuss(f, jetzt);
+      archivGeaendert = true;
+    } else if (aktion === 'archiv-loeschen') {
+      delete this.archiv[nutzlast.durchgang];
+      archivGeaendert = true;
+    } else {
+      status = 404;
+    }
+    if (geaendert) await this.state.storage.put('fall', f);
+    if (archivGeaendert) await this.state.storage.put('fallArchiv', this.archiv);
     return new Response(JSON.stringify(ergebnis), { status, headers: { 'Content-Type': 'application/json' } });
   }
 }
