@@ -185,9 +185,45 @@ function umgebung(Raum) {
   pruefe((await lehrer.textContent('.z-falltext')).includes('Frau Maler ist seit gestern Nachmittag neu im Pflegeheim.'), 'Beamer: Station 1 zeigt den Falltext');
   await h1.waitForSelector('.f-frage[data-frage="s1"]', { timeout: 8000 });
   pruefe((await h1.textContent('#f-leiste')).includes('Station 1 von 7'), 'Handy: „Station 1 von 7“');
+
+  // Wörter im Falltext antippen → Begriffsparkplatz (der Text bleibt Zeichen für Zeichen gleich)
+  const s1Absaetze = await h1.$$eval('#f-inhalt .f-falltext p', (ps) => ps.map((x) => x.textContent));
+  pruefe(JSON.stringify(s1Absaetze) === JSON.stringify(absaetze.slice(0, 3)), 'Handy: Falltext mit antippbaren Wörtern unverändert');
+  const wort = (t) => h1.locator('#f-inhalt .f-wort', { hasText: new RegExp('^' + t + '$') }).first();
+  await wort('Heparin-Spritze').click();
+  await h1.waitForSelector('#f-parkleiste:not([hidden])');
+  pruefe((await h1.textContent('.f-pl-wort')) === '„Heparin-Spritze“', 'Handy: angetipptes Wort erscheint zum Parken');
+  await wort('zur').click();
+  pruefe((await h1.textContent('.f-pl-wort')) === '„Heparin-Spritze zur“', 'Handy: Wort daneben wird dazugenommen');
+  await wort('zur').click();
+  pruefe((await h1.textContent('.f-pl-wort')) === '„Heparin-Spritze“', 'Handy: noch einmal tippen nimmt es wieder weg');
+  await h1.click('#f-pl-zu');
+  pruefe(await h1.isHidden('#f-parkleiste'), 'Handy: Abbrechen schließt die Leiste');
+  await wort('Fast-Track-Chirurgie').click();
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_wort.png') });
+  await h1.click('#f-pl-parken');
+  await h1.waitForSelector('.f-pl-ok:has-text("geparkt")');
+  pruefe(await wort('Fast-Track-Chirurgie').evaluate((e) => e.classList.contains('f-geparkt')), 'Handy: geparktes Wort ist markiert');
+  pruefe((await h1.textContent('#f-meine-woerter')).includes('Fast-Track-Chirurgie'), 'Handy: Liste der eigenen Wörter');
+  await lehrer.waitForSelector('.z-park:not([hidden])', { timeout: 6000 });
+  pruefe((await lehrer.textContent('.z-park')).includes('Fast-Track-Chirurgie'), 'Beamer: geparktes Wort live in der Kopfzeile');
+  pruefe((await h1.$$('.f-frage[data-frage="s1"] .f-opt')).length === 9, 'Station 1: 9 Risiken zur Auswahl');
   await h1.click('.f-opt[data-kuerzel="THROMB"]');
+  await h1.click('.f-opt[data-kuerzel="UNTERZ"]');
   await h1.click('[data-senden="s1"]');
+  await warte(400);
   await lehrer.click('#z-weiter'); // Ergebnis
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Auflösen: Was passt?'), 'Beamer: Station 1 hat eine Auflösung');
+  pruefe(!(await lehrer.$('.z-passt-nicht')), 'Beamer: bei „Ergebnis zeigen“ noch nicht aufgelöst');
+  await lehrer.click('#z-weiter'); // Auflösen
+  await lehrer.waitForSelector('.z-passt-nicht');
+  pruefe((await lehrer.$$('.z-passt')).length === 6 && (await lehrer.$$('.z-passt-nicht')).length === 3, 'Beamer: 6 passende, 3 unpassende Risiken markiert');
+  pruefe((await lehrer.textContent('.z-passt-nicht')).includes('kein Diabetes bekannt'), 'Beamer: Begründung bei unpassendem Risiko');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3a_station1.png'), fullPage: true });
+  await h1.waitForSelector('.f-opt.f-passt-nicht', { timeout: 8000 });
+  pruefe((await h1.textContent('.f-opt[data-kuerzel="UNTERZ"]')).includes('passt nicht'), 'Handy: Rückmeldung zu eigener unpassender Wahl');
+  pruefe((await h1.getAttribute('.f-opt[data-kuerzel="THROMB"]', 'class')).includes('f-passt'), 'Handy: Rückmeldung zu passender Wahl');
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_station1.png'), fullPage: true });
   await lehrer.click('#z-weiter'); // Station 2
   await lehrer.waitForSelector('.z-nr');
   pruefe((await lehrer.textContent('.z-falltext')).includes('ihre rechte Wade sei seit gestern dick'), 'Beamer: Station 2 bis zur Stopp-Stelle');
