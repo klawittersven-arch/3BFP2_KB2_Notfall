@@ -81,7 +81,10 @@ Handy: https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/fall.html – der 
 
 **Ablauf** (Weiter/Zurück mit den Knöpfen unten, den Pfeiltasten oder dem Presenter; die Punkte springen direkt zu einem Schritt):
 
-1. **Kaltstart** (dunkler Bildschirm): „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
+Jedes Bild erscheint zuerst **im Vollbild** (Klick aufs Bild, Pfeiltaste oder Presenter = weiter); danach steht es
+klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schauen Sie nach vorn.“
+
+1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
 2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was haben Sie getan? Wie sicher haben Sie sich gefühlt (1–5)?
 3. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
    *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).

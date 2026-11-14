@@ -250,6 +250,7 @@ var FALL = {
   // Texte auf dem Handy
   handy: {
     warten: 'Hören Sie zu. Gleich geht es weiter.',
+    nachVorn: 'Schauen Sie nach vorn.',
     gesendet: 'Gesendet. Sie können Ihre Antwort noch ändern.',
     gesperrt: 'Die Abstimmung ist beendet.',
     ihreAntwort: 'Ihre Antwort:',

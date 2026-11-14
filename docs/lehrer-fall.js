@@ -51,12 +51,21 @@
     return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
   }
   function schritt(i) { return F.schritte[Math.max(0, Math.min(i, F.schritte.length - 1))]; }
+  // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
+  // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
   function hatPassung(q) { return !!(q && q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })); }
-  function stufenAnzahl(s) {
-    if (s.art === 'station') return (abschnitte(s.id, 'aufloesung').length || hatPassung(s.frage)) ? 3 : 2;
-    if (s.art === 'kaltstart' || s.art === 'fragen' || s.art === 'zurueckspulen') return 2;
-    return 1;
+  function phasen(s) {
+    var bild = s.bild ? ['bild'] : [];
+    if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
+    if (s.art === 'station') {
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
+    }
+    if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    return ['frage'];
   }
+  function stufenAnzahl(s) { return phasen(s).length; }
+  function phase() { var s = schritt(ansicht.schritt); return phasen(s)[Math.min(ansicht.stufe, phasen(s).length - 1)]; }
   function optionen(q) { return q.ampel ? F.ampel : q.optionen; }
   function vergleich() {
     return stand && stand.steuerung.durchgang === 'sw13' && stand.archiv && stand.archiv.einf ? stand.archiv.einf : null;
@@ -105,8 +114,11 @@
     var s = schritt(ansicht.schritt);
     var n = stufenAnzahl(s);
     if (ansicht.stufe < n - 1) {
-      if (s.art === 'kaltstart') return '10 Sekunden starten';
-      if (s.art === 'station' && ansicht.stufe === 1) return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : 'Auflösen: Was passt?';
+      var naechste = phasen(s)[ansicht.stufe + 1];
+      if (naechste === 'satz') return 'Satz zeigen';
+      if (naechste === 'countdown') return '10 Sekunden starten';
+      if (naechste === 'frage') return 'Abschnitt zeigen';
+      if (naechste === 'aufloesung') return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : 'Auflösen: Was passt?';
       return 'Ergebnis zeigen';
     }
     if (ansicht.schritt >= F.schritte.length - 1) return '';
@@ -123,9 +135,11 @@
     gezeichnet = schluessel;
     if (s.art !== 'kaltstart' && countdown) { clearInterval(countdown); countdown = null; }
     document.body.classList.toggle('z-dunkel', s.art === 'kaltstart');
+    document.body.classList.toggle('z-vollbild-an', phase() === 'bild');
     if (s.art === 'kaltstart') { letztesHtml = ''; if (neu) zeichneKaltstart(s); return; }
     var html = '';
-    if (s.art === 'fragen') html = fragenHtml(s);
+    if (phase() === 'bild') html = vollbildHtml(s.bild, (s.nummer ? s.nummer + ' · ' : '') + s.kurz);
+    else if (s.art === 'fragen') html = fragenHtml(s);
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = zurueckHtml(s);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
@@ -163,9 +177,16 @@
     return '<div class="z-kalt z-kalt-bild" role="img" aria-label="' + esc(s.bild.alt) + '" style="background-image:linear-gradient(rgba(15,28,32,' + dunkel +
       '),rgba(15,28,32,' + dunkel + ')),url(\'' + encodeURI(s.bild.datei) + '\')">';
   }
+  // Bild im Vollbild (Klick, Pfeiltaste oder Presenter = weiter)
+  function vollbildHtml(b, titel) {
+    return '<div class="z-vollbild" role="img" aria-label="' + esc(b.alt) + '"><img src="' + esc(b.datei) + '" alt="">' +
+      (titel ? '<p class="z-vollbild-titel">' + esc(titel) + '</p>' : '') +
+      '<p class="z-vollbild-hinweis">Weiter: Klick, Pfeiltaste oder Presenter</p></div>';
+  }
   function zeichneKaltstart(s) {
     if (countdown) { clearInterval(countdown); countdown = null; }
-    if (ansicht.stufe === 0) {
+    if (phase() === 'bild') { buehne.innerHTML = vollbildHtml(s.bild, ''); return; }
+    if (phase() === 'satz') {
       buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p></div>';
       return;
     }
@@ -254,20 +275,22 @@
   }
 
   function stationHtml(s) {
-    var auf = ansicht.stufe >= 2;
+    var ph = phase();
+    var nach = ph === 'ergebnis' || ph === 'aufloesung';   // nach dem Abstimmen
+    var auf = ph === 'aufloesung';
     var kopf = '<h2 class="z-titel"><span class="z-nr">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>';
     var teile = abschnitte(s.id, 'frage');
-    var text = '<div class="z-falltext' + (ansicht.stufe >= 1 ? ' z-klein' : '') + '">' + falltextHtml(teile) + '</div>';
+    var text = '<div class="z-falltext' + (nach ? ' z-klein' : '') + '">' + falltextHtml(teile) + '</div>';
     // Lange Abschnitte nach dem Vorlesen zuklappen, damit das Ergebnis ohne Scrollen auf den Beamer passt
-    if (ansicht.stufe >= 1 && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
+    if (nach && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
       text = '<details class="z-text-zu"><summary>Abschnitt noch einmal anzeigen</summary>' + text + '</details>';
     }
     var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
     var rahmen = function (inhalt) {
       if (!bild) return kopf + inhalt;
-      return kopf + '<div class="z-station' + (ansicht.stufe >= 1 ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
+      return kopf + '<div class="z-station' + (nach ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
     };
-    if (ansicht.stufe === 0) {
+    if (!nach) {
       return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
     }
     return rahmen(text +
@@ -452,6 +475,12 @@
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); weiter(); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); zurueck(); }
   });
+
+  // Klick auf ein Vollbild = weiter; Bilder vorab laden, damit sie sofort erscheinen
+  buehne.addEventListener('click', function (ev) {
+    if (ev.target.closest && ev.target.closest('.z-vollbild')) weiter();
+  });
+  F.schritte.forEach(function (s) { if (s.bild) { var i = new Image(); i.src = s.bild.datei; } });
 
   if (!SERVER) {
     buehne.innerHTML = '<section class="l-karte l-schmal"><h2>Noch nicht eingerichtet</h2>' +

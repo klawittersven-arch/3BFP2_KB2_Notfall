@@ -73,6 +73,21 @@
   function abschnitte(teil, art) {
     return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); });
   }
+  // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
+  // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
+  function hatPassung(q) { return !!(q && q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })); }
+  function phasen(s) {
+    var bild = s.bild ? ['bild'] : [];
+    if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
+    if (s.art === 'station') {
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
+    }
+    if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    return ['frage'];
+  }
+  function aktuellePhase() { var s = schritt(); var p = phasen(s); return p[Math.min(stand.stufe, p.length - 1)]; }
+  function abgestimmt() { var p = aktuellePhase(); return p === 'ergebnis' || p === 'aufloesung'; }
   function hatAufloesung(schritt) { return schritt.art === 'station' && abschnitte(schritt.id, 'aufloesung').length > 0; }
 
   // ---------- Zustand ----------
@@ -169,6 +184,9 @@
     var html = '';
     if (s.art === 'kaltstart') html = '<p class="f-gross">' + esc(s.handy) + '</p>';
     else if (s.art === 'fragen') html = fragenHtml(s);
+    else if (s.art === 'station' && aktuellePhase() === 'bild') html = '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
+      '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' +
+      '<p class="f-gross">' + esc(H.nachVorn) + '</p>';
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = '<h2 class="f-titel">' + esc(s.titel) + '</h2><p class="f-vorspann">' + esc(s.vorspann) + '</p>' + frageHtml(s.frage, stand.stufe >= 1);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
@@ -188,12 +206,12 @@
   }
 
   function stationHtml(s) {
-    var auf = stand.stufe >= 2 && hatAufloesung(s);
+    var auf = aktuellePhase() === 'aufloesung' && hatAufloesung(s);
     return '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
       (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
       '<div class="f-falltext">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>' +
       '<p class="f-tipp-hinweis"><span aria-hidden="true">💡</span> ' + esc(F.begriffe.tippHinweis) + '</p>' +
-      frageHtml(s.frage, stand.stufe >= 1, stand.stufe >= 2) +
+      frageHtml(s.frage, abgestimmt(), aktuellePhase() === 'aufloesung') +
       (auf ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.christinErzaehlt) + '</p><div class="f-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '');
   }
@@ -244,7 +262,7 @@
       b.addEventListener('click', function () {
         var q = sucheFrage(b.getAttribute('data-frage'));
         var k = b.getAttribute('data-kuerzel');
-        if (!q || stand.stufe >= 1 && s.art !== 'perspektiven') return;
+        if (!q || abgestimmt()) return;
         if (q.mehrfach) {
           var a = auswahl[q.id];
           var i = a.indexOf(k);
@@ -351,7 +369,7 @@
       if (x.art !== 'station' || i > index) return;
       var alles = i < index || s.art !== 'station';
       abschnitte(x.id).forEach(function (t) {
-        if (alles || t.art === 'frage' || (t.art === 'aufloesung' && stand.stufe >= 2)) teile.push(t);
+        if (alles || t.art === 'frage' || (t.art === 'aufloesung' && aktuellePhase() === 'aufloesung')) teile.push(t);
       });
     });
     // nur ältere Stationen anzeigen – die aktuelle steht schon oben

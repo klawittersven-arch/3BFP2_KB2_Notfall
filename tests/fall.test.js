@@ -122,6 +122,14 @@ function umgebung(Raum) {
   const fehlerJs = [];
   lehrer.on('pageerror', (e) => fehlerJs.push('Lehrer: ' + e.message));
   await lehrer.goto(BASIS + 'lehrer-3bfp2-2-fall.html');
+  // Kaltstart: zuerst das Bild im Vollbild, dann der Satz, dann der Countdown
+  await lehrer.waitForSelector('.z-vollbild img');
+  await lehrer.waitForFunction(() => { const i = document.querySelector('.z-vollbild img'); return i.complete && i.naturalWidth >= 1600; });
+  pruefe((await lehrer.getAttribute('.z-vollbild img', 'src')) === 'bilder/kaltstart.jpg', 'Beamer: Kaltstart beginnt mit dem Bild im Vollbild');
+  pruefe(await lehrer.evaluate(() => { const r = document.querySelector('.z-vollbild').getBoundingClientRect(); return r.width === innerWidth && r.height === innerHeight; }), 'Beamer: Vollbild füllt den ganzen Bildschirm');
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Satz zeigen'), 'Beamer: Weiter-Knopf „Satz zeigen“');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_0_vollbild.png') });
+  await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-kalt-satz');
   pruefe((await lehrer.textContent('.z-kalt-satz')).includes('Frau Maler reagiert nicht'), 'Beamer: Kaltstart-Satz');
   pruefe(await lehrer.evaluate(() => document.body.classList.contains('z-dunkel')), 'Beamer: Kaltstart dunkel');
@@ -179,9 +187,15 @@ function umgebung(Raum) {
   await h1.waitForSelector('.f-opt:disabled', { timeout: 8000 });
   pruefe((await h1.textContent('#f-inhalt')).includes('Die Abstimmung ist beendet'), 'Handy: nach „Ergebnis zeigen“ gesperrt');
 
-  // Station 1 und 2
+  // Station 1 und 2 – jede beginnt mit dem Bild im Vollbild
   await lehrer.keyboard.press('ArrowRight');
+  await lehrer.waitForSelector('.z-vollbild');
+  pruefe((await lehrer.textContent('.z-vollbild-titel')) === '1 · Die Übergabe', 'Beamer: Station 1 beginnt mit dem Bild im Vollbild');
+  await h1.waitForSelector('#f-inhalt .f-bild', { timeout: 8000 });
+  pruefe((await h1.textContent('#f-inhalt')).includes('Schauen Sie nach vorn') && !(await h1.$('#f-inhalt .f-frage')), 'Handy: während des Vollbilds nur Bild, noch kein Text');
+  await lehrer.click('.z-vollbild'); // Klick aufs Bild = weiter
   await lehrer.waitForSelector('.z-falltext');
+  pruefe(await lehrer.$('.z-bild img') !== null, 'Beamer: danach steht das Bild klein neben dem Text');
   pruefe((await lehrer.textContent('.z-falltext')).includes('Frau Maler ist seit gestern Nachmittag neu im Pflegeheim.'), 'Beamer: Station 1 zeigt den Falltext');
   await h1.waitForSelector('.f-frage[data-frage="s1"]', { timeout: 8000 });
   pruefe((await h1.textContent('#f-leiste')).includes('Station 1 von 7'), 'Handy: „Station 1 von 7“');
@@ -224,7 +238,9 @@ function umgebung(Raum) {
   pruefe((await h1.textContent('.f-opt[data-kuerzel="UNTERZ"]')).includes('passt nicht'), 'Handy: Rückmeldung zu eigener unpassender Wahl');
   pruefe((await h1.getAttribute('.f-opt[data-kuerzel="THROMB"]', 'class')).includes('f-passt'), 'Handy: Rückmeldung zu passender Wahl');
   await h1.screenshot({ path: path.join(__dirname, 'fall_h_station1.png'), fullPage: true });
-  await lehrer.click('#z-weiter'); // Station 2
+  await lehrer.click('#z-weiter'); // Station 2 (Vollbild)
+  await lehrer.waitForSelector('.z-vollbild');
+  await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-nr');
   pruefe((await lehrer.textContent('.z-falltext')).includes('ihre rechte Wade sei seit gestern dick'), 'Beamer: Station 2 bis zur Stopp-Stelle');
   pruefe(!(await lehrer.textContent('.z-buehne')).includes('habe es nicht weitergegeben'), 'Beamer: Christins Handeln noch verdeckt');
@@ -319,6 +335,8 @@ function umgebung(Raum) {
   await h1.waitForSelector('.f-gross:has-text("nach vorn")', { timeout: 8000 });
   const s2Index = FALL.schritte.findIndex((s) => s.id === 's2');
   await lehrer.click(`[data-gehe="${s2Index}"]`);
+  await lehrer.waitForSelector('.z-vollbild');
+  await lehrer.keyboard.press('ArrowRight');
   await h1.waitForSelector('.f-frage[data-frage="s2"]', { timeout: 8000 });
   pruefe((await h1.getAttribute('.f-ampel .f-rot', 'aria-pressed')) === 'false', 'Handy: neue Sitzung – alte Antwort nicht mehr markiert');
   await h1.click('.f-ampel .f-rot');
