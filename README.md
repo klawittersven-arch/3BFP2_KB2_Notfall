@@ -92,17 +92,21 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
    aus dem Falltext, dann „Wir gehen zurück an den Anfang dieses Tages.“ Bewusst erst **nach** dem Kaltstart: Dort sollen
    die SuS selbst handeln, nicht Christin zuschauen. Mit Bild (`bild:` beim Schritt `personen`) erst Vollbild, dann
    das Bild links neben den Karten.
-4. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
+4. **Stationen 1–10:** 7 Abschnitte des Falls und 3 **zusätzliche Situationen**, in denen alles normal ist (🟢; nach
+   „Am Morgen“, dann „Gegen neun“ und „Gegen zehn Uhr“). Sie stehen nicht im Fallbeispiel und ändern nichts am Fall –
+   die SuS sollen nicht bei jeder Ampel „beobachten“ wählen. Sie sehen aus wie die anderen Stationen; beim Auflösen
+   erscheint „Einschätzung: 🟢 Alles normal“ mit Begründung. Nicht im Zeitstrahl, nicht in „Den Fall bis hier lesen“.
+   Die Stationen werden automatisch durchnummeriert. Ablauf je Station: Abschnitt groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
    *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).
-   Station 1: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.
-   Station 5: aus 8 Aktionen die **3 wichtigsten Schritte in der richtigen Reihenfolge** antippen – Merkregel der
+   Die Übergabe: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.
+   Zum Mittagessen: aus 8 Aktionen die **3 wichtigsten Schritte in der richtigen Reihenfolge** antippen – Merkregel der
    Reanimationsleitlinien 2025: *Prüfen – Rufen – Drücken*. Ergebnis = je Platz, was die Klasse gewählt hat; Auflösung =
    ✓/✗, Merksatz, „ganz richtig: x von y“ und die gewählten unpassenden Aktionen mit Grund; die Handys zeigen ✓/✗ je Platz.
    Richtige Schritte und Ablenker stehen in `fall-inhalte.js` (`s5`: die ersten `anzahl` Antworten sind die richtigen;
    ohne `anzahl` werden alle Antworten sortiert).
-   Station 7: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
+   Später: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
    Rangfolge der Klasse; Auflösung = ✓/✗ mit Grund und der Hinweis, dass die Rangfolge Gesprächsanlass ist.
-5. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
+5. **Zurückspulen:** Zeitstrahl der 7 Stationen des Fallbeispiels mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab wann hätte man den Notfall vielleicht verhindern können?
 6. **Perspektiven-Runde:** Die Beamer-Seite teilt alle Angemeldeten **automatisch und gleichmäßig in 5 Gruppen** ein – eine
    je Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft, die Angehörigen, Frau Maler). Das Handy zeigt
    „Ihre Gruppe bearbeitet: …“ und die Namen der Gruppe. Auf dem Beamer stehen die Namen bei jeder Gruppe, mit ✓ und Zahl,

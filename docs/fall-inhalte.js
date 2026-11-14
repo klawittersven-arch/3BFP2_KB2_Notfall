@@ -37,6 +37,12 @@
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
    kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
 
+   Zusätzliche Situationen (extra: true): kurze Situationen, die NICHT im Fallbeispiel stehen und am Fall
+   nichts ändern. Bei ihnen ist alles normal (🟢) – so müssen die SuS bei der Ampel wirklich unterscheiden und
+   wählen nicht immer „beobachten“. Ihr Text steht beim Schritt (text: …), nicht oben im Falltext; sie erscheinen
+   nicht im Zeitstrahl und nicht bei „Den Fall bis hier noch einmal lesen“. loesung = Einschätzung beim Auflösen.
+   Die Stationen werden automatisch durchnummeriert (mit den zusätzlichen Situationen).
+
    Bilder (optional, bei kaltstart, personen und station): bild: { datei: 'bilder/station2.jpg', alt: '…' }
    Jedes Bild liegt zweimal in docs/bilder/: groß für den Beamer (1600 px breit) und mit „-klein“
    für die Handys (800 px), z. B. station2.jpg und station2-klein.jpg. Ein Bild darf nicht mehr
@@ -148,7 +154,7 @@ var FALL = {
       nachspann: 'Wir gehen zurück an den Anfang dieses Tages.',
       handy: 'Schauen Sie nach vorn.' },
 
-    { id: 's1', art: 'station', nummer: 1, kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
+    { id: 's1', art: 'station', kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
       frage: { id: 's1', mehrfach: true,
         handyAuftrag: 'Wählen Sie alle Risiken, die Sie im Text finden.',
@@ -166,21 +172,38 @@ var FALL = {
           { kuerzel: 'LUX', text: 'Luxation der Hüfte', passt: true, grund: 'neue Hüft-TEP – Bewegungsvorgaben beachten' }
         ] } },
 
-    { id: 's2', art: 'station', nummer: 2, kurz: 'Am Morgen', zeitstrahl: 'Wade dick, Schmerzen',
+    { id: 's2', art: 'station', kurz: 'Am Morgen', zeitstrahl: 'Wade dick, Schmerzen',
       bild: { datei: 'bilder/station2.jpg', alt: 'Frau Maler sitzt auf der Bettkante und zeigt auf ihre rechte Wade. Die Auszubildende hockt neben ihr.' },
       frage: { id: 's2', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'G', kurz: 'nicht weitergegeben' } },
 
-    { id: 's3', art: 'station', nummer: 3, kurz: 'Beim Frühstück', zeitstrahl: 'verschluckt, hustet',
+    // Zusätzliche Situation (nicht im Fallbeispiel): alles normal
+    { id: 'z1', art: 'station', extra: true, kurz: 'Nach der Körperpflege',
+      text: 'Danach machte ich ihr Bett. Sie erzählte mir von ihrem Garten und lachte.',
+      frage: { id: 'z1', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
+      loesung: { ampel: 'G', text: 'Ein freundliches Gespräch. Hier gibt es nichts zu beobachten und nichts zu melden.' } },
+
+    { id: 's3', art: 'station', kurz: 'Beim Frühstück', zeitstrahl: 'verschluckt, hustet',
       frage: { id: 's3', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'Y', kurz: 'husten lassen' } },
 
-    { id: 's4', art: 'station', nummer: 4, kurz: 'Gegen elf Uhr', zeitstrahl: 'Atemnot, Puls 118',
+    // Zusätzliche Situationen (nicht im Fallbeispiel): alles normal – passt zu „drei- bis viermal … bei ihr im Zimmer“
+    { id: 'z2', art: 'station', extra: true, kurz: 'Gegen neun Uhr',
+      text: 'Gegen neun Uhr cremte ich ihr den Rücken ein. Die Haut war gesund und nicht gerötet.',
+      frage: { id: 'z2', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
+      loesung: { ampel: 'G', text: 'Die Haut wurde kontrolliert: Sie ist gesund. Das ist ein guter Befund – kein Warnzeichen.' } },
+
+    { id: 'z3', art: 'station', extra: true, kurz: 'Gegen zehn Uhr',
+      text: 'Gegen zehn Uhr wollte sie fernsehen. Ich gab ihr die Fernbedienung, und sie bedankte sich.',
+      frage: { id: 'z3', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
+      loesung: { ampel: 'G', text: 'Ein normaler Wunsch. Hier gibt es nichts zu melden.' } },
+
+    { id: 's4', art: 'station', kurz: 'Gegen elf Uhr', zeitstrahl: 'Atemnot, Puls 118',
       bild: { datei: 'bilder/station4.jpg', alt: 'Frau Maler liegt halb aufrecht im Bett, atmet mit offenem Mund und hält eine Hand auf der Brust. Die Auszubildende fühlt den Puls.' },
       frage: { id: 's4', ampel: true, text: 'Wie schätzen Sie das ein?', handyAuftrag: 'Wählen Sie eine Farbe: 🟢 🟡 🔴' },
       christin: { ampel: 'G', kurz: 'dachte: nur aufgeregt' } },
 
-    { id: 's5', art: 'station', nummer: 5, kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
+    { id: 's5', art: 'station', kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
       bild: { datei: 'bilder/kaltstart.jpg', alt: 'Das Bild vom Anfang: Frau Maler liegt reglos im Bett, im Vordergrund das Tablett mit Mittagessen.' },
       // Die 3 wichtigsten Schritte nach den Reanimationsleitlinien 2025 (ERC/GRC): Prüfen – Rufen – Drücken.
       // Die ersten 3 Antworten sind die richtigen (in der richtigen Reihenfolge), die übrigen passen nicht.
@@ -202,7 +225,7 @@ var FALL = {
           { kuerzel: 'ANGE', text: 'Die Angehörigen anrufen', grund: 'erst später – zuerst die Notfallversorgung' }
         ] } },
 
-    { id: 's6', art: 'station', nummer: 6, kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',
+    { id: 's6', art: 'station', kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',
       frage: { id: 's6',
         text: 'War die Reanimation erlaubt?',
         handyAuftrag: 'Wählen Sie eine Antwort.',
@@ -212,7 +235,7 @@ var FALL = {
           { kuerzel: 'WN', text: 'Ich weiß es nicht' }
         ] } },
 
-    { id: 's7', art: 'station', nummer: 7, kurz: 'Später', zeitstrahl: 'Albträume',
+    { id: 's7', art: 'station', kurz: 'Später', zeitstrahl: 'Albträume',
       bild: { datei: 'bilder/station7.jpg', alt: 'Eine junge Frau sitzt nachts wach auf ihrem Bett und umarmt ihre Knie.' },
       // Genau 3 wählen (waehlen: 3) – so müssen die SuS sich entscheiden. Mehrere Antworten helfen (passt: true),
       // 3 helfen nicht (passt: false). Welche 3 am wichtigsten sind, ist Gesprächsanlass (hinweis bei der Auflösung).
@@ -237,14 +260,14 @@ var FALL = {
       titel: 'Zurückspulen',
       vorspann: 'Frau Maler hatte wohl eine Lungenembolie.',
       frage: { id: 'zurueck',
-        text: 'Ab welcher Station hätte man den Notfall vielleicht verhindern können?',
-        handyAuftrag: 'Wählen Sie eine Station.',
+        text: 'Ab wann hätte man den Notfall vielleicht verhindern können?',
+        handyAuftrag: 'Wählen Sie einen Zeitpunkt.',
         optionen: [
-          { kuerzel: 'S1', text: '1 · Die Übergabe' },
-          { kuerzel: 'S2', text: '2 · Am Morgen' },
-          { kuerzel: 'S3', text: '3 · Beim Frühstück' },
-          { kuerzel: 'S4', text: '4 · Gegen elf Uhr' },
-          { kuerzel: 'S5', text: '5 · Zum Mittagessen' },
+          { kuerzel: 'S1', text: 'Schon bei der Übergabe' },
+          { kuerzel: 'S2', text: 'Am Morgen (Körperpflege)' },
+          { kuerzel: 'S3', text: 'Beim Frühstück' },
+          { kuerzel: 'S4', text: 'Gegen elf Uhr' },
+          { kuerzel: 'S5', text: 'Zum Mittagessen' },
           { kuerzel: 'NIE', text: 'Gar nicht – das war nicht zu verhindern' }
         ] } },
 
@@ -306,6 +329,7 @@ var FALL = {
     ihreAntwort: 'Ihre Antwort:',
     keineAntwort: 'Sie haben nicht abgestimmt.',
     christinErzaehlt: 'Christin erzählt weiter:',
+    einschaetzung: 'Einschätzung:',
     senden: 'Senden',
     bisher: 'Den Fall bis hier noch einmal lesen',
     keineVerbindung: 'Keine Verbindung – es wird weiter versucht …',

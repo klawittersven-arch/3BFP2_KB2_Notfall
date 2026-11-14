@@ -217,3 +217,8 @@ body.z-dunkel .z-steuer { background: #0F1C20; border-top-color: #22363C; }
 .z-handy-zeichen { grid-row: span 2; font-size: clamp(34px, 3vw, 46px); line-height: 1; animation: z-wackeln 2.4s ease-in-out infinite; }
 @keyframes z-wackeln { 0%, 70%, 100% { transform: rotate(0); } 76% { transform: rotate(-12deg); } 82% { transform: rotate(12deg); } 88% { transform: rotate(-8deg); } 94% { transform: rotate(6deg); } }
 @media (prefers-reduced-motion: reduce) { .z-handy-zeichen { animation: none; } }
+
+/* Zusätzliche Situation: Einschätzung „Alles normal“ grün statt bernsteinfarben */
+.z-einschaetzung { background: var(--gruen-hell); border-color: var(--gruen); }
+.z-einschaetzung .z-auf-kopf { color: var(--gruen); }
+.z-einschaetzung p { margin: 0 0 6px; }

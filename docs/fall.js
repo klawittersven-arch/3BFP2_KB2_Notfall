@@ -70,7 +70,18 @@
     });
     return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
   }
+  // Stationen durchnummerieren (mit den zusätzlichen Situationen) und deren Text bereitlegen
+  var EXTRA = {};
+  (function () {
+    var nr = 0;
+    F.schritte.forEach(function (s) {
+      if (s.art === 'station') s.nummer = ++nr;
+      if (s.extra) EXTRA[s.id] = s;
+    });
+  })();
+  // Abschnitte des Falltexts; bei zusätzlichen Situationen deren eigener Text (nicht im Fallbeispiel)
   function abschnitte(teil, art) {
+    if (EXTRA[teil]) return !art || art === 'frage' ? [{ teil: teil, art: 'frage', absatz: true, text: EXTRA[teil].text }] : [];
     return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); });
   }
   // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
@@ -80,7 +91,7 @@
     var bild = s.bild ? ['bild'] : [];
     if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
     if (s.art === 'station') {
-      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage) || !!s.loesung;
       return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
     }
     if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
@@ -89,7 +100,7 @@
   }
   function aktuellePhase() { var s = schritt(); var p = phasen(s); return p[Math.min(stand.stufe, p.length - 1)]; }
   function abgestimmt() { var p = aktuellePhase(); return p === 'ergebnis' || p === 'aufloesung'; }
-  function hatAufloesung(schritt) { return schritt.art === 'station' && abschnitte(schritt.id, 'aufloesung').length > 0; }
+  function hatAufloesung(schritt) { return schritt.art === 'station' && (abschnitte(schritt.id, 'aufloesung').length > 0 || !!schritt.loesung); }
 
   // ---------- Zustand ----------
   var name = SERVER ? normalisiereName(holeLokal(NAME)) : null;
@@ -267,7 +278,10 @@
       '<div class="f-falltext">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>' +
       '<p class="f-tipp-hinweis"><span aria-hidden="true">💡</span> ' + esc(F.begriffe.tippHinweis) + '</p>' +
       frageHtml(s.frage, abgestimmt(), aktuellePhase() === 'aufloesung') +
-      (auf ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.christinErzaehlt) + '</p><div class="f-falltext">' +
+      (auf && s.loesung ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.einschaetzung) + '</p><p><strong>' +
+        F.ampel.filter(function (o) { return o.kuerzel === s.loesung.ampel; }).map(function (o) { return o.zeichen + ' ' + esc(o.text); })[0] +
+        '</strong> – ' + esc(s.loesung.text) + '</p></div>' :
+       auf ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.christinErzaehlt) + '</p><div class="f-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '');
   }
 
@@ -531,7 +545,7 @@
     var index = stand.schritt;
     var teile = [];
     F.schritte.forEach(function (x, i) {
-      if (x.art !== 'station' || i > index) return;
+      if (x.art !== 'station' || x.extra || i > index) return;
       var alles = i < index || s.art !== 'station';
       abschnitte(x.id).forEach(function (t) {
         if (alles || t.art === 'frage' || (t.art === 'aufloesung' && aktuellePhase() === 'aufloesung')) teile.push(t);

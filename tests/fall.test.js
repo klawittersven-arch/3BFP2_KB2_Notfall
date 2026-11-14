@@ -75,7 +75,10 @@ function umgebung(Raum) {
   pruefe(absaetze.length === 7, 'Falltext: 7 Absätze');
   pruefe(FALL.titel === '„Reanimation und nicht nur ich war hilflos“', 'Titel wie auf dem Arbeitsblatt');
   const stationen = FALL.schritte.filter((s) => s.art === 'station');
-  pruefe(stationen.length === 7 && stationen.every((s) => FALL.text.some((t) => t.teil === s.id && t.art === 'frage')), 'jede Station hat einen Abschnitt des Falls');
+  const fallStationen = stationen.filter((s) => !s.extra), extra = stationen.filter((s) => s.extra);
+  pruefe(fallStationen.length === 7 && fallStationen.every((s) => FALL.text.some((t) => t.teil === s.id && t.art === 'frage')), 'jede Station des Fallbeispiels hat einen Abschnitt des Falls');
+  pruefe(extra.length === 3 && extra.every((s) => s.text && s.frage.ampel && s.loesung && !FALL.text.some((t) => t.teil === s.id)), 'zusätzliche Situationen: eigener Text, Ampel, Einschätzung – nicht im Falltext');
+  pruefe(extra.every((s) => s.loesung.ampel === 'G'), 'zusätzliche Situationen: alle 🟢 (alles normal)');
   const kuerzel = new Set();
   FALL.schritte.forEach((s) => (s.fragen || (s.frage ? [s.frage] : [])).forEach((q) => {
     pruefe(!kuerzel.has(q.id), 'Frage-Kennung eindeutig: ' + q.id); kuerzel.add(q.id);
@@ -229,7 +232,8 @@ function umgebung(Raum) {
   pruefe(await lehrer.$('.z-bild img') !== null, 'Beamer: danach steht das Bild klein neben dem Text');
   pruefe((await lehrer.textContent('.z-falltext')).includes('Frau Maler ist seit gestern Nachmittag neu im Pflegeheim.'), 'Beamer: Station 1 zeigt den Falltext');
   await h1.waitForSelector('.f-frage[data-frage="s1"]', { timeout: 8000 });
-  pruefe((await h1.textContent('#f-leiste')).includes('Station 1 von 7'), 'Handy: „Station 1 von 7“');
+  const stationenGesamt = FALL.schritte.filter((x) => x.art === 'station').length;
+  pruefe(stationenGesamt === 10 && (await h1.textContent('#f-leiste')).includes('Station 1 von 10'), 'Handy: „Station 1 von 10“ (mit den zusätzlichen Situationen)');
 
   // Wörter im Falltext antippen → Begriffsparkplatz (der Text bleibt Zeichen für Zeichen gleich)
   const s1Absaetze = await h1.$$eval('#f-inhalt .f-falltext p', (ps) => ps.map((x) => x.textContent));
@@ -300,6 +304,31 @@ function umgebung(Raum) {
   await h1.waitForSelector('.f-aufloesung', { timeout: 8000 });
   pruefe((await h1.textContent('.f-aufloesung')).includes('habe es nicht weitergegeben'), 'Handy: Auflösung erscheint');
   pruefe((await h1.getAttribute('.f-ampel .f-rot', 'aria-pressed')) === 'true', 'Handy: eigene Antwort bleibt sichtbar');
+
+  // Zusätzliche Situation (nicht im Fallbeispiel): alles normal → Einschätzung beim Auflösen
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Station 3 · Nach der Körperpflege'), 'Beamer: nach Station 2 folgt die zusätzliche Situation als Station 3');
+  await lehrer.click('#z-weiter');
+  await lehrer.waitForSelector('.z-falltext');
+  pruefe(!(await lehrer.$('.z-vollbild')), 'Beamer: zusätzliche Situation ohne Bild');
+  pruefe((await lehrer.textContent('.z-titel')).includes('3') && (await lehrer.textContent('.z-falltext')).includes('erzählte mir von ihrem Garten'), 'Beamer: zusätzliche Situation sieht aus wie eine Station');
+  await h1.waitForSelector('.f-frage[data-frage="z1"]', { timeout: 8000 });
+  pruefe((await h1.textContent('#f-leiste')).includes('Station 3 von 10'), 'Handy: „Station 3 von 10“');
+  pruefe(!(await h1.textContent('#f-bisher-text')).includes('Garten'), 'Handy: zusätzliche Situation nicht bei „Den Fall bis hier lesen“');
+  await h1.click('.f-ampel .f-gelb');
+  await h2.waitForSelector('.f-frage[data-frage="z1"]', { timeout: 8000 });
+  await h2.click('.f-ampel .f-gruen');
+  await warte(2300);
+  await lehrer.click('#z-weiter'); // Ergebnis
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Auflösen: Was passt?'), 'Beamer: zusätzliche Situation hat eine Auflösung');
+  await lehrer.click('#z-weiter'); // Auflösen
+  await lehrer.waitForSelector('.z-einschaetzung');
+  pruefe((await lehrer.textContent('.z-einschaetzung')).includes('🟢 Alles normal') && (await lehrer.textContent('.z-einschaetzung')).includes('nichts zu melden'), 'Beamer: Einschätzung „🟢 Alles normal“ mit Begründung');
+  pruefe(!(await lehrer.$('.z-christin')), 'Beamer: keine „Christin“-Markierung bei der zusätzlichen Situation');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3e_extra.png') });
+  await h1.waitForSelector('.f-aufloesung', { timeout: 8000 });
+  pruefe((await h1.textContent('.f-aufloesung')).includes('Einschätzung') && (await h1.textContent('.f-aufloesung')).includes('Alles normal'), 'Handy: Einschätzung erscheint');
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_extra.png'), fullPage: true });
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Station 4 · Beim Frühstück'), 'Beamer: danach geht es mit dem Fall weiter (Station 4)');
 
   // Station 5: die 3 wichtigsten Schritte aus 8 in der richtigen Reihenfolge antippen
   const s5Index = FALL.schritte.findIndex((x) => x.id === 's5');
@@ -383,8 +412,10 @@ function umgebung(Raum) {
   const zurueckIndex = FALL.schritte.findIndex((s) => s.id === 'zurueck');
   await lehrer.click(`[data-gehe="${zurueckIndex}"]`);
   await lehrer.waitForSelector('.z-zeitstrahl');
-  pruefe((await lehrer.$$('.z-zeitstrahl li')).length === 7, 'Beamer: Zeitstrahl mit 7 Stationen');
-  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie eine Station'), 'Beamer: Zurückspulen mit Smartphone-Auftrag');
+  pruefe((await lehrer.$$('.z-zeitstrahl li')).length === 7, 'Beamer: Zeitstrahl mit den 7 Stationen des Fallbeispiels');
+  pruefe(!(await lehrer.textContent('.z-zeitstrahl')).includes('Gegen neun Uhr'), 'Beamer: zusätzliche Situationen nicht im Zeitstrahl');
+  pruefe(!(await h1.textContent('#f-bisher-text')).includes('Fernbedienung'), 'Handy: ganzer Fall ohne zusätzliche Situationen');
+  pruefe((await lehrer.textContent('.z-handy-auftrag')).includes('Wählen Sie einen Zeitpunkt'), 'Beamer: Zurückspulen mit Smartphone-Auftrag');
   await lehrer.waitForFunction(() => [...document.querySelectorAll('.z-zs-bild')].every((i) => i.complete && i.naturalWidth > 0));
   pruefe((await lehrer.$$('.z-zs-bild')).length === 5, 'Beamer: Zeitstrahl mit 5 Bildern');
   pruefe((await lehrer.textContent('.z-zeitstrahl')).includes('🔴 50\u00a0%'), 'Beamer: Zeitstrahl zeigt Ampel-Anteile');

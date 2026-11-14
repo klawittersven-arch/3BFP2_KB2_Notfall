@@ -40,7 +40,21 @@
   }
   function prozent(n, gesamt) { return gesamt ? Math.round(100 * n / gesamt) : 0; }
   function antworten(n) { return n + (n === 1 ? ' Antwort' : ' Antworten'); }
-  function abschnitte(teil, art) { return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); }); }
+  // Stationen durchnummerieren (mit den zusätzlichen Situationen) und deren Text bereitlegen
+  var EXTRA = {};
+  (function () {
+    var nr = 0;
+    F.schritte.forEach(function (s) {
+      if (s.art === 'station') s.nummer = ++nr;
+      if (s.extra) EXTRA[s.id] = s;
+    });
+  })();
+  // Abschnitte des Falltexts; bei zusätzlichen Situationen deren eigener Text (nicht im Fallbeispiel)
+  function abschnitte(teil, art) {
+    if (EXTRA[teil]) return !art || art === 'frage' ? [{ teil: teil, art: 'frage', absatz: true, text: EXTRA[teil].text }] : [];
+    return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); });
+  }
+  function ampelOption(k) { return F.ampel.filter(function (o) { return o.kuerzel === k; })[0]; }
   function falltextHtml(teile) {
     var absaetze = [];
     teile.forEach(function (t, i) {
@@ -57,7 +71,7 @@
     var bild = s.bild ? ['bild'] : [];
     if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
     if (s.art === 'station') {
-      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage) || !!s.loesung;
       return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
     }
     if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
@@ -399,6 +413,11 @@
     var lang = aufText.map(function (t) { return t.text; }).join(' ').length > 400;
     var box = auf && aufText.length ? '<div class="z-aufloesung' + (lang ? ' z-lang' : '') + '"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
       falltextHtml(aufText) + '</div></div>' : '';
+    if (auf && s.loesung) {   // zusätzliche Situation: Einschätzung statt Fortsetzung des Falls
+      var lo = ampelOption(s.loesung.ampel);
+      box = '<div class="z-aufloesung z-einschaetzung"><p class="z-auf-kopf">Einschätzung:</p><p class="z-gross">' + lo.zeichen + ' ' + esc(lo.text) +
+        '</p><p>' + esc(s.loesung.text) + '</p></div>';
+    }
     if (auf && lang) {   // langer Text (Station 5): Text links, Ergebnis rechts statt Bild – passt ohne Scrollen
       return kopf + text + '<div class="z-auf-zwei">' + box + ergebnisHtml(s.frage, s.christin, true) + '</div>';
     }
@@ -407,7 +426,7 @@
 
   // Zeitstrahl: alle Stationen nebeneinander mit dem Klassen-Ergebnis und Christins Handeln
   function zeitstrahlHtml() {
-    var stationen = F.schritte.filter(function (x) { return x.art === 'station'; });
+    var stationen = F.schritte.filter(function (x) { return x.art === 'station' && !x.extra; });
     return '<ol class="z-zeitstrahl">' + stationen.map(function (x) {
       var q = x.frage;
       var erg = (stand && stand.ergebnisse[q.id]) || {};
@@ -428,7 +447,7 @@
         inhalt = oben.length ? '<span class="z-mini-legende">' + oben.map(function (o) { return esc(o.text) + ': ' + prozent(erg[o.kuerzel], n) + '\u00a0%'; }).join('<br>') + '</span>' : '<span class="z-mini-legende">–</span>';
       }
       return '<li>' + (x.bild ? '<img class="z-zs-bild" src="' + esc(x.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="">' : '') +
-        '<span class="z-zs-nr">' + x.nummer + '</span><span class="z-zs-titel">' + esc(x.kurz) + '</span>' +
+        '<span class="z-zs-titel">' + esc(x.kurz) + '</span>' +
         '<span class="z-zs-was">' + esc(x.zeitstrahl || '') + '</span>' + inhalt + '</li>';
     }).join('') + '</ol>';
   }
