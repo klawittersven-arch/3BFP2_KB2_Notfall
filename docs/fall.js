@@ -193,14 +193,14 @@
       (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
       '<div class="f-falltext">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>' +
       '<p class="f-tipp-hinweis"><span aria-hidden="true">💡</span> ' + esc(F.begriffe.tippHinweis) + '</p>' +
-      frageHtml(s.frage, stand.stufe >= 1) +
+      frageHtml(s.frage, stand.stufe >= 1, stand.stufe >= 2) +
       (auf ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.christinErzaehlt) + '</p><div class="f-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '');
   }
 
   // Eine Frage: Ampel, Auswahl (eine Antwort), Mehrfachauswahl oder Skala
   function optionen(q) { return q.ampel ? F.ampel : q.optionen; }
-  function frageHtml(q, gesperrt) {
+  function frageHtml(q, gesperrt, aufgeloest) {
     var gewaehlt = meine.antworten[q.id];
     var liste = gewaehlt === undefined ? [] : (Array.isArray(gewaehlt) ? gewaehlt : [gewaehlt]);
     if (q.mehrfach && !auswahl[q.id]) auswahl[q.id] = liste.slice();
@@ -208,13 +208,15 @@
     var art = q.ampel ? 'f-ampel' : (q.skala ? 'f-skala' : 'f-wahl');
     var knoepfe = optionen(q).map(function (o) {
       var an = aktiv.indexOf(o.kuerzel) >= 0;
-      return '<button type="button" class="f-opt' + (o.farbe ? ' f-' + o.farbe : '') + (an ? ' f-an' : '') + '"' +
+      var passung = aufgeloest && o.passt !== undefined;
+      return '<button type="button" class="f-opt' + (o.farbe ? ' f-' + o.farbe : '') + (an ? ' f-an' : '') +
+        (passung ? (o.passt ? ' f-passt' : ' f-passt-nicht') : '') + '"' +
         ' data-frage="' + esc(q.id) + '" data-kuerzel="' + esc(o.kuerzel) + '" aria-pressed="' + (an ? 'true' : 'false') + '"' +
         (gesperrt ? ' disabled' : '') + '>' +
         (q.mehrfach ? '<span class="f-haken" aria-hidden="true">' + (an ? '☑' : '☐') + '</span>' : '') +
         (o.zeichen ? '<span aria-hidden="true">' + o.zeichen + '</span>' : '') +
         (q.skala ? '<strong>' + esc(o.kuerzel) + '</strong>' : '') +
-        '<span>' + esc(o.text) + '</span></button>';
+        '<span>' + esc(o.text) + (passung ? '<small class="f-grund">' + (o.passt ? '✓ passt: ' : '✗ passt nicht: ') + esc(o.grund || '') + '</small>' : '') + '</span></button>';
     }).join('');
     var status = '';
     if (gesperrt) status = '<p class="f-status">' + esc(H.gesperrt) + (liste.length ? '' : ' ' + esc(H.keineAntwort)) + '</p>';

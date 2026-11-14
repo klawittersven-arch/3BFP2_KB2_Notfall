@@ -207,9 +207,23 @@ function umgebung(Raum) {
   pruefe((await h1.textContent('#f-meine-woerter')).includes('Fast-Track-Chirurgie'), 'Handy: Liste der eigenen Wörter');
   await lehrer.waitForSelector('.z-park:not([hidden])', { timeout: 6000 });
   pruefe((await lehrer.textContent('.z-park')).includes('Fast-Track-Chirurgie'), 'Beamer: geparktes Wort live in der Kopfzeile');
+  pruefe((await h1.$$('.f-frage[data-frage="s1"] .f-opt')).length === 9, 'Station 1: 9 Risiken zur Auswahl');
   await h1.click('.f-opt[data-kuerzel="THROMB"]');
+  await h1.click('.f-opt[data-kuerzel="UNTERZ"]');
   await h1.click('[data-senden="s1"]');
+  await warte(400);
   await lehrer.click('#z-weiter'); // Ergebnis
+  pruefe((await lehrer.textContent('#z-weiter')).includes('Auflösen: Was passt?'), 'Beamer: Station 1 hat eine Auflösung');
+  pruefe(!(await lehrer.$('.z-passt-nicht')), 'Beamer: bei „Ergebnis zeigen“ noch nicht aufgelöst');
+  await lehrer.click('#z-weiter'); // Auflösen
+  await lehrer.waitForSelector('.z-passt-nicht');
+  pruefe((await lehrer.$$('.z-passt')).length === 6 && (await lehrer.$$('.z-passt-nicht')).length === 3, 'Beamer: 6 passende, 3 unpassende Risiken markiert');
+  pruefe((await lehrer.textContent('.z-passt-nicht')).includes('kein Diabetes bekannt'), 'Beamer: Begründung bei unpassendem Risiko');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3a_station1.png'), fullPage: true });
+  await h1.waitForSelector('.f-opt.f-passt-nicht', { timeout: 8000 });
+  pruefe((await h1.textContent('.f-opt[data-kuerzel="UNTERZ"]')).includes('passt nicht'), 'Handy: Rückmeldung zu eigener unpassender Wahl');
+  pruefe((await h1.getAttribute('.f-opt[data-kuerzel="THROMB"]', 'class')).includes('f-passt'), 'Handy: Rückmeldung zu passender Wahl');
+  await h1.screenshot({ path: path.join(__dirname, 'fall_h_station1.png'), fullPage: true });
   await lehrer.click('#z-weiter'); // Station 2
   await lehrer.waitForSelector('.z-nr');
   pruefe((await lehrer.textContent('.z-falltext')).includes('ihre rechte Wade sei seit gestern dick'), 'Beamer: Station 2 bis zur Stopp-Stelle');

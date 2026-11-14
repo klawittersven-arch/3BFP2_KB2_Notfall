@@ -23,6 +23,9 @@
      perspektiven  – Gruppen: „Was hätte diese Person gebraucht?“ + Lernfrage
      ende          – Begriffsparkplatz, Ausblick, Ergebnis sichern
 
+   Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
+   kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
+
    Bilder (optional, bei kaltstart und station): bild: { datei: 'bilder/station2.jpg', alt: '…' }
    Jedes Bild liegt zweimal in docs/bilder/: groß für den Beamer (1600 px breit) und mit „-klein“
    für die Handys (800 px), z. B. station2.jpg und station2-klein.jpg. Ein Bild darf nicht mehr
@@ -119,16 +122,18 @@ var FALL = {
     { id: 's1', art: 'station', nummer: 1, kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
       frage: { id: 's1', mehrfach: true,
-        text: 'Welche Risiken sehen Sie bei Frau Maler?',
-        hilfe: 'Mehrere Antworten sind möglich.',
+        text: 'Welche Risiken hat Frau Maler?',
+        hilfe: 'Wählen Sie nur, was zum Text passt. Mehrere Antworten sind möglich.',
         optionen: [
-          { kuerzel: 'STURZ', text: 'Sturz' },
-          { kuerzel: 'THROMB', text: 'Thrombose' },
-          { kuerzel: 'DEKU', text: 'Dekubitus' },
-          { kuerzel: 'PNEU', text: 'Pneumonie' },
-          { kuerzel: 'KONTR', text: 'Kontraktur' },
-          { kuerzel: 'LUX', text: 'Luxation der Hüfte' },
-          { kuerzel: 'ANGST', text: 'Angst und Rückzug' }
+          { kuerzel: 'STURZ', text: 'Sturz', passt: true, grund: 'schon einmal gestürzt; kann nicht alleine gehen' },
+          { kuerzel: 'UNTERZ', text: 'Unterzuckerung', passt: false, grund: 'kein Diabetes bekannt' },
+          { kuerzel: 'THROMB', text: 'Thrombose', passt: true, grund: 'liegt nach der Hüft-TEP viel im Bett – Heparin senkt das Risiko nur' },
+          { kuerzel: 'DEKU', text: 'Dekubitus', passt: true, grund: 'liegt die meiste Zeit im Bett' },
+          { kuerzel: 'WEG', text: 'Weglaufen aus dem Heim', passt: false, grund: 'kann nicht alleine gehen' },
+          { kuerzel: 'PNEU', text: 'Pneumonie', passt: true, grund: 'liegt viel und bewegt sich wenig' },
+          { kuerzel: 'KONTR', text: 'Kontraktur', passt: true, grund: 'bewegt sich wenig' },
+          { kuerzel: 'KRAMPF', text: 'Krampfanfall', passt: false, grund: 'keine Epilepsie bekannt' },
+          { kuerzel: 'LUX', text: 'Luxation der Hüfte', passt: true, grund: 'neue Hüft-TEP – Bewegungsvorgaben beachten' }
         ] } },
 
     { id: 's2', art: 'station', nummer: 2, kurz: 'Am Morgen', zeitstrahl: 'Wade dick, Schmerzen',

@@ -51,8 +51,9 @@
     return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
   }
   function schritt(i) { return F.schritte[Math.max(0, Math.min(i, F.schritte.length - 1))]; }
+  function hatPassung(q) { return !!(q && q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })); }
   function stufenAnzahl(s) {
-    if (s.art === 'station') return abschnitte(s.id, 'aufloesung').length ? 3 : 2;
+    if (s.art === 'station') return (abschnitte(s.id, 'aufloesung').length || hatPassung(s.frage)) ? 3 : 2;
     if (s.art === 'kaltstart' || s.art === 'fragen' || s.art === 'zurueckspulen') return 2;
     return 1;
   }
@@ -105,7 +106,7 @@
     var n = stufenAnzahl(s);
     if (ansicht.stufe < n - 1) {
       if (s.art === 'kaltstart') return '10 Sekunden starten';
-      if (s.art === 'station' && ansicht.stufe === 1) return 'Auflösen: Was hat Christin getan?';
+      if (s.art === 'station' && ansicht.stufe === 1) return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : 'Auflösen: Was passt?';
       return 'Ergebnis zeigen';
     }
     if (ansicht.schritt >= F.schritte.length - 1) return '';
@@ -198,7 +199,7 @@
   }
 
   // Ergebnis einer Frage als Balken (Anteil der Personen, die diese Antwort gewählt haben)
-  function ergebnisHtml(q, mitChristin) {
+  function ergebnisHtml(q, mitChristin, mitPassung) {
     var erg = (stand && stand.ergebnisse[q.id]) || {};
     var n = (stand && stand.anzahl[q.id]) || 0;
     var v = vergleich();
@@ -207,17 +208,21 @@
     var zeilen = optionen(q).map(function (o) {
       var p = prozent(erg[o.kuerzel] || 0, n);
       var christin = mitChristin && mitChristin.ampel === o.kuerzel;
-      return '<div class="z-zeile' + (o.farbe ? ' z-' + o.farbe : '') + '">' +
-        '<span class="z-option">' + (o.zeichen ? o.zeichen + ' ' : '') + esc(o.text) +
-        (christin ? ' <span class="z-christin">← Christin: ' + esc(mitChristin.kurz) + '</span>' : '') + '</span>' +
+      var passung = mitPassung && o.passt !== undefined;
+      return '<div class="z-zeile' + (o.farbe ? ' z-' + o.farbe : '') + (passung ? (o.passt ? ' z-passt' : ' z-passt-nicht') : '') + '">' +
+        '<span class="z-option">' + (passung ? (o.passt ? '✓ ' : '✗ ') : '') + (o.zeichen ? o.zeichen + ' ' : '') + esc(o.text) +
+        (christin ? ' <span class="z-christin">← Christin: ' + esc(mitChristin.kurz) + '</span>' : '') +
+        (passung && o.grund ? '<small class="z-grund">' + esc(o.grund) + '</small>' : '') + '</span>' +
         '<span class="z-spur"><span class="z-balken" style="width:' + p + '%"></span></span>' +
         '<span class="z-wert">' + (erg[o.kuerzel] || 0) + ' <small>(' + p + '\u00a0%)</small></span>' +
         (ve ? '<span class="z-option z-vgl-text">SW 6</span><span class="z-spur z-vgl"><span class="z-balken" style="width:' + prozent(ve[o.kuerzel] || 0, vn) + '%"></span></span>' +
           '<span class="z-wert z-vgl-text">' + prozent(ve[o.kuerzel] || 0, vn) + ' %</span>' : '') +
         '</div>';
     }).join('');
-    return '<div class="z-ergebnis"><p class="z-ergebnis-kopf">' + esc(q.text) + ' <small>· ' + antworten(n) +
-      (q.mehrfach ? ' · mehrere möglich' : '') + (ve ? ' · zum Vergleich: SW 6 (' + antworten(vn) + ')' : '') + '</small></p>' + zeilen + '</div>';
+    var viele = optionen(q).length > 6;   // viele Antworten: zweispaltig, damit alles auf den Beamer passt
+    return '<div class="z-ergebnis' + (viele ? ' z-viele' : '') + '"><p class="z-ergebnis-kopf">' + esc(q.text) + ' <small>· ' + antworten(n) +
+      (q.mehrfach ? ' · mehrere möglich' : '') + (ve ? ' · zum Vergleich: SW 6 (' + antworten(vn) + ')' : '') + '</small></p>' +
+      '<div class="z-zeilen">' + zeilen + '</div></div>';
   }
   function skalaHtml(q, erg, n, ve, vn) {
     var summe = 0;
@@ -251,7 +256,12 @@
   function stationHtml(s) {
     var auf = ansicht.stufe >= 2;
     var kopf = '<h2 class="z-titel"><span class="z-nr">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>';
-    var text = '<div class="z-falltext' + (ansicht.stufe >= 1 ? ' z-klein' : '') + '">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>';
+    var teile = abschnitte(s.id, 'frage');
+    var text = '<div class="z-falltext' + (ansicht.stufe >= 1 ? ' z-klein' : '') + '">' + falltextHtml(teile) + '</div>';
+    // Lange Abschnitte nach dem Vorlesen zuklappen, damit das Ergebnis ohne Scrollen auf den Beamer passt
+    if (ansicht.stufe >= 1 && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
+      text = '<details class="z-text-zu"><summary>Abschnitt noch einmal anzeigen</summary>' + text + '</details>';
+    }
     var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
     var rahmen = function (inhalt) {
       if (!bild) return kopf + inhalt;
@@ -261,9 +271,9 @@
       return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
     }
     return rahmen(text +
-      (auf ? '<div class="z-aufloesung"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
+      (auf && abschnitte(s.id, 'aufloesung').length ? '<div class="z-aufloesung"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '') +
-      ergebnisHtml(s.frage, auf ? s.christin : null));
+      ergebnisHtml(s.frage, auf ? s.christin : null, auf));
   }
 
   // Zeitstrahl: alle Stationen nebeneinander mit dem Klassen-Ergebnis und Christins Handeln

@@ -42,6 +42,13 @@
 .f-ampel .f-gruen.f-an { background: #1B6E35; }
 .f-ampel .f-gelb.f-an { background: #FFD24D; color: #2A2000; }
 .f-ampel .f-rot.f-an { background: #B3261E; }
+.f-grund { display: block; margin-top: 2px; font-size: 15px; font-weight: 600; }
+.f-opt.f-passt { border-color: var(--gruen); }
+.f-opt.f-passt-nicht { border-color: #B3261E; }
+.f-opt:not(.f-an).f-passt .f-grund { color: var(--gruen); }
+.f-opt:not(.f-an).f-passt-nicht .f-grund { color: #8A1C14; }
+.f-opt.f-an.f-passt-nicht { background: #B3261E; }
+.f-opt.f-an.f-passt { background: var(--gruen); }
 .f-senden { width: 100%; margin-top: 10px; }
 .f-senden:disabled { opacity: .5; cursor: default; }
 .f-status { margin: 10px 0 0; font-size: 16px; font-weight: 600; color: #3D5257; }
@@ -93,3 +100,4 @@
 .f-pl-ok { margin: 4px 0; font-size: 18px; font-weight: 700; color: var(--gruen); }
 body:has(.f-parkleiste:not([hidden])) .inhalt { padding-bottom: 130px; }
 .f-bild { display: block; width: 100%; height: auto; margin: 0 0 12px; border-radius: 12px; }
+.f-opt.f-passt:disabled, .f-opt.f-passt-nicht:disabled { opacity: 1; }
