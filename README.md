@@ -119,6 +119,13 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
 dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus.“). Bei langen Abschnitten bleibt er beim Vorlesen unten
 sichtbar. Nach *Ergebnis zeigen* verschwindet er. Die Sätze stehen in `fall-inhalte.js` bei `handyAuftrag`.
 
+**Vorlesen:** Über jedem Abschnitt des Falls (und über „Christin erzählt weiter“) steht *🎲 Wer liest vor?*. Ein Klick
+(oder Taste **V**) lost eine angemeldete Person aus und markiert den ersten Abschnitt gelb – mit dem Namen davor; der Text
+ist dafür in Abschnitte zu 2–3 Sätzen geteilt (je Absatz, der Text selbst bleibt unverändert). *Nächster Abschnitt* (oder V)
+lost die nächste Person aus, *↻ Jemand anderes* lost für denselben Abschnitt neu, beim letzten Abschnitt *✓ Fertig*.
+Wer schon dran war, kommt erst wieder, wenn alle einmal dran waren. Die Handys markieren denselben Abschnitt; wer dran ist,
+sieht oben „📢 Sie sind dran: Lesen Sie den gelben Abschnitt laut vor.“ Weiterschalten beendet das Vorlesen.
+
 **Automatisch senden:** Antworten brauchen keinen „Senden“-Knopf. Einzelwahl und Ampel zählen beim Tippen,
 Mehrfachauswahl kurz nach dem letzten Tippen. Bei „genau 3 wählen“ und bei der Reihenfolge wird gesendet, sobald die
 Auswahl vollständig ist („Noch 1 wählen – dann wird Ihre Antwort automatisch gesendet.“); wird sie wieder

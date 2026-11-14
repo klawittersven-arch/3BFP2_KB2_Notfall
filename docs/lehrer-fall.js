@@ -25,6 +25,7 @@
   var letztesHtml = '';
   var countdown = null, countdownRest = 0;
   var gesendetBis = 0;       // kurz nach einem Klick den Server-Stand für die Steuerung ignorieren
+  var lesen = null;          // Vorlesen: {abschnitt, person} – wer liest gerade welchen Abschnitt
 
   // ---------- Hilfsfunktionen ----------
   function esc(s) {
@@ -55,14 +56,53 @@
     return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); });
   }
   function ampelOption(k) { return F.ampel.filter(function (o) { return o.kuerzel === k; })[0]; }
-  function falltextHtml(teile) {
+  // Falltext in Absätzen; jeder Vorlese-Abschnitt in einem eigenen <span>. Mit lesen = {abschnitt, name}
+  // wird der aktuelle Abschnitt markiert (davor: schon gelesen), mit dem Namen der Person, die vorliest.
+  function falltextHtml(teile, lesen) {
+    var nr = 0;
+    return leseAbsaetze(teile).map(function (abs) {
+      return '<p>' + abs.map(function (txt) {
+        var k = nr++, klasse = 'z-lese';
+        if (lesen) klasse += k === lesen.abschnitt ? ' z-lesen-an' : (k < lesen.abschnitt ? ' z-lesen-vorbei' : '');
+        return (lesen && k === lesen.abschnitt ? '<span class="z-leser-marke">📢 ' + esc(lesen.name || 'Vorlesen') + '</span> ' : '') +
+          '<span class="' + klasse + '" data-lese="' + k + '">' + esc(txt) + '</span>';
+      }).join(' ') + '</p>';
+    }).join('');
+  }
+  // ---------- Vorlesen: Text in Abschnitte zu 2–3 Sätzen teilen (gleich in fall.js und lehrer-fall.js) ----------
+  // Der Text selbst bleibt unverändert – er wird nur zum Hervorheben in Abschnitte eingeteilt (je Absatz).
+  function saetze(text) {
+    var grenze = /[.!?][“”"»)\]]*\s+(?=[A-ZÄÖÜ„"\[])/g, teile = [], start = 0, m;
+    while ((m = grenze.exec(text))) { teile.push(text.slice(start, m.index + m[0].length)); start = m.index + m[0].length; }
+    if (start < text.length) teile.push(text.slice(start));
+    return teile;
+  }
+  // Absätze → je Absatz eine Liste von Abschnitten (Text); 1–3 Sätze, möglichst gleich groß
+  function leseAbsaetze(teile) {
     var absaetze = [];
     teile.forEach(function (t, i) {
-      if (t.absatz || i === 0) absaetze.push(esc(t.text));
-      else absaetze[absaetze.length - 1] += ' ' + esc(t.text);
+      if (t.absatz || i === 0) absaetze.push(t.text);
+      else absaetze[absaetze.length - 1] += ' ' + t.text;
     });
-    return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
+    return absaetze.map(function (a) {
+      var s = saetze(a), k = Math.ceil(s.length / 3), basis = Math.floor(s.length / k), mehr = s.length % k, aus = [], pos = 0;
+      for (var i = 0; i < k; i++) {
+        var n = basis + (i < mehr ? 1 : 0);
+        aus.push(s.slice(pos, pos + n).join('').replace(/\s+$/, ''));
+        pos += n;
+      }
+      return aus;
+    });
   }
+  function leseAnzahl(teile) { return leseAbsaetze(teile).reduce(function (n, a) { return n + a.length; }, 0); }
+  // Welcher Text kann in dieser Phase vorgelesen werden? (Abschnitt vor der Abstimmung bzw. „Christin erzählt weiter“)
+  function leseTeile(s, ph) {
+    if (s.art !== 'station') return null;
+    if (ph === 'frage') return abschnitte(s.id, 'frage');
+    if (ph === 'aufloesung' && abschnitte(s.id, 'aufloesung').length) return abschnitte(s.id, 'aufloesung');
+    return null;
+  }
+
   function schritt(i) { return F.schritte[Math.max(0, Math.min(i, F.schritte.length - 1))]; }
   // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
   // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
@@ -91,7 +131,10 @@
       .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function (d) {
         stand = d;
-        if (Date.now() > gesendetBis) ansicht = { schritt: d.steuerung.schritt, stufe: d.steuerung.stufe };
+        if (Date.now() > gesendetBis) {
+          ansicht = { schritt: d.steuerung.schritt, stufe: d.steuerung.stufe };
+          lesen = d.steuerung.lesen ? { abschnitt: d.steuerung.lesen.abschnitt, person: d.steuerung.lesen.person } : null;
+        }
         status.textContent = 'Stand ' + uhrzeit(d.jetzt) + ' · ' + d.leute.length + ' angemeldet · ' +
           (d.steuerung.durchgang === 'sw13' ? 'Abschluss (SW 13)' : 'Einführung (SW 6)');
         status.className = 'l-status';
@@ -111,10 +154,66 @@
   }
   function gehe(schrittNr, stufe) {
     ansicht = { schritt: schrittNr, stufe: stufe };
+    lesen = null;
     gesendetBis = Date.now() + 3000;
-    if (stand) { stand.steuerung.schritt = schrittNr; stand.steuerung.stufe = stufe; }
+    if (stand) { stand.steuerung.schritt = schrittNr; stand.steuerung.stufe = stufe; stand.steuerung.lesen = null; }
     zeichne();
     sende('/fall/steuern', { schritt: schrittNr, stufe: stufe }).then(hole, hole);
+  }
+
+  // ---------- Vorlesen: zufällig eine angemeldete Person, die den markierten Abschnitt laut liest ----------
+  // Wer schon dran war, kommt erst wieder, wenn alle einmal dran waren (gemerkt je Stunde/Sitzung).
+  function gezogenSchluessel() { return 'kb2-notfall-vorgelesen-' + raum + '-' + (stand ? stand.steuerung.sitzung : ''); }
+  function gezogen() { try { return JSON.parse(localStorage.getItem(gezogenSchluessel()) || '[]'); } catch (e) { return []; } }
+  function merkeGezogen(liste) { try { localStorage.setItem(gezogenSchluessel(), JSON.stringify(liste)); } catch (e) { /* egal */ } }
+  function ziehe(ausser) {
+    var leute = stand ? stand.leute : [];
+    if (!leute.length) return '';
+    var schon = gezogen();
+    var frei = leute.filter(function (p) { return schon.indexOf(p.id) < 0 && p.id !== ausser; });
+    if (!frei.length) { schon = []; frei = leute.filter(function (p) { return p.id !== ausser; }); }
+    if (!frei.length) frei = leute;
+    var p = frei[Math.floor(Math.random() * frei.length)];
+    schon.push(p.id);
+    merkeGezogen(schon);
+    return p.id;
+  }
+  function leserName(id) {
+    var p = id && stand ? stand.leute.filter(function (x) { return x.id === id; })[0] : null;
+    return p ? p.name : '';
+  }
+  function aktuelleLeseTeile() { return leseTeile(schritt(ansicht.schritt), phase()); }
+  function sendeLesen() {
+    gesendetBis = Date.now() + 3000;
+    if (stand) stand.steuerung.lesen = lesen;
+    zeichne();
+    var el = buehne.querySelector('.z-lesen-an');
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    sende('/fall/steuern', { schritt: ansicht.schritt, stufe: ansicht.stufe,
+      lesen: lesen ? { abschnitt: lesen.abschnitt, person: lesen.person } : null }).then(hole, hole);
+  }
+  function lesenWeiter() {         // Start bzw. nächster Abschnitt (beim letzten: fertig)
+    var teile = aktuelleLeseTeile();
+    if (!teile) return;
+    if (!lesen) lesen = { abschnitt: 0, person: ziehe('') };
+    else if (lesen.abschnitt < leseAnzahl(teile) - 1) lesen = { abschnitt: lesen.abschnitt + 1, person: ziehe(lesen.person) };
+    else lesen = null;
+    sendeLesen();
+  }
+  function lesenAnders() {         // gleicher Abschnitt, jemand anderes
+    if (!lesen || !aktuelleLeseTeile()) return;
+    lesen = { abschnitt: lesen.abschnitt, person: ziehe(lesen.person) };
+    sendeLesen();
+  }
+  function lesenInfo() { return lesen ? { abschnitt: lesen.abschnitt, name: leserName(lesen.person) } : null; }
+  function lesezeileHtml(teile) {
+    var n = leseAnzahl(teile);
+    if (!lesen) return '<div class="z-lesezeile"><button type="button" class="z-lese-knopf" data-lesen="weiter">🎲 Wer liest vor?</button></div>';
+    var name = leserName(lesen.person);
+    return '<div class="z-lesezeile z-lesen-aktiv"><span class="z-lese-wer">📢 ' + (name ? '<strong>' + esc(name) + '</strong> liest' : 'Vorlesen:') +
+      (n > 1 ? ' Abschnitt ' + (lesen.abschnitt + 1) + ' von ' + n : (name ? ' vor' : '')) + '</span>' +
+      '<button type="button" class="z-lese-knopf z-lese-haupt" data-lesen="weiter">' + (lesen.abschnitt >= n - 1 ? '✓ Fertig' : '🎲 Nächster Abschnitt') + '</button>' +
+      (stand && stand.leute.length > 1 ? '<button type="button" class="z-lese-knopf" data-lesen="anders">↻ Jemand anderes</button>' : '') + '</div>';
   }
   function weiter() {
     var s = schritt(ansicht.schritt);
@@ -151,6 +250,7 @@
     if (s.art !== 'kaltstart' && countdown) { clearInterval(countdown); countdown = null; }
     document.body.classList.toggle('z-dunkel', s.art === 'kaltstart');
     document.body.classList.toggle('z-vollbild-an', phase() === 'bild');
+    document.body.classList.toggle('z-liest', !!lesen);   // beim Vorlesen verdeckt der Smartphone-Balken nichts
     if (s.art === 'kaltstart') { letztesHtml = ''; if (neu) zeichneKaltstart(s); return; }
     var html = '';
     if (phase() === 'bild') html = vollbildHtml(s.bild, (s.nummer ? s.nummer + ' · ' : '') + s.kurz);
@@ -394,7 +494,8 @@
     var auf = ph === 'aufloesung';
     var kopf = '<h2 class="z-titel"><span class="z-nr">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>';
     var teile = abschnitte(s.id, 'frage');
-    var text = '<div class="z-falltext' + (nach ? ' z-klein' : '') + '">' + falltextHtml(teile) + '</div>';
+    var text = '<div class="z-falltext' + (nach ? ' z-klein' : '') + '">' + falltextHtml(teile, ph === 'frage' ? lesenInfo() : null) + '</div>';
+    if (ph === 'frage') text = lesezeileHtml(teile) + text;
     // Lange Abschnitte nach dem Vorlesen zuklappen, damit das Ergebnis ohne Scrollen auf den Beamer passt
     if (nach && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
       text = '<details class="z-text-zu"><summary>Abschnitt noch einmal anzeigen</summary>' + text + '</details>';
@@ -411,8 +512,8 @@
     }
     var aufText = abschnitte(s.id, 'aufloesung');
     var lang = aufText.map(function (t) { return t.text; }).join(' ').length > 400;
-    var box = auf && aufText.length ? '<div class="z-aufloesung' + (lang ? ' z-lang' : '') + '"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
-      falltextHtml(aufText) + '</div></div>' : '';
+    var box = auf && aufText.length ? '<div class="z-aufloesung' + (lang ? ' z-lang' : '') + '"><p class="z-auf-kopf">Christin erzählt weiter:</p>' +
+      lesezeileHtml(aufText) + '<div class="z-falltext">' + falltextHtml(aufText, lesenInfo()) + '</div></div>' : '';
     if (auf && s.loesung) {   // zusätzliche Situation: Einschätzung statt Fortsetzung des Falls
       var lo = ampelOption(s.loesung.ampel);
       box = '<div class="z-aufloesung z-einschaetzung"><p class="z-auf-kopf">Einschätzung:</p><p class="z-gross">' + lo.zeichen + ' ' + esc(lo.text) +
@@ -593,6 +694,9 @@
   }
 
   function verbinde() {
+    Array.prototype.forEach.call(buehne.querySelectorAll('[data-lesen]'), function (b) {
+      b.onclick = function () { if (b.getAttribute('data-lesen') === 'anders') lesenAnders(); else lesenWeiter(); };
+    });
     Array.prototype.forEach.call(buehne.querySelectorAll('[data-person]'), function (b) {
       b.onclick = function () {
         if (!window.confirm('„' + b.getAttribute('data-name') + '“ mit allen Antworten entfernen?')) return;
@@ -652,6 +756,7 @@
     if (ziel === 'INPUT' || ziel === 'TEXTAREA' || ziel === 'SELECT') return;
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); weiter(); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); zurueck(); }
+    else if (ev.key === 'v' || ev.key === 'V') { ev.preventDefault(); lesenWeiter(); }
   });
 
   // Klick auf ein Vollbild = weiter; Bilder vorab laden, damit sie sofort erscheinen

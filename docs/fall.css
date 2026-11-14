@@ -123,3 +123,10 @@ body:has(.f-parkleiste:not([hidden])) .inhalt { padding-bottom: 130px; }
 /* Automatisch senden: Hinweis unter der Frage; Perspektiven: Text noch nicht gesendet */
 .f-auto { color: var(--petrol); font-weight: 600; }
 .f-noch-offen { color: var(--bernstein); font-weight: 700; }
+
+/* Vorlesen: markierter Abschnitt; Hinweis für die Person, die dran ist */
+.f-lesen-an { background: #FFE97A; box-shadow: 0 0 0 4px #FFE97A; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.f-lesen-vorbei { color: #7A8A8E; }
+.f-lesen-ich { position: fixed; left: 8px; right: 8px; top: 8px; z-index: 60; margin: 0; padding: 12px 14px; border-radius: 12px;
+  background: var(--dunkelpetrol); color: #fff; font-size: 18px; font-weight: 800; box-shadow: 0 4px 16px rgba(0,0,0,.25); }
+.f-lesen-ich[hidden] { display: none; }
