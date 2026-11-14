@@ -5,8 +5,9 @@ Benötigt: segno  ODER  opencv-python (cv2) – je nachdem, was installiert ist.
 from pathlib import Path
 
 BASIS = "https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/"
-IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a"]
+IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a", "fall"]  # fall = Fall-Einführung (QR-Code auf dem Beamer)
 QR = Path(__file__).resolve().parent.parent / "qr"
+DOCS = Path(__file__).resolve().parent.parent / "docs"
 QR.mkdir(exist_ok=True)
 
 
@@ -44,3 +45,5 @@ for i in IDS:
     gelesen = pruefen(ziel)
     status = "geprüft ✓" if gelesen == url else ("nicht geprüft" if gelesen is None else f"FEHLER: {gelesen!r}")
     print(f"{ziel.name}: {url}  [{status}]")
+    if i == "fall":  # die Beamer-Seite zeigt den QR-Code selbst an
+        (DOCS / "qr_fall.png").write_bytes(ziel.read_bytes())

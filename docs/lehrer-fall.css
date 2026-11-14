@@ -1,0 +1,128 @@
+/* Fall-Einführung „Zeitlupe“ – Beamer (ergänzt lehrer.css) */
+body { padding-bottom: 96px; }
+.z-buehne { padding: 18px 3vw 10px; }
+.z-titel { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: clamp(28px, 2.6vw, 40px); color: var(--dunkelpetrol); }
+.z-nr { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em; border-radius: 50%;
+  background: var(--dunkelpetrol); color: #fff; font-size: .9em; }
+.z-gross { font-size: clamp(24px, 2.2vw, 34px); font-weight: 600; margin: 0 0 14px; }
+.z-hinweis { font-size: clamp(20px, 1.6vw, 24px); padding: 10px 14px; border-left: 6px solid var(--bernstein); background: var(--bernstein-hell); border-radius: 0 10px 10px 0; }
+.z-hinweis-klein { margin: 0 0 10px; color: #5B6B6F; font-size: 18px; }
+
+/* Falltext groß zum Vorlesen */
+.z-falltext { font-size: clamp(26px, 2.3vw, 38px); line-height: 1.45; max-width: 1400px; }
+.z-falltext p { margin: 0 0 14px; }
+.z-buehne > .z-falltext { padding: 6px 0 6px 22px; border-left: 8px solid var(--petrol); margin: 0 0 18px; }
+.z-falltext.z-klein { font-size: clamp(18px, 1.4vw, 22px); color: #3D5257; }
+.z-frage { font-size: clamp(26px, 2.3vw, 36px); font-weight: 800; color: var(--dunkelpetrol); margin: 10px 0 14px; }
+.z-vorspann { font-weight: 600; color: var(--text); }
+.z-aufloesung { margin: 0 0 18px; padding: 14px 22px 4px; border-radius: 16px; background: var(--bernstein-hell); border: 4px solid #D98B00; }
+.z-auf-kopf { margin: 0 0 6px; font-size: 22px; font-weight: 800; color: var(--bernstein); }
+
+/* Kaltstart: dunkle Bühne */
+body.z-dunkel { background: #0F1C20; }
+body.z-dunkel .l-kopf { background: #0F1C20; color: #8FA6AC; }
+body.z-dunkel .l-fuss { display: none; }
+.z-kalt { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: #fff; }
+.z-kalt-satz { font-size: clamp(36px, 4.2vw, 72px); font-weight: 800; margin: 0 0 30px; max-width: 1300px; }
+.z-kalt-frage { font-size: clamp(28px, 2.8vw, 46px); color: #FFD24D; margin: 0; }
+.z-countdown { font-size: clamp(120px, 16vw, 260px); font-weight: 900; color: #FFD24D; margin: 0; font-variant-numeric: tabular-nums; }
+.z-stopp { font-size: clamp(80px, 10vw, 180px); font-weight: 900; color: #FF6B5E; margin: 0; }
+
+/* Anmelden: QR-Code neben den Namen */
+.z-zwei { display: grid; grid-template-columns: minmax(260px, 34vw) 1fr; gap: 28px; align-items: start; }
+.z-qr { text-align: center; }
+.z-qr img { width: 100%; max-width: 520px; image-rendering: pixelated; border: 1px solid var(--rand); border-radius: 12px; }
+.z-adresse { font-size: 18px; color: #3D5257; overflow-wrap: anywhere; }
+
+/* Ergebnisse als Balken */
+.z-raster { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); align-items: start; }
+.z-ergebnis { padding: 14px 18px; border: 3px solid var(--rand); border-radius: 14px; background: #fff; }
+.z-ergebnis-kopf { margin: 0 0 10px; font-size: 24px; font-weight: 800; color: var(--dunkelpetrol); }
+.z-ergebnis-kopf small { font-weight: 400; color: #5B6B6F; font-size: 18px; }
+.z-zeile { display: grid; grid-template-columns: minmax(220px, 34%) 1fr 120px; gap: 4px 14px; align-items: center; margin: 0 0 10px; font-size: 22px; }
+.z-option { font-weight: 700; }
+.z-spur { height: 30px; border-radius: 8px; background: var(--grau); overflow: hidden; }
+.z-balken { display: block; height: 100%; width: 0; background: var(--petrol); transition: width .5s; }
+.z-wert { font-weight: 800; font-variant-numeric: tabular-nums; }
+.z-wert small { font-weight: 400; color: #5B6B6F; }
+.z-vgl { height: 12px; }
+.z-vgl .z-balken { background: #9DB4B9; }
+.z-vgl-text { font-size: 16px; font-weight: 600; color: #6B7C80; }
+.z-gruen .z-spur:not(.z-vgl) .z-balken { background: #1B6E35; }
+.z-gelb .z-spur:not(.z-vgl) .z-balken { background: #E0A800; }
+.z-rot .z-spur:not(.z-vgl) .z-balken { background: #B3261E; }
+.z-christin { display: inline-block; margin-left: 6px; padding: 1px 10px; border-radius: 999px; background: var(--bernstein-hell); color: var(--bernstein); border: 2px solid #D98B00; font-size: 18px; }
+/* Skala 1–5 */
+.z-skala { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; height: 240px; align-items: end; }
+.z-saeule { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; text-align: center; }
+.z-s-zahl { font-size: 24px; font-weight: 800; }
+.z-s-balken { display: block; width: 70%; min-height: 4px; background: var(--petrol); border-radius: 8px 8px 0 0; transition: height .5s; }
+.z-s-text { font-size: 17px; line-height: 1.2; min-height: 2.6em; padding-top: 6px; }
+.z-schnitt { font-size: 22px; margin: 12px 0 0; }
+
+/* Zeitstrahl */
+.z-zeitstrahl { list-style: none; margin: 0 0 18px; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; counter-reset: none; }
+.z-zeitstrahl li { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 3px solid var(--rand); border-radius: 14px; background: var(--hellblau); }
+.z-zeitstrahl li:not(:last-child)::after { content: "▶"; position: absolute; right: -14px; top: 18px; color: var(--petrol); font-size: 16px; }
+.z-zs-nr { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--dunkelpetrol); color: #fff; font-weight: 800; }
+.z-zs-titel { font-weight: 800; font-size: 20px; color: var(--dunkelpetrol); }
+.z-zs-was { font-size: 18px; }
+.z-mini { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: var(--grau); }
+.z-mini span { display: block; height: 100%; }
+.z-mini-gruen { background: #1B6E35; } .z-mini-gelb { background: #E0A800; } .z-mini-rot { background: #B3261E; }
+.z-mini-legende { font-size: 16px; color: #3D5257; }
+.z-nw { white-space: nowrap; margin-right: 6px; }
+.z-christin-zs { font-size: 16px; font-weight: 700; color: var(--bernstein); }
+
+/* Perspektiven */
+.z-persp-kopf { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.z-spalten { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: start; }
+.z-spalten.z-sechs { grid-template-columns: repeat(6, 1fr); }
+.z-spalte { border: 3px solid var(--rand); border-radius: 14px; padding: 10px; background: var(--hellblau); min-height: 200px; }
+.z-spalte.z-ohne { background: #F4F6F7; border-style: dashed; }
+.z-spalte h3 { margin: 0 0 8px; font-size: 20px; color: var(--dunkelpetrol); }
+.z-spalte h3 small { font-weight: 400; color: #5B6B6F; }
+.z-spalte ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.z-pk { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 10px; background: #fff; border: 2px solid var(--rand); font-size: 18px; }
+.z-pk-person { font-size: 14px; font-weight: 700; color: var(--petrol); text-transform: uppercase; letter-spacing: .02em; }
+.z-pk-a { font-weight: 700; }
+.z-pk-b { color: #1F3A41; }
+.z-pk-leiste { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.z-kb { min-width: 34px; min-height: 30px; padding: 2px 6px; border: 2px solid var(--rand); border-radius: 8px; background: #fff; color: var(--dunkelpetrol);
+  font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+.z-kb-an { background: var(--dunkelpetrol); color: #fff; border-color: var(--dunkelpetrol); }
+.z-weg { color: #8A9A9E; margin-left: auto; }
+
+/* Ende */
+.z-block { margin: 0 0 18px; padding: 14px 18px; border: 3px solid var(--rand); border-radius: 14px; }
+.z-block h3 { margin: 0 0 10px; font-size: 24px; color: var(--dunkelpetrol); }
+.z-woerter { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.z-woerter li { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px 6px 14px; border-radius: 999px; background: var(--hellblau); border: 2px solid var(--petrol); font-size: 22px; font-weight: 700; }
+.z-woerter small { font-weight: 400; color: #5B6B6F; }
+.z-alt { margin: 0; padding-left: 24px; font-size: 20px; }
+.z-alt li { margin: 4px 0; }
+.z-gesichert { margin-left: 10px; color: #3D5257; }
+
+/* Steuerleiste unten */
+.z-steuer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; gap: 12px;
+  padding: 10px 3vw; background: #fff; border-top: 3px solid var(--rand); box-shadow: 0 -4px 12px rgba(0,0,0,.06); }
+body.z-dunkel .z-steuer { background: #0F1C20; border-top-color: #22363C; }
+.z-punkte { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.z-punkt { min-width: 36px; height: 36px; border-radius: 18px; border: 2px solid var(--rand); background: #fff; color: var(--dunkelpetrol);
+  font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+.z-punkt.z-vorbei { background: var(--hellblau); }
+.z-punkt.z-jetzt { background: var(--dunkelpetrol); color: #fff; border-color: var(--dunkelpetrol); }
+.z-weiter { font-size: 22px; min-height: 56px; }
+.z-zurueck:disabled { opacity: .4; }
+.z-ende-hinweis { color: #5B6B6F; }
+.z-fuss-leiste { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.z-durchgang { display: flex; flex-wrap: wrap; gap: 14px; border: 2px solid var(--rand); border-radius: 10px; padding: 6px 12px; margin: 0; font-size: 18px; }
+.z-durchgang legend { font-weight: 700; padding: 0 4px; }
+.z-durchgang input { width: 18px; height: 18px; accent-color: var(--petrol); }
+
+@media (max-width: 1100px) {
+  .z-zeitstrahl { grid-template-columns: repeat(4, 1fr); }
+  .z-spalten, .z-spalten.z-sechs { grid-template-columns: repeat(2, 1fr); }
+  .z-zwei { grid-template-columns: 1fr; }
+  .z-raster { grid-template-columns: 1fr; }
+}

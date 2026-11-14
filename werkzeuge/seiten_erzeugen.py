@@ -1,4 +1,5 @@
-"""Erzeugt die Übungsseiten docs/ab1a.html … docs/ab2c.html und die Lehrerseiten (je Klasse und AB) aus Vorlagen.
+"""Erzeugt die Übungsseiten docs/ab1a.html … docs/ab2c.html und die Lehrerseiten (je Klasse und AB) aus Vorlagen,
+dazu die Beamer-Seiten der Fall-Einführung „Zeitlupe“ (lehrer-3bfp2-1-fall.html, lehrer-3bfp2-2-fall.html).
 Aufruf: python3 werkzeuge/seiten_erzeugen.py   (nur nötig, wenn eine Übung dazukommt)"""
 from pathlib import Path
 
@@ -70,6 +71,32 @@ LEHRER = """<!DOCTYPE html>
 </html>
 """
 
+FALL_LEHRER = """<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>{titel} · Fall-Einführung (Beamer)</title>
+<link rel="stylesheet" href="lehrer.css">
+<link rel="stylesheet" href="lehrer-fall.css">
+</head>
+<body data-raum="{raum}">
+<header class="l-kopf">
+  <h1>{titel} · Fall-Einführung „Reanimation und nicht nur ich war hilflos“</h1>
+  <p id="l-status" class="l-status" role="status"></p>
+</header>
+<main id="z-buehne" class="z-buehne"></main>
+<footer class="l-fuss" id="l-fuss"></footer>
+<nav class="z-steuer" id="z-steuer" aria-label="Steuerung"></nav>
+<script src="einstellungen.js"></script>
+<script src="fall-inhalte.js"></script>
+<script src="lehrer-fall.js"></script>
+</body>
+</html>
+"""
+
 for i in IDS:
     (DOCS / f"{i}.html").write_text(VORLAGE.replace("{id}", i), encoding="utf-8")
 lehrerseiten = []
@@ -78,4 +105,8 @@ for kk, (kname, kdatei) in KLASSEN.items():
         datei = f"lehrer-{kdatei}-{ab}.html"
         (DOCS / datei).write_text(LEHRER.replace("{raum}", f"{kk}-{ab}").replace("{titel}", f"{kname} · {titel}"), encoding="utf-8")
         lehrerseiten.append(datei)
+for kk, (kname, kdatei) in KLASSEN.items():
+    datei = f"lehrer-{kdatei}-fall.html"
+    (DOCS / datei).write_text(FALL_LEHRER.replace("{raum}", f"{kk}-fall").replace("{titel}", kname), encoding="utf-8")
+    lehrerseiten.append(datei)
 print("ok:", ", ".join(IDS), "+ Lehrerseiten", ", ".join(lehrerseiten))
