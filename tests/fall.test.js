@@ -517,6 +517,19 @@ function umgebung(Raum) {
   pruefe(!(await lehrer.textContent('.z-buehne')).includes('passenden KB'), 'Beamer: kein Hinweis auf KB-Zuordnung');
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_5_perspektiven.png'), fullPage: true });
 
+  // Lernfragen drucken: Liste ohne Namen (window.print wird im Test ersetzt)
+  await lehrer.evaluate(() => { window.print = () => { window.__gedruckt = (window.__gedruckt || 0) + 1; }; });
+  await lehrer.click('.z-persp-kopf [data-drucken]');
+  const druck = await lehrer.textContent('#z-druck');
+  pruefe(await lehrer.evaluate(() => window.__gedruckt === 1), 'Drucken: Druckfenster wird geöffnet');
+  pruefe(druck.includes('Unsere Lernfragen') && druck.includes('Wie gebe ich im Notfall klare Anweisungen?') && druck.includes('hätte gebraucht: eine klare Anweisung'), 'Drucken: Lernfragen mit „hätte gebraucht“');
+  pruefe(FALL.schritte.find((x) => x.id === 'persp').personen.every((p) => druck.includes(p.text)), 'Drucken: alle 5 Personen als Überschrift');
+  pruefe(!druck.includes('Lena') && !druck.includes('Tim B'), 'Drucken: ohne Namen');
+  pruefe(druck.includes('Fast-Track-Chirurgie'), 'Drucken: geparkte Begriffe dabei');
+  await lehrer.evaluate(() => document.body.classList.add('z-drucken'));
+  await lehrer.pdf({ path: path.join(__dirname, 'fall_lernfragen.pdf'), format: 'A4' });
+  await lehrer.evaluate(() => document.body.classList.remove('z-drucken'));
+
   // Begriffsparkplatz und Ende
   await h2.fill('#f-wort', 'Redon-Drainage');
   await h2.click('#f-wort-form button');

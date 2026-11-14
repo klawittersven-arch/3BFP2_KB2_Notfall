@@ -632,6 +632,7 @@
     }).join('');
     var mitEintrag = stand ? stand.leute.filter(function (p) { return p.eintraege; }).length : 0;
     return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2><span class="z-persp-knoepfe">' +
+      '<button type="button" class="l-knopf l-zweit" data-drucken="1" title="Alle Lernfragen ohne Namen drucken (auch als PDF)">🖨 Lernfragen drucken</button> ' +
       '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen" title="Klick auf einen Namen setzt ihn in die nächste Gruppe">Gruppen neu einteilen</button></span></div>' +
       handyAuftragHtml(s.handyAuftrag || s.beamerAuftrag || '', '<span class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' +
         (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</span>') +
@@ -663,6 +664,37 @@
     }).join('') + '</ul>';
   }
 
+  // ---------- Lernfragen drucken: alle Einträge der Perspektiven-Runde und die geparkten Begriffe, ohne Namen ----------
+  function druckHtml() {
+    var s = F.schritte.filter(function (x) { return x.art === 'perspektiven'; })[0];
+    var texte = stand ? stand.texte : [];
+    var persp = texte.filter(function (t) { return t.art === 'persp'; });
+    var heute = new Date();
+    var kopf = '<h1>Unsere Lernfragen</h1><p class="d-unter">Fall ' + esc(F.titel) + ' · ' + esc(document.title.split(' · ')[0]) + ' · ' +
+      heute.getDate() + '.' + (heute.getMonth() + 1) + '.' + heute.getFullYear() + '</p>' +
+      '<p class="d-frage">' + esc(s.titel) + ' – und was müssen wir dafür lernen?</p>';
+    var personen = s.personen.map(function (p) {
+      var eigene = persp.filter(function (t) { return t.person === p.id; });
+      return '<section class="d-person"><h2>' + esc(p.text) + '</h2>' + (eigene.length ? '<ul>' + eigene.map(function (t) {
+        return '<li>' + (t.b ? '<span class="d-b">❓ ' + esc(t.b) + '</span>' : '') +
+          (t.a ? '<span class="d-a">hätte gebraucht: ' + esc(t.a) + '</span>' : '') + '</li>';
+      }).join('') + '</ul>' : '<p class="d-leer">Keine Einträge.</p>') + '</section>';
+    }).join('');
+    var begriffe = begriffListe(texte);
+    return kopf + personen + '<section class="d-person"><h2>Geparkte Begriffe (unklare Wörter)</h2>' +
+      (begriffe.length ? '<p>' + begriffe.map(function (w) { return esc(w.text) + (w.anzahl > 1 ? ' (' + w.anzahl + '×)' : ''); }).join(' · ') + '</p>' :
+        '<p class="d-leer">Keine Begriffe.</p>') + '</section>';
+  }
+  function drucke() {
+    var d = document.getElementById('z-druck');
+    if (!d) { d = document.createElement('div'); d.id = 'z-druck'; document.body.appendChild(d); }
+    d.innerHTML = druckHtml();
+    document.body.classList.add('z-drucken');
+    window.print();
+    setTimeout(function () { document.body.classList.remove('z-drucken'); }, 500);
+  }
+  window.addEventListener('afterprint', function () { document.body.classList.remove('z-drucken'); });
+
   function archivZeile() {
     if (!stand) return '';
     var d = stand.steuerung.durchgang;
@@ -690,6 +722,9 @@
       '<section class="z-block"><h3>🅿️ ' + esc(F.begriffe.titel) + '</h3>' + begriffeHtml(texte) + '</section>' +
       (alteFragen.length ? '<section class="z-block"><h3>Ihre Lernfragen aus der Einführung (SW 6) – können Sie sie jetzt beantworten?</h3><ul class="z-alt">' +
         alteFragen.map(function (t) { return '<li>' + (t.kb ? '<span class="z-kb z-kb-an">' + esc(t.kb) + '</span> ' : '') + esc(t.b) + '</li>'; }).join('') + '</ul></section>' : '') +
+      '<section class="z-block"><h3>Lernfragen drucken</h3><p>Alle Lernfragen der Gruppen und die geparkten Begriffe – <strong>ohne Namen</strong>. ' +
+      'Zum Austeilen in der nächsten Stunde oder für die Kolleginnen und Kollegen (im Druckfenster auch „Als PDF speichern“).</p>' +
+      '<button type="button" class="l-knopf" data-drucken="1">🖨 Lernfragen drucken</button></section>' +
       '<section class="z-block"><h3>Ergebnis sichern</h3><p>Speichert die Ergebnisse dieser Stunde <strong>ohne Namen</strong> für einen späteren Vergleich.</p>' +
       '<button type="button" class="l-knopf" data-sichern="1">💾 Ergebnis sichern</button> <span class="z-gesichert">' + esc(archivZeile()) + '</span></section>';
   }
@@ -718,6 +753,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-sichern]'), function (b) {
       b.onclick = sichern;
     });
+    Array.prototype.forEach.call(buehne.querySelectorAll('[data-drucken]'), function (b) { b.onclick = drucke; });
   }
 
   function sichern() {

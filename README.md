@@ -113,7 +113,14 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
    sobald jemand einen Eintrag geschickt hat („2 von 22 haben schon etwas geschickt“) – die Einträge selbst bleiben ohne Namen.
    Klick auf einen Namen setzt die Person in die nächste Gruppe; *Gruppen neu einteilen* mischt neu; wer später kommt, landet
    in der kleinsten Gruppe. Unpassende Einträge entfernt × am Eintrag.
-7. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
+7. **Ausblick:** Begriffsparkplatz, **Lernfragen drucken** und **Ergebnis sichern**.
+
+**Lernfragen drucken** (in der Perspektiven-Runde und beim Ausblick): eine Seite mit allen Lernfragen der Gruppen, nach
+Person sortiert, und den geparkten Begriffen – ohne Namen. Im Druckfenster auch „Als PDF speichern“, z. B. für die
+Kolleginnen und Kollegen der anderen Kompetenzbereiche. Unpassende Einträge vorher mit × entfernen.
+
+**Arbeitsblatt:** nur noch der Fall (unverändert) und als Hausaufgabe „Lesen Sie den ganzen Fall noch einmal in Ruhe.
+Markieren Sie im Text alle Warnzeichen, die Christin bei Frau Maler beobachtet.“ – die Inhalte kommen im Fachunterricht.
 
 **Jetzt am Smartphone:** Solange abgestimmt oder geschrieben wird, steht auf dem Beamer ein dunkler Balken mit 📱 und
 dem Auftrag (z. B. „Wählen Sie genau 3 Dinge aus.“). Bei langen Abschnitten bleibt er beim Vorlesen unten
