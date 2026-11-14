@@ -306,6 +306,32 @@ function umgebung(Raum) {
   const h2Falsch = await h2.$$eval('.f-folge-falsch', (e) => e.map((x) => x.textContent).join(' | '));
   pruefe(h2Falsch.includes('passt nicht') && h2Falsch.includes('richtig: Platz 2'), 'Handy: unpassende Aktion mit Grund, richtige auf falschem Platz mit richtigem Platz');
 
+  // Station 7: genau 3 wählen – eine echte Entscheidung; Auflösung mit ✓/✗
+  const s7Index = FALL.schritte.findIndex((x) => x.id === 's7');
+  await lehrer.click(`[data-gehe="${s7Index}"]`);
+  await lehrer.waitForSelector('.z-vollbild');
+  await lehrer.keyboard.press('ArrowRight');
+  await h1.waitForSelector('.f-frage[data-frage="s7"] .f-opt', { timeout: 8000 });
+  for (const k of ['REDEN', 'TEAM']) await h1.click(`.f-opt[data-kuerzel="${k}"]`);
+  pruefe(await h1.isDisabled('[data-senden="s7"]') && (await h1.textContent('[data-senden="s7"]')).includes('2 von 3'), 'Handy: Senden erst bei genau 3');
+  await h1.click('.f-opt[data-kuerzel="PROFI"]');
+  pruefe(await h1.isDisabled('.f-opt[data-kuerzel="NIX"]'), 'Handy: nach 3 gewählten sind die übrigen gesperrt');
+  await h1.click('[data-senden="s7"]');
+  await h2.waitForSelector('.f-frage[data-frage="s7"] .f-opt', { timeout: 8000 });
+  for (const k of ['NIX', 'REDEN', 'SCHULD']) await h2.click(`.f-opt[data-kuerzel="${k}"]`);
+  await h2.click('[data-senden="s7"]');
+  await warte(2300);
+  await lehrer.click('#z-weiter'); // Ergebnis
+  await lehrer.waitForSelector('.z-ergebnis .z-zeile');
+  pruefe((await lehrer.textContent('.z-zeile')).includes('Vertrauensperson'), 'Beamer: Station 7 nach Häufigkeit sortiert (2× zuerst)');
+  pruefe((await lehrer.textContent('.z-ergebnis-kopf')).includes('je 3 gewählt'), 'Beamer: „je 3 gewählt“');
+  await lehrer.click('#z-weiter'); // Auflösen
+  await lehrer.waitForSelector('.z-hinweis-aufl');
+  pruefe((await lehrer.$$('.z-passt-nicht')).length === 3, 'Beamer: 3 nicht hilfreiche Antworten markiert');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_3c_station7.png'), fullPage: true });
+  await h2.waitForSelector('.f-opt.f-passt-nicht', { timeout: 8000 });
+  pruefe((await h2.textContent('.f-opt[data-kuerzel="NIX"]')).includes('passt nicht'), 'Handy: Rückmeldung zu „Nichts“');
+
   // Sprung zum Zurückspulen (Punkt in der Steuerleiste)
   const zurueckIndex = FALL.schritte.findIndex((s) => s.id === 'zurueck');
   await lehrer.click(`[data-gehe="${zurueckIndex}"]`);

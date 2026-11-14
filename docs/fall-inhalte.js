@@ -27,6 +27,8 @@
    die Handys zeigen sie gemischt. Die SuS tippen sie nacheinander an (1., 2., 3. …).
    Mit „anzahl: 3“ werden nur die ersten 3 gesucht – die übrigen Antworten passen nicht (mit „grund“).
 
+   Mehrfachauswahl mit „waehlen: 3“: Die SuS müssen genau 3 Antworten wählen (eine echte Entscheidung).
+
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
    kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
 
@@ -186,17 +188,22 @@ var FALL = {
 
     { id: 's7', art: 'station', nummer: 7, kurz: 'Später', zeitstrahl: 'Albträume',
       bild: { datei: 'bilder/station7.jpg', alt: 'Eine junge Frau sitzt nachts wach auf ihrem Bett und umarmt ihre Knie.' },
-      frage: { id: 's7', mehrfach: true,
-        text: 'Was braucht Christin jetzt?',
-        hilfe: 'Mehrere Antworten sind möglich.',
+      // Genau 3 wählen (waehlen: 3) – so müssen die SuS sich entscheiden. Mehrere Antworten helfen (passt: true),
+      // 3 helfen nicht (passt: false). Welche 3 am wichtigsten sind, ist Gesprächsanlass (hinweis bei der Auflösung).
+      frage: { id: 's7', mehrfach: true, waehlen: 3,
+        text: 'Welche 3 Dinge würden Christin jetzt am meisten helfen?',
+        hilfe: 'Wählen Sie genau 3.',
+        hinweis: 'Alle grünen Antworten können helfen. Welche zuerst? Das hängt von Christin ab – darüber lohnt sich das Gespräch.',
         optionen: [
-          { kuerzel: 'REDEN', text: 'Mit jemandem reden, dem sie vertraut' },
-          { kuerzel: 'TEAM', text: 'Ein Gespräch im Team über den Notfall' },
-          { kuerzel: 'PA', text: 'Hilfe von ihrer Praxisanleitung' },
-          { kuerzel: 'PROFI', text: 'Hilfe von Fachleuten, z. B. Psychologin' },
-          { kuerzel: 'UEBEN', text: 'Mehr Wissen und Übung für Notfälle' },
-          { kuerzel: 'RUHE', text: 'Ruhe und Zeit' },
-          { kuerzel: 'NIX', text: 'Nichts – das geht von allein vorbei' }
+          { kuerzel: 'REDEN', text: 'Mit einer Vertrauensperson darüber reden', passt: true, grund: 'Reden entlastet' },
+          { kuerzel: 'TEAM', text: 'Eine Nachbesprechung im Team', passt: true, grund: 'gemeinsam verstehen, was passiert ist' },
+          { kuerzel: 'NIX', text: 'Nichts – das geht von allein vorbei', passt: false, grund: 'Albträume über längere Zeit sind ein Warnzeichen' },
+          { kuerzel: 'PA', text: 'Ein Gespräch mit ihrer Praxisanleitung', passt: true, grund: 'Begleitung in der Ausbildung' },
+          { kuerzel: 'NORMAL', text: 'Erfahren, dass ihre Reaktion normal ist', passt: true, grund: 'Erstarren ist eine normale Reaktion im Notfall' },
+          { kuerzel: 'SCHULD', text: 'Herausfinden, wer schuld war', passt: false, grund: 'es geht ums Lernen, nicht um Schuld' },
+          { kuerzel: 'PROFI', text: 'Hilfe von Fachleuten, z. B. Psychologin', passt: true, grund: 'die Albträume halten an' },
+          { kuerzel: 'VERG', text: 'Nicht mehr darüber reden und vergessen', passt: false, grund: 'Verdrängen hilft auf Dauer nicht' },
+          { kuerzel: 'UEBEN', text: 'Reanimation üben, um sicherer zu werden', passt: true, grund: 'Übung gibt Sicherheit' }
         ] } },
 
     { id: 'zurueck', art: 'zurueckspulen', kurz: 'Zurückspulen',

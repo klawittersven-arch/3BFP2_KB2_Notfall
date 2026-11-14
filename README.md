@@ -94,6 +94,8 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
    ✓/✗, Merksatz, „ganz richtig: x von y“ und die gewählten unpassenden Aktionen mit Grund; die Handys zeigen ✓/✗ je Platz.
    Richtige Schritte und Ablenker stehen in `fall-inhalte.js` (`s5`: die ersten `anzahl` Antworten sind die richtigen;
    ohne `anzahl` werden alle Antworten sortiert).
+   Station 7: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
+   Rangfolge der Klasse; Auflösung = ✓/✗ mit Grund und der Hinweis, dass die Rangfolge Gesprächsanlass ist.
 4. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
 5. **Perspektiven-Runde:** Jede Gruppe wählt eine Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft,
    die Angehörigen, Frau Maler): „Was hätte diese Person gebraucht?“ + Lernfrage. Auf dem Beamer je Person eine Spalte;

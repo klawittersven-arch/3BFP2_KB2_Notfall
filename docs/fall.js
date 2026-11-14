@@ -293,13 +293,14 @@
     if (q.mehrfach && !auswahl[q.id]) auswahl[q.id] = liste.slice();
     var aktiv = q.mehrfach ? auswahl[q.id] : liste;
     var art = q.ampel ? 'f-ampel' : (q.skala ? 'f-skala' : 'f-wahl');
+    var voll = q.waehlen && aktiv.length >= q.waehlen;   // genau x wählen: danach sind die übrigen gesperrt
     var knoepfe = optionen(q).map(function (o) {
       var an = aktiv.indexOf(o.kuerzel) >= 0;
       var passung = aufgeloest && o.passt !== undefined;
       return '<button type="button" class="f-opt' + (o.farbe ? ' f-' + o.farbe : '') + (an ? ' f-an' : '') +
         (passung ? (o.passt ? ' f-passt' : ' f-passt-nicht') : '') + '"' +
         ' data-frage="' + esc(q.id) + '" data-kuerzel="' + esc(o.kuerzel) + '" aria-pressed="' + (an ? 'true' : 'false') + '"' +
-        (gesperrt ? ' disabled' : '') + '>' +
+        (gesperrt || (voll && !an) ? ' disabled' : '') + '>' +
         (q.mehrfach ? '<span class="f-haken" aria-hidden="true">' + (an ? '☑' : '☐') + '</span>' : '') +
         (o.zeichen ? '<span aria-hidden="true">' + o.zeichen + '</span>' : '') +
         (q.skala ? '<strong>' + esc(o.kuerzel) + '</strong>' : '') +
@@ -313,7 +314,8 @@
       (q.hilfe ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') +
       '<div class="' + art + '" role="group" aria-label="' + esc(q.text) + '">' + knoepfe + '</div>' +
       (q.mehrfach && !gesperrt ? '<button type="button" class="knopf f-senden" data-senden="' + esc(q.id) + '"' +
-        (aktiv.length ? '' : ' disabled') + '>' + esc(H.senden) + '</button>' : '') +
+        ((q.waehlen ? aktiv.length === q.waehlen : aktiv.length) ? '' : ' disabled') + '>' + esc(H.senden) +
+        (q.waehlen && aktiv.length < q.waehlen ? ' (' + aktiv.length + ' von ' + q.waehlen + ')' : '') + '</button>' : '') +
       status + '</section>';
   }
   function gleicheListe(a, b) { return a.length === b.length && a.every(function (x) { return b.indexOf(x) >= 0; }); }
@@ -335,7 +337,7 @@
         if (q.mehrfach) {
           var a = auswahl[q.id];
           var i = a.indexOf(k);
-          if (i >= 0) a.splice(i, 1); else a.push(k);
+          if (i >= 0) a.splice(i, 1); else if (!q.waehlen || a.length < q.waehlen) a.push(k);
         } else {
           sendeAntwort(q.id, k);
         }
@@ -369,7 +371,8 @@
     Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden]'), function (b) {
       b.addEventListener('click', function () {
         var id = b.getAttribute('data-senden');
-        if (!auswahl[id] || !auswahl[id].length) return;
+        var qs = sucheFrage(id);
+        if (!auswahl[id] || !auswahl[id].length || (qs && qs.waehlen && auswahl[id].length !== qs.waehlen)) return;
         sendeAntwort(id, auswahl[id].slice());
         var y = window.scrollY;
         neuZeichnen();

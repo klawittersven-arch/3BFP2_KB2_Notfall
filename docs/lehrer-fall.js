@@ -303,7 +303,9 @@
     var v = vergleich();
     var ve = v ? (v.ergebnisse[q.id] || {}) : null, vn = v ? (v.anzahl[q.id] || 0) : 0;
     if (q.skala) return skalaHtml(q, erg, n, ve, vn);
-    var zeilen = optionen(q).map(function (o) {
+    var reihe = optionen(q).slice();
+    if (q.waehlen) reihe.sort(function (a, b) { return (erg[b.kuerzel] || 0) - (erg[a.kuerzel] || 0); });   // Rangfolge der Klasse
+    var zeilen = reihe.map(function (o) {
       var p = prozent(erg[o.kuerzel] || 0, n);
       var christin = mitChristin && mitChristin.ampel === o.kuerzel;
       var passung = mitPassung && o.passt !== undefined;
@@ -319,8 +321,9 @@
     }).join('');
     var viele = optionen(q).length > 6;   // viele Antworten: zweispaltig, damit alles auf den Beamer passt
     return '<div class="z-ergebnis' + (viele ? ' z-viele' : '') + '"><p class="z-ergebnis-kopf">' + esc(q.text) + ' <small>· ' + antworten(n) +
-      (q.mehrfach ? ' · mehrere möglich' : '') + (ve ? ' · zum Vergleich: SW 6 (' + antworten(vn) + ')' : '') + '</small></p>' +
-      '<div class="z-zeilen">' + zeilen + '</div></div>';
+      (q.waehlen ? ' · je ' + q.waehlen + ' gewählt' : (q.mehrfach ? ' · mehrere möglich' : '')) + (ve ? ' · zum Vergleich: SW 6 (' + antworten(vn) + ')' : '') + '</small></p>' +
+      '<div class="z-zeilen" style="--reihen:' + Math.ceil(reihe.length / 2) + '">' + zeilen + '</div>' +
+      (mitPassung && q.hinweis ? '<p class="z-hinweis-aufl">' + esc(q.hinweis) + '</p>' : '') + '</div>';
   }
   function skalaHtml(q, erg, n, ve, vn) {
     var summe = 0;
@@ -362,7 +365,9 @@
     if (nach && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
       text = '<details class="z-text-zu"><summary>Abschnitt noch einmal anzeigen</summary>' + text + '</details>';
     }
-    var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
+    // Viele Antworten: beim Ergebnis ohne Bild, damit die ganze Breite für die Balken bleibt und alles auf den Beamer passt
+    var viele = !s.frage.reihenfolge && s.frage.optionen && s.frage.optionen.length > 6;
+    var bild = s.bild && !(nach && viele) ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
     var rahmen = function (inhalt) {
       if (!bild) return kopf + inhalt;
       return kopf + '<div class="z-station' + (nach ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
