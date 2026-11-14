@@ -15,7 +15,7 @@
     F: '#FCD2B5', c: '#FAA2A8',          // Haut, Wangen
     // Hindernisse (Notfall- und Krisensituationen)
     A: '#D7262F', a: '#A3161F',          // Notfallrot, dunkles Rot
-    D: '#1F8A4C', d: '#13643A',          // Defi-Koffer grün
+    D: '#16B35A', d: '#0B5E2E',          // Defi-Koffer: kräftiges Grün mit dunklem Rand, Blitz dunkelgrün
     Y: '#F2C200',                        // Blitz, Scheinwerfer
     Q: '#F26B1D', q: '#B84A12',          // Leitkegel orange
     U: '#2F6BFF', u: '#A9C2FF',          // Blaulicht
@@ -226,16 +226,18 @@
     defi: [
       '......mmmm......',
       '.....m....m.....',
-      'dDDDDDDDDDDDDDDd',
-      'DDDDDWWDDWWDDDDD',
-      'DDDDWWWWWWWWDDDD',
-      'DDDDWWWYWWWWDDDD',
-      'DDDDWWYYWWWWDDDD',
-      'DDDDDWWYYWWDDDDD',
-      'DDDDDDWWYWDDDDDD',
-      'DDDDDDDWWDDDDDDD',
-      'DDDDDDDDDDDDDDDD',
-      'dddddddddddddddd'
+      'mmmmmmmmmmmmmmmm',
+      'mDDDDDDDDDDDDDDm',
+      'mDDDWWWDDWWWDDDm',
+      'mDDWWWWWWWWWWDDm',
+      'mDDWWWWWdWWWWDDm',
+      'mDDWWWWddWWWWDDm',
+      'mDDDWWWWddWWDDDm',
+      'mDDDDWWWWdWDDDDm',
+      'mDDDDDWWWWDDDDDm',
+      'mDDDDDDWWDDDDDDm',
+      'mDDDDDDDDDDDDDDm',
+      'mmmmmmmmmmmmmmmm'
     ],
     leitkegel: [
       '.....qQ.....',
