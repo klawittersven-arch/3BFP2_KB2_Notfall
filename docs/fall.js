@@ -73,6 +73,21 @@
   function abschnitte(teil, art) {
     return F.text.filter(function (t) { return t.teil === teil && (!art || t.art === art); });
   }
+  // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
+  // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
+  function hatPassung(q) { return !!(q && (q.reihenfolge || (q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })))); }
+  function phasen(s) {
+    var bild = s.bild ? ['bild'] : [];
+    if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
+    if (s.art === 'station') {
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
+    }
+    if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    return ['frage'];
+  }
+  function aktuellePhase() { var s = schritt(); var p = phasen(s); return p[Math.min(stand.stufe, p.length - 1)]; }
+  function abgestimmt() { var p = aktuellePhase(); return p === 'ergebnis' || p === 'aufloesung'; }
   function hatAufloesung(schritt) { return schritt.art === 'station' && abschnitte(schritt.id, 'aufloesung').length > 0; }
 
   // ---------- Zustand ----------
@@ -113,13 +128,13 @@
   }
   function frage() {
     if (!SERVER || !name || !klasse) return;
-    fetch(SERVER + '/fall/zustand?raum=' + encodeURIComponent(raum()), { cache: 'no-store' })
+    fetch(SERVER + '/fall/zustand?raum=' + encodeURIComponent(raum()) + '&geraet=' + geraetId(), { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function (z) {
         verbunden = true;
         var neueSitzung = !stand || stand.sitzung !== z.sitzung;
         stand = z;
-        if (neueSitzung) { ladeMeine(); auswahl = {}; }
+        if (neueSitzung) { ladeMeine(); auswahl = {}; folge = {}; }
         zeichne();
       })
       .catch(function () { verbunden = false; zeigeLeiste(); });
@@ -161,7 +176,8 @@
     zeigeLeiste();
     var s = schritt();
     if (!s) return;
-    var schluessel = stand.sitzung + '|' + stand.schritt + '|' + stand.stufe;
+    var schluessel = stand.sitzung + '|' + stand.schritt + '|' + stand.stufe + '|' + (stand.gruppe || '');
+    zeigeMitglieder();
     if (schluessel === gezeichnet && !erzwingen) return;   // nichts Neues – Eingaben nicht zerstören
     var gleicherSchritt = gezeichnet.split('|').slice(0, 2).join('|') === stand.sitzung + '|' + stand.schritt;
     gezeichnet = schluessel;
@@ -169,6 +185,9 @@
     var html = '';
     if (s.art === 'kaltstart') html = '<p class="f-gross">' + esc(s.handy) + '</p>';
     else if (s.art === 'fragen') html = fragenHtml(s);
+    else if (s.art === 'station' && aktuellePhase() === 'bild') html = '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
+      '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' +
+      '<p class="f-gross">' + esc(H.nachVorn) + '</p>';
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = '<h2 class="f-titel">' + esc(s.titel) + '</h2><p class="f-vorspann">' + esc(s.vorspann) + '</p>' + frageHtml(s.frage, stand.stufe >= 1);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
@@ -188,31 +207,101 @@
   }
 
   function stationHtml(s) {
-    var auf = stand.stufe >= 2 && hatAufloesung(s);
+    var auf = aktuellePhase() === 'aufloesung' && hatAufloesung(s);
     return '<h2 class="f-titel"><span class="nummer">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>' +
       (s.bild ? '<img class="f-bild" src="' + esc(s.bild.datei.replace(/\.jpg$/, '-klein.jpg')) + '" alt="' + esc(s.bild.alt) + '" width="800" height="450">' : '') +
       '<div class="f-falltext">' + falltextHtml(abschnitte(s.id, 'frage')) + '</div>' +
       '<p class="f-tipp-hinweis"><span aria-hidden="true">💡</span> ' + esc(F.begriffe.tippHinweis) + '</p>' +
-      frageHtml(s.frage, stand.stufe >= 1, stand.stufe >= 2) +
+      frageHtml(s.frage, abgestimmt(), aktuellePhase() === 'aufloesung') +
       (auf ? '<div class="f-aufloesung"><p class="f-auf-kopf">' + esc(H.christinErzaehlt) + '</p><div class="f-falltext">' +
         falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '');
   }
 
   // Eine Frage: Ampel, Auswahl (eine Antwort), Mehrfachauswahl oder Skala
   function optionen(q) { return q.ampel ? F.ampel : q.optionen; }
+  // ---------- Reihenfolge-Fragen ----------
+  // Gesendet wird die Reihenfolge als Liste „Platz + Kürzel“ (z. B. '1ANSP', '2RUF' …) und 'OK', wenn alles stimmt.
+  // So zählt der Server ohne Änderung, wie oft welcher Schritt auf welchem Platz steht.
+  var folge = {};       // Frage → angetippte Kürzel in Reihenfolge (noch nicht gesendet)
+  var mischung = {};    // Frage → gemischte Anzeige-Reihenfolge (bleibt, solange die Seite offen ist)
+  function folgeAusWert(wert) {
+    return (Array.isArray(wert) ? wert : []).filter(function (c) { return /^\d/.test(c); })
+      .sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); })
+      .map(function (c) { return c.replace(/^\d+/, ''); });
+  }
+  function folgeAnzahl(q) { return q.anzahl || q.optionen.length; }
+  function folgeRichtig(q) { return q.optionen.slice(0, folgeAnzahl(q)).map(function (o) { return o.kuerzel; }); }
+  function folgeAlsWert(q, liste) {
+    var wert = liste.map(function (k, i) { return (i + 1) + k; });
+    if (liste.join() === folgeRichtig(q).join()) wert.push('OK');
+    return wert;
+  }
+  function gemischt(q) {
+    if (mischung[q.id]) return mischung[q.id];
+    var a = q.optionen.slice(), richtig = q.optionen.map(function (o) { return o.kuerzel; }).join();
+    for (var n = 0; n < 20; n++) {          // nie zufällig in der richtigen Reihenfolge anzeigen
+      for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+      if (a.map(function (o) { return o.kuerzel; }).join() !== richtig) break;
+    }
+    return (mischung[q.id] = a);
+  }
+  function reihenfolgeHtml(q, gesperrt, aufgeloest) {
+    var gesendet = folgeAusWert(meine.antworten[q.id]);
+    if (!folge[q.id]) folge[q.id] = gesendet.slice();
+    var liste = gesperrt ? gesendet : folge[q.id];
+    var n = folgeAnzahl(q), richtig = folgeRichtig(q), voll = liste.length >= n;
+    var opt = function (k) { return q.optionen.filter(function (o) { return o.kuerzel === k; })[0]; };
+    var html;
+    if (!aufgeloest) {
+      html = '<div class="f-folge" role="group" aria-label="' + esc(q.text) + '">' + gemischt(q).map(function (o) {
+        var platz = liste.indexOf(o.kuerzel);
+        return '<button type="button" class="f-opt f-folge-opt' + (platz >= 0 ? ' f-an' : '') + '" data-folge="' + esc(q.id) +
+          '" data-kuerzel="' + esc(o.kuerzel) + '"' + (gesperrt || (voll && platz < 0) ? ' disabled' : '') + '>' +
+          '<span class="f-platz" aria-hidden="true">' + (platz >= 0 ? platz + 1 : '') + '</span><span>' + esc(o.text) + '</span></button>';
+      }).join('') + '</div>';
+      if (liste.length) {
+        html += '<p class="f-unter">' + esc(H.ihreReihenfolge) + '</p><ol class="f-folge-liste">' +
+          liste.map(function (k) { return '<li>' + esc(opt(k).text) + '</li>'; }).join('') + '</ol>';
+      }
+    } else {
+      // Auflösung: eigene Reihenfolge mit ✓/✗ und die richtige Reihenfolge
+      html = '<p class="f-unter">' + esc(H.ihreReihenfolge) + '</p><ol class="f-folge-liste">' + (gesendet.length ? gesendet.map(function (k, i) {
+        var ok = richtig[i] === k, o = opt(k), pr = richtig.indexOf(k);
+        return '<li class="' + (ok ? 'f-folge-ok' : 'f-folge-falsch') + '">' + (ok ? '✓ ' : '✗ ') + esc(o.text) +
+          (ok ? '' : ' <small>(' + (pr >= 0 ? 'richtig: Platz ' + (pr + 1) : 'passt nicht: ' + esc(o.grund || '')) + ')</small>') + '</li>';
+      }).join('') : '<li>' + esc(H.keineAntwort) + '</li>') + '</ol>' +
+        '<p class="f-unter">' + esc(H.richtigeReihenfolge) + (q.merksatz ? ' <strong>' + esc(q.merksatz) + '</strong>' : '') + '</p>' +
+        '<ol class="f-folge-liste f-folge-richtig">' + richtig.map(function (k) {
+          var o = opt(k);
+          return '<li>' + (o.merk ? esc(o.merk) + ': ' : '') + esc(o.text) + '</li>';
+        }).join('') + '</ol>' + (q.quelle ? '<p class="f-hilfe">' + esc(q.quelle) + '</p>' : '');
+    }
+    var status = '';
+    if (gesperrt && !aufgeloest) status = '<p class="f-status">' + esc(H.gesperrt) + (gesendet.length ? '' : ' ' + esc(H.keineAntwort)) + '</p>';
+    else if (!gesperrt && gesendet.length && gesendet.join() === liste.join()) status = '<p class="f-status f-ok">✓ ' + esc(H.gesendet) + '</p>';
+    return '<section class="f-frage" data-frage="' + esc(q.id) + '"><h3>' + esc(q.text) + '</h3>' +
+      (q.hilfe && !gesperrt ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') + html +
+      (!gesperrt ? '<button type="button" class="knopf f-senden" data-senden-folge="' + esc(q.id) + '"' +
+        (liste.length === n ? '' : ' disabled') + '>' + esc(H.senden) +
+        (liste.length < n ? ' (' + liste.length + ' von ' + n + ')' : '') + '</button>' : '') +
+      status + '</section>';
+  }
+
   function frageHtml(q, gesperrt, aufgeloest) {
+    if (q.reihenfolge) return reihenfolgeHtml(q, gesperrt, aufgeloest);
     var gewaehlt = meine.antworten[q.id];
     var liste = gewaehlt === undefined ? [] : (Array.isArray(gewaehlt) ? gewaehlt : [gewaehlt]);
     if (q.mehrfach && !auswahl[q.id]) auswahl[q.id] = liste.slice();
     var aktiv = q.mehrfach ? auswahl[q.id] : liste;
     var art = q.ampel ? 'f-ampel' : (q.skala ? 'f-skala' : 'f-wahl');
+    var voll = q.waehlen && aktiv.length >= q.waehlen;   // genau x wählen: danach sind die übrigen gesperrt
     var knoepfe = optionen(q).map(function (o) {
       var an = aktiv.indexOf(o.kuerzel) >= 0;
       var passung = aufgeloest && o.passt !== undefined;
       return '<button type="button" class="f-opt' + (o.farbe ? ' f-' + o.farbe : '') + (an ? ' f-an' : '') +
         (passung ? (o.passt ? ' f-passt' : ' f-passt-nicht') : '') + '"' +
         ' data-frage="' + esc(q.id) + '" data-kuerzel="' + esc(o.kuerzel) + '" aria-pressed="' + (an ? 'true' : 'false') + '"' +
-        (gesperrt ? ' disabled' : '') + '>' +
+        (gesperrt || (voll && !an) ? ' disabled' : '') + '>' +
         (q.mehrfach ? '<span class="f-haken" aria-hidden="true">' + (an ? '☑' : '☐') + '</span>' : '') +
         (o.zeichen ? '<span aria-hidden="true">' + o.zeichen + '</span>' : '') +
         (q.skala ? '<strong>' + esc(o.kuerzel) + '</strong>' : '') +
@@ -226,7 +315,8 @@
       (q.hilfe ? '<p class="f-hilfe">' + esc(q.hilfe) + '</p>' : '') +
       '<div class="' + art + '" role="group" aria-label="' + esc(q.text) + '">' + knoepfe + '</div>' +
       (q.mehrfach && !gesperrt ? '<button type="button" class="knopf f-senden" data-senden="' + esc(q.id) + '"' +
-        (aktiv.length ? '' : ' disabled') + '>' + esc(H.senden) + '</button>' : '') +
+        ((q.waehlen ? aktiv.length === q.waehlen : aktiv.length) ? '' : ' disabled') + '>' + esc(H.senden) +
+        (q.waehlen && aktiv.length < q.waehlen ? ' (' + aktiv.length + ' von ' + q.waehlen + ')' : '') + '</button>' : '') +
       status + '</section>';
   }
   function gleicheListe(a, b) { return a.length === b.length && a.every(function (x) { return b.indexOf(x) >= 0; }); }
@@ -244,11 +334,11 @@
       b.addEventListener('click', function () {
         var q = sucheFrage(b.getAttribute('data-frage'));
         var k = b.getAttribute('data-kuerzel');
-        if (!q || stand.stufe >= 1 && s.art !== 'perspektiven') return;
+        if (!q || abgestimmt()) return;
         if (q.mehrfach) {
           var a = auswahl[q.id];
           var i = a.indexOf(k);
-          if (i >= 0) a.splice(i, 1); else a.push(k);
+          if (i >= 0) a.splice(i, 1); else if (!q.waehlen || a.length < q.waehlen) a.push(k);
         } else {
           sendeAntwort(q.id, k);
         }
@@ -257,10 +347,33 @@
         window.scrollTo(0, y);
       });
     });
+    Array.prototype.forEach.call(inhalt.querySelectorAll('[data-folge]'), function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-folge'), k = b.getAttribute('data-kuerzel');
+        if (abgestimmt()) return;
+        var a = folge[id], i = a.indexOf(k), q = sucheFrage(id);
+        if (i >= 0) a.splice(i, 1);                     // noch einmal tippen = herausnehmen, die anderen rücken nach
+        else if (a.length < folgeAnzahl(q)) a.push(k);
+        var y = window.scrollY;
+        neuZeichnen();
+        window.scrollTo(0, y);
+      });
+    });
+    Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden-folge]'), function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-senden-folge'), q = sucheFrage(id);
+        if (!q || folge[id].length !== folgeAnzahl(q)) return;
+        sendeAntwort(id, folgeAlsWert(q, folge[id]));
+        var y = window.scrollY;
+        neuZeichnen();
+        window.scrollTo(0, y);
+      });
+    });
     Array.prototype.forEach.call(inhalt.querySelectorAll('[data-senden]'), function (b) {
       b.addEventListener('click', function () {
         var id = b.getAttribute('data-senden');
-        if (!auswahl[id] || !auswahl[id].length) return;
+        var qs = sucheFrage(id);
+        if (!auswahl[id] || !auswahl[id].length || (qs && qs.waehlen && auswahl[id].length !== qs.waehlen)) return;
         sendeAntwort(id, auswahl[id].slice());
         var y = window.scrollY;
         neuZeichnen();
@@ -271,10 +384,21 @@
   }
 
   // ---------- Perspektiven-Runde ----------
+  // Namen der Gruppe aktualisieren, ohne neu zu zeichnen (Eingaben bleiben erhalten)
+  function zeigeMitglieder() {
+    var el = document.getElementById('f-gruppe-namen');
+    if (!el || !stand || !stand.mitglieder) return;
+    var s = schritt();
+    el.textContent = (s.gruppeMit || '') + ' ' + stand.mitglieder.join(', ');
+  }
   function perspektivenHtml(s) {
-    var personen = s.personen.map(function (p) {
-      return '<button type="button" class="f-person' + (person === p.id ? ' f-an' : '') + '" data-person="' + esc(p.id) + '" aria-pressed="' + (person === p.id) + '">' + esc(p.text) + '</button>';
-    }).join('');
+    // Die Gruppe (= Person) teilt die Lehrkraft zu; ohne Gruppe wird gewartet
+    if (!stand.gruppe) return '<h2 class="f-titel">' + esc(s.titel) + '</h2><p class="f-gross">' + esc(s.gruppeWarten) + '</p>';
+    person = stand.gruppe;
+    var meinePerson = s.personen.filter(function (x) { return x.id === person; })[0];
+    var gruppe = '<div class="f-gruppe" data-gruppe="' + esc(person) + '"><p class="f-gruppe-titel">' + esc(s.gruppeTitel) + '</p>' +
+      '<p class="f-gruppe-person" id="f-gruppe-person">' + esc(meinePerson ? meinePerson.text : person) + '</p>' +
+      '<p class="f-gruppe-namen" id="f-gruppe-namen">' + esc(s.gruppeMit + ' ' + (stand.mitglieder || []).join(', ')) + '</p></div>';
     var formular = '';
     if (person) {
       formular = '<form id="f-persp-form" class="f-persp-form" novalidate>' +
@@ -293,8 +417,7 @@
       var p = s.personen.filter(function (x) { return x.id === t.person; })[0];
       return '<li><strong>' + esc(p ? p.text : '') + '</strong>' + (t.a ? '<br>' + esc(t.a) : '') + (t.b ? '<br>❓ ' + esc(t.b) : '') + '</li>';
     }).join('') + '</ul>' : '';
-    return '<h2 class="f-titel">' + esc(s.titel) + '</h2><p>' + fmt(s.auftrag) + '</p>' +
-      '<div class="f-personen" role="group" aria-label="Person">' + personen + '</div>' + formular + liste;
+    return '<h2 class="f-titel">' + esc(s.titel) + '</h2>' + gruppe + '<p>' + fmt(s.auftrag) + '</p>' + formular + liste;
   }
   function verbindePerspektiven(s) {
     Array.prototype.forEach.call(inhalt.querySelectorAll('.f-person'), function (b) {
@@ -351,7 +474,7 @@
       if (x.art !== 'station' || i > index) return;
       var alles = i < index || s.art !== 'station';
       abschnitte(x.id).forEach(function (t) {
-        if (alles || t.art === 'frage' || (t.art === 'aufloesung' && stand.stufe >= 2)) teile.push(t);
+        if (alles || t.art === 'frage' || (t.art === 'aufloesung' && aktuellePhase() === 'aufloesung')) teile.push(t);
       });
     });
     // nur ältere Stationen anzeigen – die aktuelle steht schon oben

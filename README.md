@@ -81,14 +81,28 @@ Handy: https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/fall.html – der 
 
 **Ablauf** (Weiter/Zurück mit den Knöpfen unten, den Pfeiltasten oder dem Presenter; die Punkte springen direkt zu einem Schritt):
 
-1. **Kaltstart** (dunkler Bildschirm): „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
+Jedes Bild erscheint zuerst **im Vollbild** (Klick aufs Bild, Pfeiltaste oder Presenter = weiter); danach steht es
+klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schauen Sie nach vorn.“
+
+1. **Kaltstart:** Bild im Vollbild → *Satz zeigen*: „Sie kommen ins Zimmer. Frau Maler reagiert nicht.“ → *10 Sekunden starten* → Countdown → „Stopp!“
 2. **Ihre 10 Sekunden:** QR-Code, Hinweis auf die Belastung, Namen mit ✓. Fragen: Was haben Sie getan? Wie sicher haben Sie sich gefühlt (1–5)?
 3. **Stationen 1–7:** Abschnitt des Falls groß zum Vorlesen → Frage auf dem Handy (Ampel 🟢🟡🔴 oder Auswahl) →
    *Ergebnis zeigen* (Abstimmung endet) → *Auflösen: Was hat Christin getan?* (der nächste Satz aus dem Fall, bei Ampel mit Markierung).
+   Station 1: Risiken auswählen (6 passen, 3 nicht) → *Auflösen: Was passt?* mit Begründung.
+   Station 5: aus 8 Aktionen die **3 wichtigsten Schritte in der richtigen Reihenfolge** antippen – Merkregel der
+   Reanimationsleitlinien 2025: *Prüfen – Rufen – Drücken*. Ergebnis = je Platz, was die Klasse gewählt hat; Auflösung =
+   ✓/✗, Merksatz, „ganz richtig: x von y“ und die gewählten unpassenden Aktionen mit Grund; die Handys zeigen ✓/✗ je Platz.
+   Richtige Schritte und Ablenker stehen in `fall-inhalte.js` (`s5`: die ersten `anzahl` Antworten sind die richtigen;
+   ohne `anzahl` werden alle Antworten sortiert).
+   Station 7: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
+   Rangfolge der Klasse; Auflösung = ✓/✗ mit Grund und der Hinweis, dass die Rangfolge Gesprächsanlass ist.
 4. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
-5. **Perspektiven-Runde:** Jede Gruppe wählt eine Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft,
-   die Angehörigen, Frau Maler): „Was hätte diese Person gebraucht?“ + Lernfrage. Auf dem Beamer je Person eine Spalte;
-   die Lehrkraft tippt bei jedem Eintrag den passenden KB (I–V) an. *Nach Kompetenzbereichen ordnen* zeigt die Lernlandkarte.
+5. **Perspektiven-Runde:** Die Beamer-Seite teilt alle Angemeldeten **automatisch und gleichmäßig in 5 Gruppen** ein – eine
+   je Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft, die Angehörigen, Frau Maler). Das Handy zeigt
+   „Ihre Gruppe bearbeitet: …“ und die Namen der Gruppe. Auf dem Beamer stehen die Namen bei jeder Gruppe, mit ✓ und Zahl,
+   sobald jemand einen Eintrag geschickt hat („2 von 22 haben schon etwas geschickt“) – die Einträge selbst bleiben ohne Namen.
+   Klick auf einen Namen setzt die Person in die nächste Gruppe; *Gruppen neu einteilen* mischt neu; wer später kommt, landet
+   in der kleinsten Gruppe. Unpassende Einträge entfernt × am Eintrag.
 6. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
 
 **Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;

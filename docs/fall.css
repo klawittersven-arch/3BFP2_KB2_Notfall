@@ -49,12 +49,25 @@
 .f-opt:not(.f-an).f-passt-nicht .f-grund { color: #8A1C14; }
 .f-opt.f-an.f-passt-nicht { background: #B3261E; }
 .f-opt.f-an.f-passt { background: var(--gruen); }
+.f-folge { display: grid; gap: 8px; }
+.f-platz { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 34px; height: 34px; border-radius: 17px;
+  border: 2px dashed var(--petrol); font-size: 18px; font-weight: 800; }
+.f-folge-opt.f-an .f-platz { border: 0; background: #fff; color: var(--dunkelpetrol); }
+.f-folge-liste { margin: 0 0 6px; padding-left: 26px; font-size: 17px; }
+.f-folge-liste li { margin: 2px 0; }
+.f-folge-ok { color: var(--gruen); font-weight: 700; }
+.f-folge-falsch { color: #8A1C14; font-weight: 700; }
+.f-folge-richtig { font-weight: 700; color: var(--dunkelpetrol); }
 .f-senden { width: 100%; margin-top: 10px; }
 .f-senden:disabled { opacity: .5; cursor: default; }
 .f-status { margin: 10px 0 0; font-size: 16px; font-weight: 600; color: #3D5257; }
 .f-ok { color: var(--gruen); }
 
 /* Perspektiven */
+.f-gruppe { margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--dunkelpetrol); color: #fff; }
+.f-gruppe-titel { margin: 0; font-size: 15px; opacity: .9; }
+.f-gruppe-person { margin: 2px 0 6px; font-size: 22px; font-weight: 800; }
+.f-gruppe-namen { margin: 0; font-size: 16px; }
 .f-personen { display: grid; gap: 8px; margin: 0 0 14px; }
 .f-person {
   min-height: 52px; padding: 10px 12px; border: 2px solid var(--petrol); border-radius: 10px; background: #fff;

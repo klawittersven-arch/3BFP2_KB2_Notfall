@@ -16,12 +16,14 @@
 //   POST /fall/steuern  {raum, schritt, stufe, durchgang}            (Lehrerseite: Weiter/Zurück)
 //   POST /fall/text-weg {raum, id} · /fall/kb {raum, id, kb} · /fall/entfernen {raum, id}
 //   POST /fall/leeren {raum} · /fall/sichern {raum} · /fall/archiv-loeschen {raum, durchgang}
+//   POST /fall/gruppen  {raum, zuordnung: {kurzId: gruppe}, ersetzen?}  (Lehrerseite: Perspektiven-Gruppen)
+//   GET  /fall/zustand?raum=…&geraet=…  liefert dem Handy zusätzlich seine Gruppe und deren Namen
 
 import { pruefeEintrag, pruefeRaum, pruefeSpiel, aufraeumen, eintragen, spielEintragen, stand, entfernen } from './logik.js';
 import {
   pruefeFallRaum, pruefeId, pruefeAntwort, pruefeText, pruefeSteuerung, pruefeKb, DURCHGAENGE,
   leererFall, fallAufraeumen, fallLeeren, antwortEintragen, textEintragen, textEntfernen, begriffEntfernen, textKb,
-  personEntfernen, steuern, zustand, fallStand, schnappschuss
+  personEntfernen, steuern, zustand, fallStand, schnappschuss, pruefeGruppen, gruppenSetzen
 } from './fall.js';
 
 const KOPF = {
@@ -109,7 +111,8 @@ async function fallAnfrage(request, env, url) {
   if (request.method === 'GET' && (aktion === 'zustand' || aktion === 'stand')) {
     const raum = url.searchParams.get('raum');
     if (!pruefeFallRaum(raum)) return antwort(400, { fehler: 'raum' });
-    const r = await anRaum(env, raum, 'fall-' + aktion);
+    const geraet = url.searchParams.get('geraet');
+    const r = await anRaum(env, raum, 'fall-' + aktion, aktion === 'zustand' && geraet && /^[a-f0-9]{16,64}$/.test(geraet) ? { geraet } : {});
     return antwort(200, await r.json());
   }
   if (request.method !== 'POST') return antwort(404, { fehler: 'unbekannt' });
@@ -132,6 +135,10 @@ async function fallAnfrage(request, env, url) {
     if (!pruefeId(d.id)) return antwort(400, { fehler: 'id' });
     if (aktion === 'kb' && !pruefeKb(d.kb)) return antwort(400, { fehler: 'kb' });
     nutzlast = { raum: d.raum, id: d.id, kb: d.kb };
+  } else if (aktion === 'gruppen') {
+    const p = pruefeGruppen(d);
+    if (p.fehler) return antwort(400, { fehler: p.fehler });
+    nutzlast = p.eintrag;
   } else if (aktion === 'leeren' || aktion === 'sichern' || aktion === 'archiv-loeschen') {
     if (!d || !pruefeFallRaum(d.raum)) return antwort(400, { fehler: 'raum' });
     if (aktion === 'archiv-loeschen' && DURCHGAENGE.indexOf(d.durchgang) < 0) return antwort(400, { fehler: 'durchgang' });
@@ -203,7 +210,7 @@ export class Raum {
     let ergebnis = {};
 
     if (aktion === 'zustand') {
-      ergebnis = zustand(f);
+      ergebnis = zustand(f, nutzlast && nutzlast.geraet);
     } else if (aktion === 'stand') {
       ergebnis = fallStand(f, this.archiv, jetzt);
     } else if (aktion === 'antwort') {
@@ -221,6 +228,9 @@ export class Raum {
       if (personEntfernen(f, nutzlast.id)) geaendert = true;
     } else if (aktion === 'leeren') {
       fallLeeren(f, kurzId);
+      geaendert = true;
+    } else if (aktion === 'gruppen') {
+      gruppenSetzen(f, nutzlast);
       geaendert = true;
     } else if (aktion === 'sichern') {
       this.archiv[f.steuerung.durchgang] = schnappschuss(f, jetzt);

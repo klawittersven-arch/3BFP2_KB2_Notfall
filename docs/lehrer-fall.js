@@ -24,7 +24,6 @@
   var gezeichnet = '';
   var letztesHtml = '';
   var countdown = null, countdownRest = 0;
-  var perspNachKb = false;
   var gesendetBis = 0;       // kurz nach einem Klick den Server-Stand für die Steuerung ignorieren
 
   // ---------- Hilfsfunktionen ----------
@@ -51,12 +50,21 @@
     return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
   }
   function schritt(i) { return F.schritte[Math.max(0, Math.min(i, F.schritte.length - 1))]; }
-  function hatPassung(q) { return !!(q && q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })); }
-  function stufenAnzahl(s) {
-    if (s.art === 'station') return (abschnitte(s.id, 'aufloesung').length || hatPassung(s.frage)) ? 3 : 2;
-    if (s.art === 'kaltstart' || s.art === 'fragen' || s.art === 'zurueckspulen') return 2;
-    return 1;
+  // Phasen eines Schritts (= Stufen, die mit „Weiter“ durchlaufen werden). Gleich in fall.js und lehrer-fall.js.
+  // Ein Bild wird immer zuerst im Vollbild gezeigt, danach steht es klein neben dem Text.
+  function hatPassung(q) { return !!(q && (q.reihenfolge || (q.optionen && q.optionen.some(function (o) { return o.passt !== undefined; })))); }
+  function phasen(s) {
+    var bild = s.bild ? ['bild'] : [];
+    if (s.art === 'kaltstart') return bild.concat(['satz', 'countdown']);
+    if (s.art === 'station') {
+      var auf = F.text.some(function (t) { return t.teil === s.id && t.art === 'aufloesung'; }) || hatPassung(s.frage);
+      return bild.concat(['frage', 'ergebnis'], auf ? ['aufloesung'] : []);
+    }
+    if (s.art === 'fragen' || s.art === 'zurueckspulen') return ['frage', 'ergebnis'];
+    return ['frage'];
   }
+  function stufenAnzahl(s) { return phasen(s).length; }
+  function phase() { var s = schritt(ansicht.schritt); return phasen(s)[Math.min(ansicht.stufe, phasen(s).length - 1)]; }
   function optionen(q) { return q.ampel ? F.ampel : q.optionen; }
   function vergleich() {
     return stand && stand.steuerung.durchgang === 'sw13' && stand.archiv && stand.archiv.einf ? stand.archiv.einf : null;
@@ -73,6 +81,7 @@
           (d.steuerung.durchgang === 'sw13' ? 'Abschluss (SW 13)' : 'Einführung (SW 6)');
         status.className = 'l-status';
         zeigeParkZeile(d.texte);
+        autoEinteilen();
         zeichne();
       })
       .catch(function () {
@@ -105,8 +114,11 @@
     var s = schritt(ansicht.schritt);
     var n = stufenAnzahl(s);
     if (ansicht.stufe < n - 1) {
-      if (s.art === 'kaltstart') return '10 Sekunden starten';
-      if (s.art === 'station' && ansicht.stufe === 1) return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : 'Auflösen: Was passt?';
+      var naechste = phasen(s)[ansicht.stufe + 1];
+      if (naechste === 'satz') return 'Satz zeigen';
+      if (naechste === 'countdown') return '10 Sekunden starten';
+      if (naechste === 'frage') return 'Abschnitt zeigen';
+      if (naechste === 'aufloesung') return abschnitte(s.id, 'aufloesung').length ? 'Auflösen: Was hat Christin getan?' : (s.frage.reihenfolge ? 'Auflösen: richtige Reihenfolge' : 'Auflösen: Was passt?');
       return 'Ergebnis zeigen';
     }
     if (ansicht.schritt >= F.schritte.length - 1) return '';
@@ -123,9 +135,11 @@
     gezeichnet = schluessel;
     if (s.art !== 'kaltstart' && countdown) { clearInterval(countdown); countdown = null; }
     document.body.classList.toggle('z-dunkel', s.art === 'kaltstart');
+    document.body.classList.toggle('z-vollbild-an', phase() === 'bild');
     if (s.art === 'kaltstart') { letztesHtml = ''; if (neu) zeichneKaltstart(s); return; }
     var html = '';
-    if (s.art === 'fragen') html = fragenHtml(s);
+    if (phase() === 'bild') html = vollbildHtml(s.bild, (s.nummer ? s.nummer + ' · ' : '') + s.kurz);
+    else if (s.art === 'fragen') html = fragenHtml(s);
     else if (s.art === 'station') html = stationHtml(s);
     else if (s.art === 'zurueckspulen') html = zurueckHtml(s);
     else if (s.art === 'perspektiven') html = perspektivenHtml(s);
@@ -163,9 +177,16 @@
     return '<div class="z-kalt z-kalt-bild" role="img" aria-label="' + esc(s.bild.alt) + '" style="background-image:linear-gradient(rgba(15,28,32,' + dunkel +
       '),rgba(15,28,32,' + dunkel + ')),url(\'' + encodeURI(s.bild.datei) + '\')">';
   }
+  // Bild im Vollbild (Klick, Pfeiltaste oder Presenter = weiter)
+  function vollbildHtml(b, titel) {
+    return '<div class="z-vollbild" role="img" aria-label="' + esc(b.alt) + '"><img src="' + esc(b.datei) + '" alt="">' +
+      (titel ? '<p class="z-vollbild-titel">' + esc(titel) + '</p>' : '') +
+      '<p class="z-vollbild-hinweis">Weiter: Klick, Pfeiltaste oder Presenter</p></div>';
+  }
   function zeichneKaltstart(s) {
     if (countdown) { clearInterval(countdown); countdown = null; }
-    if (ansicht.stufe === 0) {
+    if (phase() === 'bild') { buehne.innerHTML = vollbildHtml(s.bild, ''); return; }
+    if (phase() === 'satz') {
       buehne.innerHTML = kaltKopf(s, 0.45) + '<p class="z-kalt-satz">' + esc(s.satz) + '</p><p class="z-kalt-frage">' + esc(s.aufforderung) + '</p></div>';
       return;
     }
@@ -199,13 +220,92 @@
   }
 
   // Ergebnis einer Frage als Balken (Anteil der Personen, die diese Antwort gewählt haben)
+  // Reihenfolge-Frage. Alle sortieren: Reihenfolge der Klasse nach Durchschnittsplatz.
+  // Nur die ersten x wählen (anzahl): je Platz, was die Klasse gewählt hat. Bei der Auflösung: richtig/falsch.
+  function folgeZaehlung(erg) {   // { platz: { kuerzel: anzahl } } aus den Antwort-Kürzeln '1ANSP', '2RUF' …
+    var z = {};
+    Object.keys(erg).forEach(function (c) {
+      var m = c.match(/^(\d+)(.+)$/);
+      if (!m) return;
+      (z[m[1]] = z[m[1]] || {})[m[2]] = erg[c];
+    });
+    return z;
+  }
+  function reihenfolgeErgebnisHtml(q, aufgeloest) {
+    var erg = (stand && stand.ergebnisse[q.id]) || {};
+    var n = (stand && stand.anzahl[q.id]) || 0;
+    var v = vergleich();
+    var ve = v ? (v.ergebnisse[q.id] || {}) : null, vn = v ? (v.anzahl[q.id] || 0) : 0;
+    var anzahl = q.anzahl || q.optionen.length;
+    var richtig = q.optionen.slice(0, anzahl);
+    var text = function (k) { var o = q.optionen.filter(function (x) { return x.kuerzel === k; })[0]; return o ? o.text : k; };
+    var z = folgeZaehlung(erg);
+    var kopf = '<p class="z-ergebnis-kopf">' + esc(q.text) + ' <small>· ' + antworten(n) + '</small></p>';
+    var ganz = erg.OK || 0;
+    var ganzHtml = aufgeloest ? '<p class="z-folge-ganz">Ganz richtig: <strong>' + ganz + ' von ' + n + '</strong> (' + prozent(ganz, n) + '\u00a0%)' +
+      (ve && vn ? ' <span class="z-vgl-text">· SW 6: ' + prozent(ve.OK || 0, vn) + '\u00a0%</span>' : '') + '</p>' : '';
+
+    if (anzahl < q.optionen.length) {
+      // je Platz eine Spalte mit den häufigsten Antworten
+      var spalten = richtig.map(function (r, i) {
+        var platz = z[String(i + 1)] || {};
+        var liste = Object.keys(platz).sort(function (a, b) { return platz[b] - platz[a]; }).slice(0, 4);
+        return '<div class="z-platz"><p class="z-platz-kopf">' + (i + 1) + '. Schritt' +
+          (aufgeloest && r.merk ? ' <span class="z-merk">' + esc(r.merk) + '</span>' : '') + '</p>' +
+          (liste.length ? '<ul>' + liste.map(function (k) {
+            var ok = k === r.kuerzel;
+            return '<li class="' + (aufgeloest ? (ok ? 'z-folge-ok' : 'z-folge-falsch') : '') + '">' + (aufgeloest ? (ok ? '✓ ' : '✗ ') : '') +
+              esc(text(k)) + ' <small>' + platz[k] + '×</small></li>';
+          }).join('') + '</ul>' : '<p class="l-leer">–</p>') +
+          (aufgeloest && !platz[r.kuerzel] ? '<p class="z-folge-ok">✓ ' + esc(r.text) + '</p>' : '') + '</div>';
+      }).join('');
+      var falschGewaehlt = aufgeloest ? q.optionen.slice(anzahl).filter(function (o) {
+        return Object.keys(z).some(function (pl) { return z[pl][o.kuerzel]; });
+      }) : [];
+      return '<div class="z-ergebnis">' + kopf + ganzHtml +
+        (aufgeloest && q.merksatz ? '<p class="z-merksatz">' + esc(q.merksatz) + '</p>' : '') +
+        '<div class="z-plaetze">' + spalten + '</div>' +
+        (falschGewaehlt.length ? '<p class="z-folge-titel">Passt nicht:</p><ul class="z-grundliste">' + falschGewaehlt.map(function (o) {
+          return '<li><strong>' + esc(o.text) + '</strong> – ' + esc(o.grund || '') + '</li>';
+        }).join('') + '</ul>' : '') +
+        (aufgeloest && q.quelle ? '<p class="z-quelle">' + esc(q.quelle) + '</p>' : '') + '</div>';
+    }
+
+    // alle Schritte sortieren: Durchschnittsplatz je Schritt
+    var schnitt = q.optionen.map(function (o) {
+      var summe = 0, zahl = 0;
+      Object.keys(z).forEach(function (pl) { if (z[pl][o.kuerzel]) { summe += Number(pl) * z[pl][o.kuerzel]; zahl += z[pl][o.kuerzel]; } });
+      return { o: o, schnitt: zahl ? summe / zahl : null };
+    }).sort(function (a, b) { return (a.schnitt === null) - (b.schnitt === null) || a.schnitt - b.schnitt; });
+    if (!aufgeloest) {
+      return '<div class="z-ergebnis">' + kopf + '<p class="z-folge-titel">So hat die Klasse sortiert (Durchschnittsplatz):</p><ol class="z-folge">' +
+        schnitt.map(function (x) {
+          return '<li>' + esc(x.o.text) + ' <small>Ø ' + (x.schnitt === null ? '–' : x.schnitt.toFixed(1).replace('.', ',')) + '</small></li>';
+        }).join('') + '</ol></div>';
+    }
+    var platzKlasse = {};
+    schnitt.forEach(function (x, i) { platzKlasse[x.o.kuerzel] = x.schnitt === null ? null : i + 1; });
+    return '<div class="z-ergebnis">' + kopf + ganzHtml +
+      '<p class="z-folge-titel">Richtige Reihenfolge – daneben der Platz der Klasse:</p><ol class="z-folge z-folge-richtig">' +
+      q.optionen.map(function (o, i) {
+        var pk = platzKlasse[o.kuerzel], ok = pk === i + 1;
+        var x = schnitt.filter(function (y) { return y.o.kuerzel === o.kuerzel; })[0];
+        return '<li class="' + (ok ? 'z-folge-ok' : 'z-folge-falsch') + '">' + esc(o.text) + ' <small>' + (ok ? '✓' : '✗') +
+          ' Klasse: ' + (pk ? 'Platz ' + pk + ' (Ø ' + x.schnitt.toFixed(1).replace('.', ',') + ')' : '–') + '</small></li>';
+      }).join('') + '</ol>' +
+      (q.quelle ? '<p class="z-quelle">' + esc(q.quelle) + '</p>' : '') + '</div>';
+  }
+
   function ergebnisHtml(q, mitChristin, mitPassung) {
+    if (q.reihenfolge) return reihenfolgeErgebnisHtml(q, mitPassung);
     var erg = (stand && stand.ergebnisse[q.id]) || {};
     var n = (stand && stand.anzahl[q.id]) || 0;
     var v = vergleich();
     var ve = v ? (v.ergebnisse[q.id] || {}) : null, vn = v ? (v.anzahl[q.id] || 0) : 0;
     if (q.skala) return skalaHtml(q, erg, n, ve, vn);
-    var zeilen = optionen(q).map(function (o) {
+    var reihe = optionen(q).slice();
+    if (q.waehlen) reihe.sort(function (a, b) { return (erg[b.kuerzel] || 0) - (erg[a.kuerzel] || 0); });   // Rangfolge der Klasse
+    var zeilen = reihe.map(function (o) {
       var p = prozent(erg[o.kuerzel] || 0, n);
       var christin = mitChristin && mitChristin.ampel === o.kuerzel;
       var passung = mitPassung && o.passt !== undefined;
@@ -221,8 +321,9 @@
     }).join('');
     var viele = optionen(q).length > 6;   // viele Antworten: zweispaltig, damit alles auf den Beamer passt
     return '<div class="z-ergebnis' + (viele ? ' z-viele' : '') + '"><p class="z-ergebnis-kopf">' + esc(q.text) + ' <small>· ' + antworten(n) +
-      (q.mehrfach ? ' · mehrere möglich' : '') + (ve ? ' · zum Vergleich: SW 6 (' + antworten(vn) + ')' : '') + '</small></p>' +
-      '<div class="z-zeilen">' + zeilen + '</div></div>';
+      (q.waehlen ? ' · je ' + q.waehlen + ' gewählt' : (q.mehrfach ? ' · mehrere möglich' : '')) + (ve ? ' · zum Vergleich: SW 6 (' + antworten(vn) + ')' : '') + '</small></p>' +
+      '<div class="z-zeilen" style="--reihen:' + Math.ceil(reihe.length / 2) + '">' + zeilen + '</div>' +
+      (mitPassung && q.hinweis ? '<p class="z-hinweis-aufl">' + esc(q.hinweis) + '</p>' : '') + '</div>';
   }
   function skalaHtml(q, erg, n, ve, vn) {
     var summe = 0;
@@ -254,26 +355,34 @@
   }
 
   function stationHtml(s) {
-    var auf = ansicht.stufe >= 2;
+    var ph = phase();
+    var nach = ph === 'ergebnis' || ph === 'aufloesung';   // nach dem Abstimmen
+    var auf = ph === 'aufloesung';
     var kopf = '<h2 class="z-titel"><span class="z-nr">' + s.nummer + '</span>' + esc(s.kurz) + '</h2>';
     var teile = abschnitte(s.id, 'frage');
-    var text = '<div class="z-falltext' + (ansicht.stufe >= 1 ? ' z-klein' : '') + '">' + falltextHtml(teile) + '</div>';
+    var text = '<div class="z-falltext' + (nach ? ' z-klein' : '') + '">' + falltextHtml(teile) + '</div>';
     // Lange Abschnitte nach dem Vorlesen zuklappen, damit das Ergebnis ohne Scrollen auf den Beamer passt
-    if (ansicht.stufe >= 1 && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
+    if (nach && teile.map(function (t) { return t.text; }).join(' ').length > 320) {
       text = '<details class="z-text-zu"><summary>Abschnitt noch einmal anzeigen</summary>' + text + '</details>';
     }
-    var bild = s.bild ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
+    // Viele Antworten: beim Ergebnis ohne Bild, damit die ganze Breite für die Balken bleibt und alles auf den Beamer passt
+    var viele = !s.frage.reihenfolge && s.frage.optionen && s.frage.optionen.length > 6;
+    var bild = s.bild && !(nach && viele) ? '<figure class="z-bild"><img src="' + esc(s.bild.datei) + '" alt="' + esc(s.bild.alt) + '"></figure>' : '';
     var rahmen = function (inhalt) {
       if (!bild) return kopf + inhalt;
-      return kopf + '<div class="z-station' + (ansicht.stufe >= 1 ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
+      return kopf + '<div class="z-station' + (nach ? ' z-spaeter' : '') + '"><div class="z-station-text">' + inhalt + '</div>' + bild + '</div>';
     };
-    if (ansicht.stufe === 0) {
+    if (!nach) {
       return rahmen(text + '<p class="z-frage">' + esc(s.frage.text) + '</p>' + namenHtml([s.frage.id]));
     }
-    return rahmen(text +
-      (auf && abschnitte(s.id, 'aufloesung').length ? '<div class="z-aufloesung"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
-        falltextHtml(abschnitte(s.id, 'aufloesung')) + '</div></div>' : '') +
-      ergebnisHtml(s.frage, auf ? s.christin : null, auf));
+    var aufText = abschnitte(s.id, 'aufloesung');
+    var lang = aufText.map(function (t) { return t.text; }).join(' ').length > 400;
+    var box = auf && aufText.length ? '<div class="z-aufloesung' + (lang ? ' z-lang' : '') + '"><p class="z-auf-kopf">Christin erzählt weiter:</p><div class="z-falltext">' +
+      falltextHtml(aufText) + '</div></div>' : '';
+    if (auf && lang) {   // langer Text (Station 5): Text links, Ergebnis rechts statt Bild – passt ohne Scrollen
+      return kopf + text + '<div class="z-auf-zwei">' + box + ergebnisHtml(s.frage, s.christin, true) + '</div>';
+    }
+    return rahmen(text + box + ergebnisHtml(s.frage, auf ? s.christin : null, auf));
   }
 
   // Zeitstrahl: alle Stationen nebeneinander mit dem Klassen-Ergebnis und Christins Handeln
@@ -291,6 +400,8 @@
           return '<span class="z-nw">' + o.zeichen + ' ' + prozent(erg[o.kuerzel] || 0, n) + '\u00a0%</span>';
         }).join(' ') + '</span>' +
           (x.christin ? '<span class="z-christin-zs">Christin: ' + F.ampel.filter(function (o) { return o.kuerzel === x.christin.ampel; })[0].zeichen + ' ' + esc(x.christin.kurz) + '</span>' : '');
+      } else if (q.reihenfolge) {
+        inhalt = '<span class="z-mini-legende">richtig sortiert: ' + prozent(erg.OK || 0, n) + '\u00a0%</span>';
       } else {
         var oben = optionen(q).slice().sort(function (a, b) { return (erg[b.kuerzel] || 0) - (erg[a.kuerzel] || 0); })
           .filter(function (o) { return erg[o.kuerzel]; }).slice(0, 2);
@@ -308,36 +419,81 @@
       (ansicht.stufe === 0 ? namenHtml([s.frage.id]) : ergebnisHtml(s.frage));
   }
 
+  // ---------- Gruppen der Perspektiven-Runde ----------
+  // Beim Schritt „Perspektiven“ werden alle Angemeldeten automatisch und gleichmäßig auf die Personen verteilt.
+  // Wer später dazukommt, kommt in die kleinste Gruppe. Klick auf einen Namen = in die nächste Gruppe setzen.
+  var einteilenLaeuft = false;
+  function mische(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function gruppenIds() {
+    var s = F.schritte.filter(function (x) { return x.art === 'perspektiven'; })[0];
+    return s ? s.personen.map(function (p) { return p.id; }) : [];
+  }
+  function verteile(leute, zaehl) {
+    var ids = gruppenIds(), zuordnung = {};
+    mische(leute.slice()).forEach(function (p) {
+      var ziel = ids.slice().sort(function (a, b) { return (zaehl[a] || 0) - (zaehl[b] || 0) || ids.indexOf(a) - ids.indexOf(b); })[0];
+      zuordnung[p.id] = ziel;
+      zaehl[ziel] = (zaehl[ziel] || 0) + 1;
+      p.gruppe = ziel;
+    });
+    return zuordnung;
+  }
+  function autoEinteilen() {
+    if (!stand || einteilenLaeuft || schritt(ansicht.schritt).art !== 'perspektiven') return;
+    var ohne = stand.leute.filter(function (p) { return !p.gruppe; });
+    if (!ohne.length) return;
+    var zaehl = {};
+    stand.leute.forEach(function (p) { if (p.gruppe) zaehl[p.gruppe] = (zaehl[p.gruppe] || 0) + 1; });
+    einteilenLaeuft = true;
+    sende('/fall/gruppen', { zuordnung: verteile(ohne, zaehl) }).then(function () { einteilenLaeuft = false; }, function () { einteilenLaeuft = false; });
+  }
+  function neuEinteilen() {
+    if (!stand || !window.confirm('Alle Angemeldeten neu auf die Gruppen verteilen?')) return;
+    var zuordnung = verteile(stand.leute, {});
+    gezeichnet = ''; zeichne();
+    sende('/fall/gruppen', { zuordnung: zuordnung, ersetzen: true }).then(hole, hole);
+  }
+  function wechsle(id) {
+    var ids = gruppenIds(), p = stand && stand.leute.filter(function (x) { return x.id === id; })[0];
+    if (!p) return;
+    var neu = ids[(ids.indexOf(p.gruppe) + 1) % ids.length];
+    p.gruppe = neu;
+    gezeichnet = ''; zeichne();
+    var z = {}; z[id] = neu;
+    sende('/fall/gruppen', { zuordnung: z }).then(hole, hole);
+  }
+  function mitgliederHtml(gruppe) {
+    var leute = stand ? stand.leute.filter(function (p) { return p.gruppe === gruppe; }).sort(function (a, b) { return a.name.localeCompare(b.name, 'de'); }) : [];
+    if (!leute.length) return '<p class="z-mg-leer">noch niemand</p>';
+    return '<ul class="z-mitglieder">' + leute.map(function (p) {
+      return '<li><button type="button" class="z-mg' + (p.eintraege ? ' z-mg-ok' : '') + '" data-wechsel="' + esc(p.id) + '" title="In die nächste Gruppe setzen">' +
+        esc(p.name) + ' <span>' + (p.eintraege ? '✓ ' + p.eintraege : '–') + '</span></button></li>';
+    }).join('') + '</ul>';
+  }
+
   // Perspektiven: je Person eine Spalte – oder nach Kompetenzbereichen geordnet (Lernlandkarte)
   function karteHtml(t, mitPerson, s) {
     var p = s.personen.filter(function (x) { return x.id === t.person; })[0];
     return '<li class="z-pk">' + (mitPerson && p ? '<span class="z-pk-person">' + esc(p.text) + '</span>' : '') +
       (t.a ? '<span class="z-pk-a">' + esc(t.a) + '</span>' : '') +
       (t.b ? '<span class="z-pk-b">❓ ' + esc(t.b) + '</span>' : '') +
-      '<span class="z-pk-leiste">' + F.kb.map(function (k) {
-        return '<button type="button" class="z-kb' + (t.kb === k.kuerzel ? ' z-kb-an' : '') + '" data-kb="' + k.kuerzel + '" data-text="' + esc(t.id) + '" title="' + esc(k.name) + ' zuordnen">' + esc(k.kuerzel) + '</button>';
-      }).join('') + '<button type="button" class="z-kb z-weg" data-weg="' + esc(t.id) + '" aria-label="Eintrag entfernen" title="Eintrag entfernen">×</button></span></li>';
+      '<span class="z-pk-leiste"><button type="button" class="z-kb z-weg" data-weg="' + esc(t.id) + '" aria-label="Eintrag entfernen" title="Eintrag entfernen">×</button></span></li>';
   }
   function perspektivenHtml(s) {
     var texte = stand ? stand.texte.filter(function (t) { return t.art === 'persp'; }) : [];
-    var spalten;
-    if (!perspNachKb) {
-      spalten = s.personen.map(function (p) {
-        var eigene = texte.filter(function (t) { return t.person === p.id; });
-        return '<section class="z-spalte"><h3>' + esc(p.text) + ' <small>' + eigene.length + '</small></h3><ul>' +
-          eigene.map(function (t) { return karteHtml(t, false, s); }).join('') + '</ul></section>';
-      }).join('');
-    } else {
-      spalten = F.kb.concat([{ kuerzel: '', name: 'Noch ohne KB' }]).map(function (k) {
-        var eigene = texte.filter(function (t) { return t.kb === k.kuerzel; });
-        return '<section class="z-spalte' + (k.kuerzel ? '' : ' z-ohne') + '"><h3>' + esc(k.name) + ' <small>' + eigene.length + '</small></h3><ul>' +
-          eigene.map(function (t) { return karteHtml(t, true, s); }).join('') + '</ul></section>';
-      }).join('');
-    }
-    return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2>' +
-      '<button type="button" class="l-knopf l-zweit" id="z-ordnen">' + (perspNachKb ? 'Nach Personen ordnen' : 'Nach Kompetenzbereichen ordnen') + '</button></div>' +
-      '<p class="z-hinweis-klein">' + texte.length + ' Einträge · Tippen Sie bei jedem Eintrag auf den passenden KB (I–V).</p>' +
-      '<div class="z-spalten' + (perspNachKb ? ' z-sechs' : '') + '">' + spalten + '</div>';
+    var spalten = s.personen.map(function (p) {
+      var eigene = texte.filter(function (t) { return t.person === p.id; });
+      return '<section class="z-spalte"><h3>' + esc(p.text) + ' <small>' + eigene.length + '</small></h3>' + mitgliederHtml(p.id) + '<ul class="z-karten">' +
+        eigene.map(function (t) { return karteHtml(t, false, s); }).join('') + '</ul></section>';
+    }).join('');
+    var mitEintrag = stand ? stand.leute.filter(function (p) { return p.eintraege; }).length : 0;
+    return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2><span class="z-persp-knoepfe">' +
+      '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen" title="Klick auf einen Namen setzt ihn in die nächste Gruppe">Gruppen neu einteilen</button></span></div>' +
+      '<p class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' + (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</p>' +
+      '<div class="z-spalten">' + spalten + '</div>';
   }
 
   function zeigeParkZeile(texte) {
@@ -380,7 +536,7 @@
       '<section class="z-block"><h3>🅿️ ' + esc(F.begriffe.titel) + '</h3>' + begriffeHtml(texte) + '</section>' +
       (alteFragen.length ? '<section class="z-block"><h3>Ihre Lernfragen aus der Einführung (SW 6) – können Sie sie jetzt beantworten?</h3><ul class="z-alt">' +
         alteFragen.map(function (t) { return '<li>' + (t.kb ? '<span class="z-kb z-kb-an">' + esc(t.kb) + '</span> ' : '') + esc(t.b) + '</li>'; }).join('') + '</ul></section>' : '') +
-      '<section class="z-block"><h3>Ergebnis sichern</h3><p>Speichert die Ergebnisse dieser Stunde <strong>ohne Namen</strong> für den Vergleich in SW 13.</p>' +
+      '<section class="z-block"><h3>Ergebnis sichern</h3><p>Speichert die Ergebnisse dieser Stunde <strong>ohne Namen</strong> für einen späteren Vergleich.</p>' +
       '<button type="button" class="l-knopf" data-sichern="1">💾 Ergebnis sichern</button> <span class="z-gesichert">' + esc(archivZeile()) + '</span></section>';
   }
 
@@ -391,24 +547,17 @@
         sende('/fall/entfernen', { id: b.getAttribute('data-person') }).then(hole, hole);
       };
     });
-    Array.prototype.forEach.call(buehne.querySelectorAll('[data-kb]'), function (b) {
-      b.onclick = function () {
-        var id = b.getAttribute('data-text'), kb = b.getAttribute('data-kb');
-        var t = stand.texte.filter(function (x) { return x.id === id; })[0];
-        if (!t) return;
-        t.kb = t.kb === kb ? '' : kb;   // noch einmal tippen = Zuordnung aufheben
-        gezeichnet = ''; zeichne();
-        sende('/fall/kb', { id: id, kb: t.kb }).then(hole, hole);
-      };
-    });
     Array.prototype.forEach.call(buehne.querySelectorAll('[data-weg]'), function (b) {
       b.onclick = function () {
         if (!window.confirm('Diesen Eintrag entfernen?')) return;
         sende('/fall/text-weg', { id: b.getAttribute('data-weg') }).then(hole, hole);
       };
     });
-    var o = document.getElementById('z-ordnen');
-    if (o) o.onclick = function () { perspNachKb = !perspNachKb; gezeichnet = ''; zeichne(); };
+    var ne = document.getElementById('z-neu-einteilen');
+    if (ne) ne.onclick = neuEinteilen;
+    Array.prototype.forEach.call(buehne.querySelectorAll('[data-wechsel]'), function (b) {
+      b.onclick = function () { wechsle(b.getAttribute('data-wechsel')); };
+    });
     Array.prototype.forEach.call(document.querySelectorAll('[data-sichern]'), function (b) {
       b.onclick = sichern;
     });
@@ -431,7 +580,7 @@
       '<button type="button" class="l-knopf l-zweit" id="l-leeren">Liste leeren (neue Stunde)</button></div>' +
       '<p class="l-hinweis">' + esc(archivZeile()) + ' · Weiter/Zurück auch mit den Pfeiltasten oder dem Presenter. ' +
       'Auf dem Beamer stehen Antworten nur zusammengezählt, Texte ohne Namen. Namen und Antworten werden nach spätestens 12 Stunden ' +
-      'automatisch gelöscht; gesicherte Ergebnisse (ohne Namen) bleiben für den Vergleich in SW 13.</p>';
+      'automatisch gelöscht; gesicherte Ergebnisse (ohne Namen) bleiben für einen späteren Vergleich.</p>';
     Array.prototype.forEach.call(fuss.querySelectorAll('input[name=durchgang]'), function (r) {
       r.onchange = function () {
         if (!window.confirm('Neuer Durchgang: Namen und Antworten dieser Runde werden gelöscht (gesicherte Ergebnisse bleiben). Haben Sie das Ergebnis gesichert?')) { zeichneFuss(); return; }
@@ -452,6 +601,12 @@
     if (ev.key === 'ArrowRight' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); weiter(); }
     else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); zurueck(); }
   });
+
+  // Klick auf ein Vollbild = weiter; Bilder vorab laden, damit sie sofort erscheinen
+  buehne.addEventListener('click', function (ev) {
+    if (ev.target.closest && ev.target.closest('.z-vollbild')) weiter();
+  });
+  F.schritte.forEach(function (s) { if (s.bild) { var i = new Image(); i.src = s.bild.datei; } });
 
   if (!SERVER) {
     buehne.innerHTML = '<section class="l-karte l-schmal"><h2>Noch nicht eingerichtet</h2>' +

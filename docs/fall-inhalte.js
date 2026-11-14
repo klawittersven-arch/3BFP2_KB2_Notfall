@@ -23,6 +23,12 @@
      perspektiven  – Gruppen: „Was hätte diese Person gebraucht?“ + Lernfrage
      ende          – Begriffsparkplatz, Ausblick, Ergebnis sichern
 
+   Reihenfolge-Fragen (reihenfolge: true): Die Antworten stehen hier in der RICHTIGEN Reihenfolge,
+   die Handys zeigen sie gemischt. Die SuS tippen sie nacheinander an (1., 2., 3. …).
+   Mit „anzahl: 3“ werden nur die ersten 3 gesucht – die übrigen Antworten passen nicht (mit „grund“).
+
+   Mehrfachauswahl mit „waehlen: 3“: Die SuS müssen genau 3 Antworten wählen (eine echte Entscheidung).
+
    Auflösung bei Auswahlfragen (optional): Haben die Antworten einer Station „passt: true/false“ und einen
    kurzen „grund“, zeigt „Auflösen“ auf dem Beamer und auf den Handys, was passt (✓) und was nicht (✗).
 
@@ -152,17 +158,23 @@ var FALL = {
 
     { id: 's5', art: 'station', nummer: 5, kurz: 'Zum Mittagessen', zeitstrahl: 'blau, reagiert nicht',
       bild: { datei: 'bilder/kaltstart.jpg', alt: 'Das Bild vom Anfang: Frau Maler liegt reglos im Bett, im Vordergrund das Tablett mit Mittagessen.' },
-      frage: { id: 's5',
-        text: 'Was tun Sie als Erstes?',
+      // Die 3 wichtigsten Schritte nach den Reanimationsleitlinien 2025 (ERC/GRC): Prüfen – Rufen – Drücken.
+      // Die ersten 3 Antworten sind die richtigen (in der richtigen Reihenfolge), die übrigen passen nicht.
+      // Die Handys zeigen alle gemischt. Kürzel höchstens 4 Zeichen.
+      frage: { id: 's5', reihenfolge: true, anzahl: 3,
+        text: 'Was sind die 3 wichtigsten Schritte? Tippen Sie sie in der richtigen Reihenfolge an.',
+        hilfe: 'Tippen Sie zuerst Schritt 1, dann Schritt 2, dann Schritt 3. Noch einmal tippen nimmt einen Schritt wieder heraus.',
+        merksatz: 'Prüfen – Rufen – Drücken',
+        quelle: 'Nach den Reanimationsleitlinien 2025 (ERC/GRC)',
         optionen: [
-          { kuerzel: 'ANSP', text: 'Frau Maler ansprechen oder anfassen' },
-          { kuerzel: 'RUF', text: 'Laut um Hilfe rufen' },
-          { kuerzel: 'ATEM', text: 'Die Atmung prüfen' },
-          { kuerzel: 'PULS', text: 'Den Puls fühlen' },
-          { kuerzel: 'NOT', text: 'Den Notruf wählen' },
-          { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen' },
-          { kuerzel: 'HOL', text: 'Jemanden holen' },
-          { kuerzel: 'WEISS', text: 'Ich weiß es nicht' }
+          { kuerzel: 'ANSP', text: 'Ansprechen und an den Schultern rütteln', merk: 'Prüfen' },
+          { kuerzel: 'RUF', text: 'Laut um Hilfe rufen und Notruf 112 wählen (lassen)', merk: 'Rufen' },
+          { kuerzel: 'HDM', text: 'Mit der Herzdruckmassage beginnen', merk: 'Drücken' },
+          { kuerzel: 'PULS', text: 'Den Puls fühlen', grund: 'kostet Zeit – geprüft werden Bewusstsein und Atmung' },
+          { kuerzel: 'GEH', text: 'Selbst losgehen und Hilfe holen', grund: 'Frau Maler nicht allein lassen – laut rufen, andere holen lassen' },
+          { kuerzel: 'HOCH', text: 'Den Oberkörper hochlagern', grund: 'Herzdruckmassage nur flach auf dem Rücken, auf harter Unterlage' },
+          { kuerzel: 'WART', text: 'Abwarten, ob sie wieder zu sich kommt', grund: 'jede Sekunde zählt' },
+          { kuerzel: 'ANGE', text: 'Die Angehörigen anrufen', grund: 'erst später – zuerst die Notfallversorgung' }
         ] } },
 
     { id: 's6', art: 'station', nummer: 6, kurz: 'Nach der Reanimation', zeitstrahl: 'Patientenverfügung',
@@ -176,17 +188,22 @@ var FALL = {
 
     { id: 's7', art: 'station', nummer: 7, kurz: 'Später', zeitstrahl: 'Albträume',
       bild: { datei: 'bilder/station7.jpg', alt: 'Eine junge Frau sitzt nachts wach auf ihrem Bett und umarmt ihre Knie.' },
-      frage: { id: 's7', mehrfach: true,
-        text: 'Was braucht Christin jetzt?',
-        hilfe: 'Mehrere Antworten sind möglich.',
+      // Genau 3 wählen (waehlen: 3) – so müssen die SuS sich entscheiden. Mehrere Antworten helfen (passt: true),
+      // 3 helfen nicht (passt: false). Welche 3 am wichtigsten sind, ist Gesprächsanlass (hinweis bei der Auflösung).
+      frage: { id: 's7', mehrfach: true, waehlen: 3,
+        text: 'Welche 3 Dinge würden Christin jetzt am meisten helfen?',
+        hilfe: 'Wählen Sie genau 3.',
+        hinweis: 'Alle grünen Antworten können helfen. Welche zuerst? Das hängt von Christin ab – darüber lohnt sich das Gespräch.',
         optionen: [
-          { kuerzel: 'REDEN', text: 'Mit jemandem reden, dem sie vertraut' },
-          { kuerzel: 'TEAM', text: 'Ein Gespräch im Team über den Notfall' },
-          { kuerzel: 'PA', text: 'Hilfe von ihrer Praxisanleitung' },
-          { kuerzel: 'PROFI', text: 'Hilfe von Fachleuten, z. B. Psychologin' },
-          { kuerzel: 'UEBEN', text: 'Mehr Wissen und Übung für Notfälle' },
-          { kuerzel: 'RUHE', text: 'Ruhe und Zeit' },
-          { kuerzel: 'NIX', text: 'Nichts – das geht von allein vorbei' }
+          { kuerzel: 'REDEN', text: 'Mit einer Vertrauensperson darüber reden', passt: true, grund: 'Reden entlastet' },
+          { kuerzel: 'TEAM', text: 'Eine Nachbesprechung im Team', passt: true, grund: 'gemeinsam verstehen, was passiert ist' },
+          { kuerzel: 'NIX', text: 'Nichts – das geht von allein vorbei', passt: false, grund: 'Albträume über längere Zeit sind ein Warnzeichen' },
+          { kuerzel: 'PA', text: 'Ein Gespräch mit ihrer Praxisanleitung', passt: true, grund: 'Begleitung in der Ausbildung' },
+          { kuerzel: 'NORMAL', text: 'Erfahren, dass ihre Reaktion normal ist', passt: true, grund: 'Erstarren ist eine normale Reaktion im Notfall' },
+          { kuerzel: 'SCHULD', text: 'Herausfinden, wer schuld war', passt: false, grund: 'es geht ums Lernen, nicht um Schuld' },
+          { kuerzel: 'PROFI', text: 'Hilfe von Fachleuten, z. B. Psychologin', passt: true, grund: 'die Albträume halten an' },
+          { kuerzel: 'VERG', text: 'Nicht mehr darüber reden und vergessen', passt: false, grund: 'Verdrängen hilft auf Dauer nicht' },
+          { kuerzel: 'UEBEN', text: 'Reanimation üben, um sicherer zu werden', passt: true, grund: 'Übung gibt Sicherheit' }
         ] } },
 
     { id: 'zurueck', art: 'zurueckspulen', kurz: 'Zurückspulen',
@@ -205,7 +222,12 @@ var FALL = {
 
     { id: 'persp', art: 'perspektiven', kurz: 'Perspektiven',
       titel: 'Was hätte diese Person gebraucht?',
-      auftrag: 'Wählen Sie die Person Ihrer Gruppe. Schreiben Sie auf, was diese Person gebraucht hätte. Formulieren Sie dazu eine Lernfrage: Was müssen wir dafür lernen?',
+      // Die Beamer-Seite teilt alle Angemeldeten automatisch und gleichmäßig auf die Personen auf (eine Gruppe je Person).
+      auftrag: 'Besprechen Sie in Ihrer Gruppe: Was hätte diese Person gebraucht? Jede und jeder schickt **mindestens einen Eintrag** – mit einer Lernfrage: Was müssen wir dafür lernen?',
+      beamerAuftrag: 'Jede Gruppe bearbeitet eine Person. Jede und jeder schickt mindestens einen Eintrag.',
+      gruppeTitel: 'Ihre Gruppe bearbeitet:',
+      gruppeMit: 'In Ihrer Gruppe:',
+      gruppeWarten: 'Ihre Lehrkraft teilt gleich die Gruppen ein …',
       personen: [
         { id: 'christin', text: 'Christin (Auszubildende)' },
         { id: 'pk1', text: 'Die Pflegekraft, die reanimiert hat' },
@@ -221,17 +243,8 @@ var FALL = {
 
     { id: 'ende', art: 'ende', kurz: 'Ausblick',
       titel: 'Wie geht es weiter?',
-      beamerText: 'In den nächsten Wochen lernen wir in allen Fächern, was Christin gebraucht hätte. In SW 13 spielen wir die Zeitlupe noch einmal.',
+      beamerText: 'In den nächsten Wochen lernen wir in allen Fächern, was Christin gebraucht hätte.',
       handy: 'Danke! Sie bekommen jetzt das Arbeitsblatt mit dem ganzen Fall.' }
-  ],
-
-  // Kompetenzbereiche für die Zuordnung der Lernfragen auf dem Beamer
-  kb: [
-    { kuerzel: 'I', name: 'KB I' },
-    { kuerzel: 'II', name: 'KB II' },
-    { kuerzel: 'III', name: 'KB III' },
-    { kuerzel: 'IV', name: 'KB IV' },
-    { kuerzel: 'V', name: 'KB V' }
   ],
 
   begriffe: {
@@ -250,6 +263,9 @@ var FALL = {
   // Texte auf dem Handy
   handy: {
     warten: 'Hören Sie zu. Gleich geht es weiter.',
+    nachVorn: 'Schauen Sie nach vorn.',
+    ihreReihenfolge: 'Ihre Reihenfolge:',
+    richtigeReihenfolge: 'Richtige Reihenfolge:',
     gesendet: 'Gesendet. Sie können Ihre Antwort noch ändern.',
     gesperrt: 'Die Abstimmung ist beendet.',
     ihreAntwort: 'Ihre Antwort:',
