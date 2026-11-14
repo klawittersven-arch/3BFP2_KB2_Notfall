@@ -140,7 +140,7 @@ Lernfragen aus SW 6 („Können Sie sie jetzt beantworten?“).
 - **Ergebnis sichern** speichert nur Zahlen und Texte **ohne Namen** – dauerhaft, bis es überschrieben wird. Namen und
   Einzelantworten werden wie bei den Übungen nach 12 Stunden gelöscht (oder mit *Liste leeren*).
 - Ein neuer Durchgang beginnt immer mit einer leeren Liste – vorher sichern!
-- **Bilder** (Kaltstart, Stationen 1, 2, 4, 5 und 7; optional Vorstellung) liegen in `docs/bilder/` – je groß für den Beamer (1600 px) und
+- **Bilder** (Kaltstart, Vorstellung und die Stationen Übergabe, Am Morgen, Gegen elf Uhr, Zum Mittagessen, Später) liegen in `docs/bilder/` – je groß für den Beamer (1600 px) und
   `-klein` für die Handys (800 px). Beamer: Kaltstart abgedunkelt im Hintergrund, bei den Stationen rechts neben dem Text,
   im Zeitstrahl als kleine Vorschau. Ein Bild tauschen: beide Dateien gleichen Namens ersetzen; welche Station welches
   Bild zeigt, steht in `fall-inhalte.js` (`bild:`). Die Bilder sind KI-erzeugt und zeigen keine echten Personen.

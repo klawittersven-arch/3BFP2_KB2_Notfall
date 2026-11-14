@@ -152,7 +152,8 @@ var FALL = {
         { name: 'Frau Maler', text: '71 Jahre alt. Sie ist seit gestern neu im Pflegeheim.' }
       ],
       nachspann: 'Wir gehen zurück an den Anfang dieses Tages.',
-      handy: 'Schauen Sie nach vorn.' },
+      handy: 'Schauen Sie nach vorn.',
+      bild: { datei: 'bilder/personen.jpg', alt: 'Frau Maler sitzt aufrecht im Pflegebett. Christin steht neben dem Bett, eine Hand auf dem Bettgitter, und begrüßt sie lächelnd. Vor dem Bett steht ein Rollator.' } },
 
     { id: 's1', art: 'station', kurz: 'Die Übergabe', zeitstrahl: 'Übergabe',
       bild: { datei: 'bilder/station1.jpg', alt: 'Frau Maler sitzt im Pflegebett und schaut besorgt. Neben dem Bett steht ein Rollator.' },
