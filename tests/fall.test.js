@@ -346,26 +346,40 @@ function umgebung(Raum) {
   await warte(2300);
   await lehrer.screenshot({ path: path.join(__dirname, 'fall_4_zurueck.png'), fullPage: true });
 
-  // Perspektiven
+  // Perspektiven: Gruppen werden automatisch eingeteilt, Namen stehen bei der Gruppe
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.keyboard.press('ArrowRight');
   await lehrer.waitForSelector('.z-spalten');
-  await h1.waitForSelector('.f-person', { timeout: 8000 });
-  await h1.click('.f-person[data-person="christin"]');
+  await h1.waitForSelector('.f-gruppe', { timeout: 10000 });
+  await h2.waitForSelector('.f-gruppe', { timeout: 10000 });
+  const g1 = await h1.getAttribute('.f-gruppe', 'data-gruppe');
+  let g2 = await h2.getAttribute('.f-gruppe', 'data-gruppe');
+  pruefe(g1 && g2 && g1 !== g2, 'Gruppen: automatisch und gleichmäßig eingeteilt (' + g1 + ', ' + g2 + ')');
+  pruefe((await h1.textContent('#f-gruppe-namen')).includes('Lena K.'), 'Handy: Namen der eigenen Gruppe');
+  pruefe(!(await h1.$('.f-person')), 'Handy: Person nicht mehr selbst wählbar');
+  await lehrer.waitForSelector('.z-mg');
+  pruefe((await lehrer.textContent('.z-spalten')).includes('Lena K.') && (await lehrer.textContent('.z-persp-auftrag')).includes('0 von 2'), 'Beamer: Namen bei den Gruppen, „0 von 2 haben schon etwas geschickt“');
   await h1.fill('#f-a', 'eine klare Anweisung');
   await h1.click('.f-anfang:has-text("Wie")');
   pruefe((await h1.inputValue('#f-b')) === 'Wie ', 'Handy: Satzanfang wird eingefügt');
   await h1.fill('#f-b', 'Wie gebe ich im Notfall klare Anweisungen?');
   await h1.click('#f-persp-form button[type=submit]');
   await h1.waitForSelector('.f-eigene li');
-  await h2.waitForSelector('.f-person', { timeout: 8000 });
-  await h2.click('.f-person[data-person="angeh"]');
+  await warte(2300);
+  pruefe((await lehrer.textContent('.z-mg-ok')).includes('Lena K.') && (await lehrer.textContent('.z-mg-ok')).includes('✓ 1'), 'Beamer: ✓ 1 beim Namen nach dem ersten Eintrag');
+  // Lehrkraft setzt Tim in die nächste Gruppe
+  await lehrer.click('.z-mg:has-text("Tim B.")');
+  await h2.waitForFunction((alt) => { const e = document.querySelector('.f-gruppe'); return e && e.getAttribute('data-gruppe') !== alt; }, g2, { timeout: 8000 });
+  const g2neu = await h2.getAttribute('.f-gruppe', 'data-gruppe');
+  pruefe(g2neu && g2neu !== g2, 'Gruppen: Klick auf den Namen setzt in die nächste Gruppe, das Handy folgt');
   await h2.fill('#f-b', 'Wie überbringe ich eine schlechte Nachricht?');
   await h2.click('#f-persp-form button[type=submit]');
   await h2.waitForSelector('.f-eigene li');
   await h1.screenshot({ path: path.join(__dirname, 'fall_h_perspektive.png'), fullPage: true });
   await warte(2300);
-  pruefe((await lehrer.textContent('.z-spalten')).includes('eine klare Anweisung') && !(await lehrer.textContent('.z-spalten')).includes('Lena'), 'Beamer: Perspektive ohne Namen');
+  const karten = await lehrer.$$eval('.z-pk', (e) => e.map((x) => x.textContent).join(' '));
+  pruefe(karten.includes('eine klare Anweisung') && !karten.includes('Lena'), 'Beamer: Einträge selbst ohne Namen');
+  await lehrer.screenshot({ path: path.join(__dirname, 'fall_5a_gruppen.png'), fullPage: true });
   await lehrer.click('.z-pk >> nth=0 >> .z-kb[data-kb="II"]');
   await warte(500);
   await lehrer.click('#z-ordnen');

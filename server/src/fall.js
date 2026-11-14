@@ -108,6 +108,7 @@ export function fallLeeren(f, kurzId) {
   f.leute = {};
   f.antworten = {};
   f.texte = [];
+  f.gruppen = {};
   f.steuerung.schritt = 0;
   f.steuerung.stufe = 0;
   f.steuerung.sitzung = neueSitzung(kurzId);
@@ -171,6 +172,7 @@ export function personEntfernen(f, id) {
     if (f.leute[g].id === id) {
       delete f.leute[g];
       delete f.antworten[g];
+      if (f.gruppen) delete f.gruppen[g];
       f.texte = f.texte.filter((x) => x.geraet !== g);
       return true;
     }
@@ -190,9 +192,43 @@ export function steuern(f, s, jetzt, kurzId) {
 }
 
 // Für die Handys: nur, welcher Schritt dran ist (klein, wird alle paar Sekunden abgefragt).
-export function zustand(f) {
+export function zustand(f, geraet) {
   const s = f.steuerung;
-  return { schritt: s.schritt, stufe: s.stufe, durchgang: s.durchgang, sitzung: s.sitzung };
+  const z = { schritt: s.schritt, stufe: s.stufe, durchgang: s.durchgang, sitzung: s.sitzung };
+  // Perspektiven-Runde: Gruppe dieses Handys und die Namen der Gruppe (damit sich die Gruppe findet)
+  const gr = geraet && f.gruppen ? f.gruppen[geraet] : null;
+  if (gr && f.leute[geraet]) {
+    z.gruppe = gr;
+    z.mitglieder = Object.keys(f.gruppen).filter((g) => f.gruppen[g] === gr && f.leute[g]).map((g) => f.leute[g].name).sort();
+  }
+  return z;
+}
+
+// Gruppen für die Perspektiven-Runde (von der Lehrerseite): {kurzId der Person: Gruppe} – '' nimmt aus der Gruppe.
+// ersetzen = true: alle bisherigen Zuordnungen verwerfen (neu einteilen).
+export function pruefeGruppen(d) {
+  if (!d || typeof d !== 'object' || !pruefeFallRaum(d.raum)) return { fehler: 'raum' };
+  const z = d.zuordnung;
+  if (!z || typeof z !== 'object' || Array.isArray(z)) return { fehler: 'zuordnung' };
+  const keys = Object.keys(z);
+  if (keys.length > MAX_GERAETE) return { fehler: 'zuordnung' };
+  for (const k of keys) {
+    if (!ID.test(k) || typeof z[k] !== 'string' || (z[k] !== '' && !PERSON.test(z[k]))) return { fehler: 'zuordnung' };
+  }
+  return { eintrag: { raum: d.raum, zuordnung: z, ersetzen: d.ersetzen === true } };
+}
+export function gruppenSetzen(f, e) {
+  if (!f.gruppen || e.ersetzen) f.gruppen = {};
+  const geraetVon = {};
+  for (const g of Object.keys(f.leute)) geraetVon[f.leute[g].id] = g;
+  let n = 0;
+  for (const id of Object.keys(e.zuordnung)) {
+    const g = geraetVon[id];
+    if (!g) continue;
+    if (e.zuordnung[id]) f.gruppen[g] = e.zuordnung[id]; else delete f.gruppen[g];
+    n++;
+  }
+  return n;
 }
 
 // Antworten zusammenzählen: { frage: { kuerzel: anzahl } } und { frage: anzahl Personen }
@@ -219,7 +255,10 @@ export function fallStand(f, archiv, jetzt) {
     steuerung: zustand(f),
     leute: Object.keys(f.leute).map((g) => ({
       id: f.leute[g].id, name: f.leute[g].name, t: f.leute[g].t,
-      beantwortet: Object.keys(f.antworten[g] || {})
+      beantwortet: Object.keys(f.antworten[g] || {}),
+      gruppe: (f.gruppen && f.gruppen[g]) || '',
+      // Wie viele Perspektiven-Einträge diese Person geschickt hat (nur die Zahl – die Texte bleiben ohne Namen)
+      eintraege: f.texte.filter((x) => x.geraet === g && x.art === 'persp').length
     })),
     ergebnisse, anzahl,
     texte: f.texte.map((x) => ({ id: x.id, art: x.art, person: x.person, a: x.a, b: x.b, kb: x.kb, t: x.t })),

@@ -266,6 +266,49 @@ r = await post(envF, '/fall/archiv-loeschen', { raum: 'k2-fall', durchgang: 'ein
 fs1 = await fst();
 pruefe(r.status === 204 && !fs1.archiv.einf, 'Fall: gesichertes Ergebnis löschen');
 pruefe(envF._raeume.get('k2-fall').speicher.get('fall') && envF._raeume.get('k2-fall').speicher.get('fallArchiv'), 'Fall: Daten im Durable-Object-Speicher');
+// Gruppen für die Perspektiven-Runde
+const envG = umgebung();
+const gA = 'a'.repeat(32), gB = 'b'.repeat(32), gC = 'c'.repeat(32);
+await post(envG, '/fall/antwort', fa({ geraet: gA, name: 'Lena K.' }));
+await post(envG, '/fall/antwort', fa({ geraet: gB, name: 'Tim B.' }));
+await post(envG, '/fall/antwort', fa({ geraet: gC, name: 'Mia S.' }));
+let gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();
+const idVon = (n) => gs.leute.find((p) => p.name === n).id;
+pruefe(gs.leute.every((p) => p.gruppe === '' && p.eintraege === 0), 'Gruppen: anfangs ohne Gruppe');
+r = await post(envG, '/fall/gruppen', { raum: 'k2-fall', zuordnung: { [idVon('Lena K.')]: 'christin', [idVon('Tim B.')]: 'christin', [idVon('Mia S.')]: 'angeh' } });
+pruefe(r.status === 204, 'Gruppen: Lehrerseite teilt ein');
+let gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gA)).json();
+pruefe(gz.gruppe === 'christin' && JSON.stringify(gz.mitglieder) === '["Lena K.","Tim B."]', 'Gruppen: Handy erfährt Gruppe und Namen der Gruppe');
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall')).json();
+pruefe(gz.gruppe === undefined && gz.mitglieder === undefined, 'Gruppen: ohne Gerät keine Gruppe im Zustand');
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + 'd'.repeat(32))).json();
+pruefe(gz.gruppe === undefined, 'Gruppen: unbekanntes Gerät ohne Gruppe');
+await post(envG, '/fall/text', tx({ geraet: gA, name: 'Lena K.', person: 'christin' }));
+await post(envG, '/fall/text', tx({ geraet: gA, name: 'Lena K.', art: 'begriff', a: 'Luxation' }));
+gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();
+pruefe(gs.leute.find((p) => p.name === 'Lena K.').eintraege === 1 && gs.leute.find((p) => p.name === 'Tim B.').eintraege === 0, 'Gruppen: Zahl der Perspektiven-Einträge je Name (Begriffe zählen nicht)');
+pruefe(gs.leute.find((p) => p.name === 'Mia S.').gruppe === 'angeh', 'Gruppen: Gruppe im Stand');
+await post(envG, '/fall/gruppen', { raum: 'k2-fall', zuordnung: { [idVon('Tim B.')]: 'pk1' } });
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gB)).json();
+pruefe(gz.gruppe === 'pk1' && JSON.stringify(gz.mitglieder) === '["Tim B."]', 'Gruppen: eine Person umsetzen, die anderen bleiben');
+await post(envG, '/fall/gruppen', { raum: 'k2-fall', ersetzen: true, zuordnung: { [idVon('Mia S.')]: 'maler' } });
+gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();
+pruefe(gs.leute.find((p) => p.name === 'Lena K.').gruppe === '' && gs.leute.find((p) => p.name === 'Mia S.').gruppe === 'maler', 'Gruppen: neu einteilen ersetzt alles');
+for (const [t, d] of [['Raum', { raum: 'k2-ab1', zuordnung: {} }], ['keine Zuordnung', { raum: 'k2-fall' }], ['Liste statt Objekt', { raum: 'k2-fall', zuordnung: [] }],
+  ['Gruppe ungültig', { raum: 'k2-fall', zuordnung: { abcd1234: 'Christin!' } }], ['Kennung ungültig', { raum: 'k2-fall', zuordnung: { 'x y': 'christin' } }]]) {
+  r = await post(envG, '/fall/gruppen', d);
+  pruefe(r.status === 400, 'Gruppen abgelehnt: ' + t);
+}
+await post(envG, '/fall/entfernen', { raum: 'k2-fall', id: idVon('Mia S.') });
+gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gC)).json();
+pruefe(!gs.leute.some((p) => p.name === 'Mia S.') && gz.gruppe === undefined, 'Gruppen: entfernte Person verliert ihre Gruppe');
+await post(envG, '/fall/gruppen', { raum: 'k2-fall', zuordnung: { [idVon('Lena K.')]: 'christin' } });
+await post(envG, '/fall/leeren', { raum: 'k2-fall' });
+await post(envG, '/fall/antwort', fa({ geraet: gA, name: 'Lena K.' }));
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gA)).json();
+pruefe(gz.gruppe === undefined, 'Gruppen: „Liste leeren“ löscht die Gruppen');
+
 r = await get(envF, '/fall/unbekannt?raum=k2-fall');
 pruefe(r.status === 404, 'Fall: unbekannte Aktion → 404');
 

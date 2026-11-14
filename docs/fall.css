@@ -64,6 +64,10 @@
 .f-ok { color: var(--gruen); }
 
 /* Perspektiven */
+.f-gruppe { margin: 0 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--dunkelpetrol); color: #fff; }
+.f-gruppe-titel { margin: 0; font-size: 15px; opacity: .9; }
+.f-gruppe-person { margin: 2px 0 6px; font-size: 22px; font-weight: 800; }
+.f-gruppe-namen { margin: 0; font-size: 16px; }
 .f-personen { display: grid; gap: 8px; margin: 0 0 14px; }
 .f-person {
   min-height: 52px; padding: 10px 12px; border: 2px solid var(--petrol); border-radius: 10px; background: #fff;

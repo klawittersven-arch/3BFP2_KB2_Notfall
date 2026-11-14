@@ -140,7 +140,14 @@ body.z-dunkel .l-fuss { display: none; }
 .z-spalte.z-ohne { background: #F4F6F7; border-style: dashed; }
 .z-spalte h3 { margin: 0 0 8px; font-size: 20px; color: var(--dunkelpetrol); }
 .z-spalte h3 small { font-weight: 400; color: #5B6B6F; }
-.z-spalte ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.z-spalte ul.z-karten { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.z-persp-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; }
+.z-persp-auftrag { margin: 0 0 4px; font-size: 22px; }
+.z-mitglieder { list-style: none; margin: 0 0 10px; padding: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 2px solid var(--rand); }
+.z-mg { padding: 3px 10px; border-radius: 999px; border: 2px dashed #8A9A9E; background: #fff; color: #3D5257; font: inherit; font-size: 17px; cursor: pointer; }
+.z-mg span { font-weight: 700; }
+.z-mg-ok { border: 2px solid var(--gruen); background: var(--gruen-hell); color: var(--gruen); }
+.z-mg-leer { margin: 0 0 10px; color: #8A9A9E; font-size: 16px; }
 .z-pk { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-radius: 10px; background: #fff; border: 2px solid var(--rand); font-size: 18px; }
 .z-pk-person { font-size: 14px; font-weight: 700; color: var(--petrol); text-transform: uppercase; letter-spacing: .02em; }
 .z-pk-a { font-weight: 700; }

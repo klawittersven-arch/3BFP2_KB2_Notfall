@@ -222,7 +222,12 @@ var FALL = {
 
     { id: 'persp', art: 'perspektiven', kurz: 'Perspektiven',
       titel: 'Was hätte diese Person gebraucht?',
-      auftrag: 'Wählen Sie die Person Ihrer Gruppe. Schreiben Sie auf, was diese Person gebraucht hätte. Formulieren Sie dazu eine Lernfrage: Was müssen wir dafür lernen?',
+      // Die Beamer-Seite teilt alle Angemeldeten automatisch und gleichmäßig auf die Personen auf (eine Gruppe je Person).
+      auftrag: 'Besprechen Sie in Ihrer Gruppe: Was hätte diese Person gebraucht? Jede und jeder schickt **mindestens einen Eintrag** – mit einer Lernfrage: Was müssen wir dafür lernen?',
+      beamerAuftrag: 'Jede Gruppe bearbeitet eine Person. Jede und jeder schickt mindestens einen Eintrag.',
+      gruppeTitel: 'Ihre Gruppe bearbeitet:',
+      gruppeMit: 'In Ihrer Gruppe:',
+      gruppeWarten: 'Ihre Lehrkraft teilt gleich die Gruppen ein …',
       personen: [
         { id: 'christin', text: 'Christin (Auszubildende)' },
         { id: 'pk1', text: 'Die Pflegekraft, die reanimiert hat' },

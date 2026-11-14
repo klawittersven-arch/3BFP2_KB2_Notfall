@@ -82,6 +82,7 @@
           (d.steuerung.durchgang === 'sw13' ? 'Abschluss (SW 13)' : 'Einführung (SW 6)');
         status.className = 'l-status';
         zeigeParkZeile(d.texte);
+        autoEinteilen();
         zeichne();
       })
       .catch(function () {
@@ -419,6 +420,61 @@
       (ansicht.stufe === 0 ? namenHtml([s.frage.id]) : ergebnisHtml(s.frage));
   }
 
+  // ---------- Gruppen der Perspektiven-Runde ----------
+  // Beim Schritt „Perspektiven“ werden alle Angemeldeten automatisch und gleichmäßig auf die Personen verteilt.
+  // Wer später dazukommt, kommt in die kleinste Gruppe. Klick auf einen Namen = in die nächste Gruppe setzen.
+  var einteilenLaeuft = false;
+  function mische(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function gruppenIds() {
+    var s = F.schritte.filter(function (x) { return x.art === 'perspektiven'; })[0];
+    return s ? s.personen.map(function (p) { return p.id; }) : [];
+  }
+  function verteile(leute, zaehl) {
+    var ids = gruppenIds(), zuordnung = {};
+    mische(leute.slice()).forEach(function (p) {
+      var ziel = ids.slice().sort(function (a, b) { return (zaehl[a] || 0) - (zaehl[b] || 0) || ids.indexOf(a) - ids.indexOf(b); })[0];
+      zuordnung[p.id] = ziel;
+      zaehl[ziel] = (zaehl[ziel] || 0) + 1;
+      p.gruppe = ziel;
+    });
+    return zuordnung;
+  }
+  function autoEinteilen() {
+    if (!stand || einteilenLaeuft || schritt(ansicht.schritt).art !== 'perspektiven') return;
+    var ohne = stand.leute.filter(function (p) { return !p.gruppe; });
+    if (!ohne.length) return;
+    var zaehl = {};
+    stand.leute.forEach(function (p) { if (p.gruppe) zaehl[p.gruppe] = (zaehl[p.gruppe] || 0) + 1; });
+    einteilenLaeuft = true;
+    sende('/fall/gruppen', { zuordnung: verteile(ohne, zaehl) }).then(function () { einteilenLaeuft = false; }, function () { einteilenLaeuft = false; });
+  }
+  function neuEinteilen() {
+    if (!stand || !window.confirm('Alle Angemeldeten neu auf die Gruppen verteilen?')) return;
+    var zuordnung = verteile(stand.leute, {});
+    gezeichnet = ''; zeichne();
+    sende('/fall/gruppen', { zuordnung: zuordnung, ersetzen: true }).then(hole, hole);
+  }
+  function wechsle(id) {
+    var ids = gruppenIds(), p = stand && stand.leute.filter(function (x) { return x.id === id; })[0];
+    if (!p) return;
+    var neu = ids[(ids.indexOf(p.gruppe) + 1) % ids.length];
+    p.gruppe = neu;
+    gezeichnet = ''; zeichne();
+    var z = {}; z[id] = neu;
+    sende('/fall/gruppen', { zuordnung: z }).then(hole, hole);
+  }
+  function mitgliederHtml(gruppe) {
+    var leute = stand ? stand.leute.filter(function (p) { return p.gruppe === gruppe; }).sort(function (a, b) { return a.name.localeCompare(b.name, 'de'); }) : [];
+    if (!leute.length) return '<p class="z-mg-leer">noch niemand</p>';
+    return '<ul class="z-mitglieder">' + leute.map(function (p) {
+      return '<li><button type="button" class="z-mg' + (p.eintraege ? ' z-mg-ok' : '') + '" data-wechsel="' + esc(p.id) + '" title="In die nächste Gruppe setzen">' +
+        esc(p.name) + ' <span>' + (p.eintraege ? '✓ ' + p.eintraege : '–') + '</span></button></li>';
+    }).join('') + '</ul>';
+  }
+
   // Perspektiven: je Person eine Spalte – oder nach Kompetenzbereichen geordnet (Lernlandkarte)
   function karteHtml(t, mitPerson, s) {
     var p = s.personen.filter(function (x) { return x.id === t.person; })[0];
@@ -435,19 +491,23 @@
     if (!perspNachKb) {
       spalten = s.personen.map(function (p) {
         var eigene = texte.filter(function (t) { return t.person === p.id; });
-        return '<section class="z-spalte"><h3>' + esc(p.text) + ' <small>' + eigene.length + '</small></h3><ul>' +
+        return '<section class="z-spalte"><h3>' + esc(p.text) + ' <small>' + eigene.length + '</small></h3>' + mitgliederHtml(p.id) + '<ul class="z-karten">' +
           eigene.map(function (t) { return karteHtml(t, false, s); }).join('') + '</ul></section>';
       }).join('');
     } else {
       spalten = F.kb.concat([{ kuerzel: '', name: 'Noch ohne KB' }]).map(function (k) {
         var eigene = texte.filter(function (t) { return t.kb === k.kuerzel; });
-        return '<section class="z-spalte' + (k.kuerzel ? '' : ' z-ohne') + '"><h3>' + esc(k.name) + ' <small>' + eigene.length + '</small></h3><ul>' +
+        return '<section class="z-spalte' + (k.kuerzel ? '' : ' z-ohne') + '"><h3>' + esc(k.name) + ' <small>' + eigene.length + '</small></h3><ul class="z-karten">' +
           eigene.map(function (t) { return karteHtml(t, true, s); }).join('') + '</ul></section>';
       }).join('');
     }
-    return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2>' +
-      '<button type="button" class="l-knopf l-zweit" id="z-ordnen">' + (perspNachKb ? 'Nach Personen ordnen' : 'Nach Kompetenzbereichen ordnen') + '</button></div>' +
-      '<p class="z-hinweis-klein">' + texte.length + ' Einträge · Tippen Sie bei jedem Eintrag auf den passenden KB (I–V).</p>' +
+    var mitEintrag = stand ? stand.leute.filter(function (p) { return p.eintraege; }).length : 0;
+    return '<div class="z-persp-kopf"><h2 class="z-titel">' + esc(s.titel) + '</h2><span class="z-persp-knoepfe">' +
+      (perspNachKb ? '' : '<button type="button" class="l-knopf l-zweit" id="z-neu-einteilen">Gruppen neu einteilen</button> ') +
+      '<button type="button" class="l-knopf l-zweit" id="z-ordnen">' + (perspNachKb ? 'Nach Personen ordnen' : 'Nach Kompetenzbereichen ordnen') + '</button></span></div>' +
+      (perspNachKb ? '' : '<p class="z-persp-auftrag">' + esc(s.beamerAuftrag || '') + ' <strong>' + mitEintrag + ' von ' + (stand ? stand.leute.length : 0) + '</strong> haben schon etwas geschickt.</p>') +
+      '<p class="z-hinweis-klein">' + texte.length + ' Einträge · Tippen Sie bei jedem Eintrag auf den passenden KB (I–V)' +
+      (perspNachKb ? '' : ' · Klick auf einen Namen setzt ihn in die nächste Gruppe') + '.</p>' +
       '<div class="z-spalten' + (perspNachKb ? ' z-sechs' : '') + '">' + spalten + '</div>';
   }
 
@@ -520,6 +580,11 @@
     });
     var o = document.getElementById('z-ordnen');
     if (o) o.onclick = function () { perspNachKb = !perspNachKb; gezeichnet = ''; zeichne(); };
+    var ne = document.getElementById('z-neu-einteilen');
+    if (ne) ne.onclick = neuEinteilen;
+    Array.prototype.forEach.call(buehne.querySelectorAll('[data-wechsel]'), function (b) {
+      b.onclick = function () { wechsle(b.getAttribute('data-wechsel')); };
+    });
     Array.prototype.forEach.call(document.querySelectorAll('[data-sichern]'), function (b) {
       b.onclick = sichern;
     });

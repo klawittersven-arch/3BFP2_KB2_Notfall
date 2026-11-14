@@ -128,7 +128,7 @@
   }
   function frage() {
     if (!SERVER || !name || !klasse) return;
-    fetch(SERVER + '/fall/zustand?raum=' + encodeURIComponent(raum()), { cache: 'no-store' })
+    fetch(SERVER + '/fall/zustand?raum=' + encodeURIComponent(raum()) + '&geraet=' + geraetId(), { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
       .then(function (z) {
         verbunden = true;
@@ -176,7 +176,8 @@
     zeigeLeiste();
     var s = schritt();
     if (!s) return;
-    var schluessel = stand.sitzung + '|' + stand.schritt + '|' + stand.stufe;
+    var schluessel = stand.sitzung + '|' + stand.schritt + '|' + stand.stufe + '|' + (stand.gruppe || '');
+    zeigeMitglieder();
     if (schluessel === gezeichnet && !erzwingen) return;   // nichts Neues – Eingaben nicht zerstören
     var gleicherSchritt = gezeichnet.split('|').slice(0, 2).join('|') === stand.sitzung + '|' + stand.schritt;
     gezeichnet = schluessel;
@@ -383,10 +384,21 @@
   }
 
   // ---------- Perspektiven-Runde ----------
+  // Namen der Gruppe aktualisieren, ohne neu zu zeichnen (Eingaben bleiben erhalten)
+  function zeigeMitglieder() {
+    var el = document.getElementById('f-gruppe-namen');
+    if (!el || !stand || !stand.mitglieder) return;
+    var s = schritt();
+    el.textContent = (s.gruppeMit || '') + ' ' + stand.mitglieder.join(', ');
+  }
   function perspektivenHtml(s) {
-    var personen = s.personen.map(function (p) {
-      return '<button type="button" class="f-person' + (person === p.id ? ' f-an' : '') + '" data-person="' + esc(p.id) + '" aria-pressed="' + (person === p.id) + '">' + esc(p.text) + '</button>';
-    }).join('');
+    // Die Gruppe (= Person) teilt die Lehrkraft zu; ohne Gruppe wird gewartet
+    if (!stand.gruppe) return '<h2 class="f-titel">' + esc(s.titel) + '</h2><p class="f-gross">' + esc(s.gruppeWarten) + '</p>';
+    person = stand.gruppe;
+    var meinePerson = s.personen.filter(function (x) { return x.id === person; })[0];
+    var gruppe = '<div class="f-gruppe" data-gruppe="' + esc(person) + '"><p class="f-gruppe-titel">' + esc(s.gruppeTitel) + '</p>' +
+      '<p class="f-gruppe-person" id="f-gruppe-person">' + esc(meinePerson ? meinePerson.text : person) + '</p>' +
+      '<p class="f-gruppe-namen" id="f-gruppe-namen">' + esc(s.gruppeMit + ' ' + (stand.mitglieder || []).join(', ')) + '</p></div>';
     var formular = '';
     if (person) {
       formular = '<form id="f-persp-form" class="f-persp-form" novalidate>' +
@@ -405,8 +417,7 @@
       var p = s.personen.filter(function (x) { return x.id === t.person; })[0];
       return '<li><strong>' + esc(p ? p.text : '') + '</strong>' + (t.a ? '<br>' + esc(t.a) : '') + (t.b ? '<br>❓ ' + esc(t.b) : '') + '</li>';
     }).join('') + '</ul>' : '';
-    return '<h2 class="f-titel">' + esc(s.titel) + '</h2><p>' + fmt(s.auftrag) + '</p>' +
-      '<div class="f-personen" role="group" aria-label="Person">' + personen + '</div>' + formular + liste;
+    return '<h2 class="f-titel">' + esc(s.titel) + '</h2>' + gruppe + '<p>' + fmt(s.auftrag) + '</p>' + formular + liste;
   }
   function verbindePerspektiven(s) {
     Array.prototype.forEach.call(inhalt.querySelectorAll('.f-person'), function (b) {

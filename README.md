@@ -97,9 +97,13 @@ klein neben dem Text. Die Handys zeigen währenddessen nur das Bild und „Schau
    Station 7: **genau 3** von 9 Dingen wählen, die Christin am meisten helfen würden (6 helfen, 3 nicht). Ergebnis =
    Rangfolge der Klasse; Auflösung = ✓/✗ mit Grund und der Hinweis, dass die Rangfolge Gesprächsanlass ist.
 4. **Zurückspulen:** Zeitstrahl aller Stationen mit den Klassen-Ergebnissen und Christins Handeln. Frage: Ab welcher Station hätte man den Notfall vielleicht verhindern können?
-5. **Perspektiven-Runde:** Jede Gruppe wählt eine Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft,
-   die Angehörigen, Frau Maler): „Was hätte diese Person gebraucht?“ + Lernfrage. Auf dem Beamer je Person eine Spalte;
-   die Lehrkraft tippt bei jedem Eintrag den passenden KB (I–V) an. *Nach Kompetenzbereichen ordnen* zeigt die Lernlandkarte.
+5. **Perspektiven-Runde:** Die Beamer-Seite teilt alle Angemeldeten **automatisch und gleichmäßig in 5 Gruppen** ein – eine
+   je Person (Christin, die reanimierende Pflegekraft, die erstarrte Pflegekraft, die Angehörigen, Frau Maler). Das Handy zeigt
+   „Ihre Gruppe bearbeitet: …“ und die Namen der Gruppe. Auf dem Beamer stehen die Namen bei jeder Gruppe, mit ✓ und Zahl,
+   sobald jemand einen Eintrag geschickt hat („2 von 22 haben schon etwas geschickt“) – die Einträge selbst bleiben ohne Namen.
+   Klick auf einen Namen setzt die Person in die nächste Gruppe; *Gruppen neu einteilen* mischt neu; wer später kommt, landet
+   in der kleinsten Gruppe. Die Lehrkraft tippt bei jedem Eintrag den passenden KB (I–V) an; *Nach Kompetenzbereichen ordnen*
+   zeigt die Lernlandkarte.
 6. **Ausblick:** Begriffsparkplatz und **Ergebnis sichern**.
 
 **Begriffsparkplatz:** Auf dem Handy ist jedes Wort im Falltext antippbar. Tipp auf ein Wort → unten erscheint *Parken*;
