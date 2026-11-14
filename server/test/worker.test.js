@@ -182,6 +182,12 @@ for (const [t, d] of [['Schritt negativ', { schritt: -1, stufe: 0 }], ['Schritt 
   r = await post(envF, '/fall/steuern', Object.assign({ raum: 'k2-fall' }, d));
   pruefe(r.status === 400, 'Fall: Steuerung abgelehnt: ' + t);
 }
+// Vorlesen: Abschnitt und Person (kurzId) – ungültige Angaben werden abgelehnt
+for (const [t, l] of [['Abschnitt negativ', { abschnitt: -1, person: '' }], ['Abschnitt zu groß', { abschnitt: 99, person: '' }],
+  ['Person', { abschnitt: 0, person: 'X!' }], ['kein Objekt', 'abc']]) {
+  r = await post(envF, '/fall/steuern', { raum: 'k2-fall', schritt: 3, stufe: 0, lesen: l });
+  pruefe(r.status === 400, 'Fall: Vorlesen abgelehnt: ' + t);
+}
 
 // Antworten (einzeln und Mehrfachauswahl) und Zählung
 r = await post(envF, '/fall/antwort', fa());
@@ -292,6 +298,21 @@ gz = await (await get(envG, '/fall/zustand?raum=k2-fall')).json();
 pruefe(gz.gruppe === undefined && gz.mitglieder === undefined, 'Gruppen: ohne Gerät keine Gruppe im Zustand');
 gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + 'd'.repeat(32))).json();
 pruefe(gz.gruppe === undefined, 'Gruppen: unbekanntes Gerät ohne Gruppe');
+// Vorlesen: Handy erfährt den Abschnitt und ob es selbst dran ist, die Lehrerseite auch die Person
+r = await post(envG, '/fall/steuern', { raum: 'k2-fall', schritt: 4, stufe: 1, lesen: { abschnitt: 2, person: idVon('Tim B.') } });
+pruefe(r.status === 204, 'Vorlesen: Lehrerseite bestimmt Abschnitt und Person');
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gB)).json();
+pruefe(gz.lesen && gz.lesen.abschnitt === 2 && gz.lesen.ich === true && gz.lesen.person === undefined, 'Vorlesen: Tims Handy weiß, dass es dran ist (ohne Kennung)');
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gA)).json();
+pruefe(gz.lesen && gz.lesen.abschnitt === 2 && gz.lesen.ich === false, 'Vorlesen: andere Handys sehen nur den Abschnitt');
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall')).json();
+pruefe(gz.lesen && gz.lesen.ich === false && gz.lesen.person === undefined, 'Vorlesen: ohne Gerät keine Person');
+gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();
+pruefe(gs.steuerung.lesen && gs.steuerung.lesen.person === idVon('Tim B.') && gs.steuerung.lesen.abschnitt === 2, 'Vorlesen: Lehrerseite bekommt die Person (nach dem Neuladen)');
+r = await post(envG, '/fall/steuern', { raum: 'k2-fall', schritt: 4, stufe: 2 });
+gz = await (await get(envG, '/fall/zustand?raum=k2-fall&geraet=' + gB)).json();
+pruefe(r.status === 204 && gz.lesen === undefined, 'Vorlesen: Weiterschalten ohne „lesen“ beendet das Vorlesen');
+gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();
 await post(envG, '/fall/text', tx({ geraet: gA, name: 'Lena K.', person: 'christin' }));
 await post(envG, '/fall/text', tx({ geraet: gA, name: 'Lena K.', art: 'begriff', a: 'Luxation' }));
 gs = await (await get(envG, '/fall/stand?raum=k2-fall')).json();

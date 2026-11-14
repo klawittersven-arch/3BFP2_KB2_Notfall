@@ -11,6 +11,7 @@ export const MAX_TEXTE_JE_GERAET = 15;
 export const MAX_TEXT = 200;      // Zeichen je Feld (Perspektive)
 export const MAX_BEGRIFF = 40;    // Zeichen (Begriffsparkplatz)
 export const MAX_SCHRITT = 40;
+export const MAX_LESEABSCHNITT = 40;
 export const DURCHGAENGE = ['einf', 'sw13'];
 
 const FALL_RAUM = /^k[1-9]-fall$/;
@@ -93,7 +94,15 @@ export function pruefeSteuerung(d) {
   if (!Number.isInteger(d.schritt) || d.schritt < 0 || d.schritt > MAX_SCHRITT) return { fehler: 'schritt' };
   if (!Number.isInteger(d.stufe) || d.stufe < 0 || d.stufe > 3) return { fehler: 'stufe' };
   if (d.durchgang !== undefined && DURCHGAENGE.indexOf(d.durchgang) < 0) return { fehler: 'durchgang' };
-  return { eintrag: { schritt: d.schritt, stufe: d.stufe, durchgang: d.durchgang } };
+  // Vorlesen (optional): welcher Abschnitt gerade gelesen wird und von wem (kurzId der Person, '' = niemand bestimmt)
+  let lesen = null;
+  if (d.lesen !== undefined && d.lesen !== null) {
+    const l = d.lesen;
+    if (typeof l !== 'object' || !Number.isInteger(l.abschnitt) || l.abschnitt < 0 || l.abschnitt > MAX_LESEABSCHNITT ||
+      (l.person !== '' && !pruefeId(l.person))) return { fehler: 'lesen' };
+    lesen = { abschnitt: l.abschnitt, person: l.person };
+  }
+  return { eintrag: { schritt: d.schritt, stufe: d.stufe, durchgang: d.durchgang, lesen } };
 }
 
 export function pruefeKb(kb) { return typeof kb === 'string' && KB.indexOf(kb) >= 0; }
@@ -191,6 +200,7 @@ export function steuern(f, s, jetzt, kurzId) {
   }
   f.steuerung.schritt = s.schritt;
   f.steuerung.stufe = s.stufe;
+  f.steuerung.lesen = s.lesen || null;
   f.t = jetzt;
 }
 
@@ -198,6 +208,10 @@ export function steuern(f, s, jetzt, kurzId) {
 export function zustand(f, geraet) {
   const s = f.steuerung;
   const z = { schritt: s.schritt, stufe: s.stufe, durchgang: s.durchgang, sitzung: s.sitzung };
+  // Vorlesen: ein Handy erfährt nur, welcher Abschnitt dran ist und ob es selbst vorliest
+  if (s.lesen) {
+    z.lesen = { abschnitt: s.lesen.abschnitt, ich: !!(geraet && s.lesen.person && f.leute[geraet] && f.leute[geraet].id === s.lesen.person) };
+  }
   // Perspektiven-Runde: Gruppe dieses Handys und die Namen der Gruppe (damit sich die Gruppe findet)
   const gr = geraet && f.gruppen ? f.gruppen[geraet] : null;
   if (gr && f.leute[geraet]) {
@@ -255,7 +269,8 @@ export function fallStand(f, archiv, jetzt) {
   const { ergebnisse, anzahl } = auswerten(f);
   return {
     jetzt,
-    steuerung: zustand(f),
+    // die Lehrerseite bekommt beim Vorlesen auch die Person (nach dem Neuladen der Seite)
+    steuerung: Object.assign(zustand(f), f.steuerung.lesen ? { lesen: { abschnitt: f.steuerung.lesen.abschnitt, person: f.steuerung.lesen.person } } : {}),
     leute: Object.keys(f.leute).map((g) => ({
       id: f.leute[g].id, name: f.leute[g].name, t: f.leute[g].t,
       beantwortet: Object.keys(f.antworten[g] || {}),

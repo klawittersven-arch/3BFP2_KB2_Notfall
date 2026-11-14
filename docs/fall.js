@@ -62,14 +62,47 @@
       return esc(m[1]) + '<span class="f-wort" role="button" tabindex="0">' + esc(m[2]) + '</span>' + esc(m[3]);
     }).join('');
   }
+  // Falltext in Absätzen; jeder Vorlese-Abschnitt in einem eigenen <span> (zum Markieren, wenn vorgelesen wird)
   function falltextHtml(teile) {
+    var nr = 0;
+    return leseAbsaetze(teile).map(function (abs) {
+      return '<p>' + abs.map(function (txt) { return '<span class="f-lese" data-lese="' + (nr++) + '">' + woerterHtml(txt) + '</span>'; }).join(' ') + '</p>';
+    }).join('');
+  }
+  // ---------- Vorlesen: Text in Abschnitte zu 2–3 Sätzen teilen (gleich in fall.js und lehrer-fall.js) ----------
+  // Der Text selbst bleibt unverändert – er wird nur zum Hervorheben in Abschnitte eingeteilt (je Absatz).
+  function saetze(text) {
+    var grenze = /[.!?][“”"»)\]]*\s+(?=[A-ZÄÖÜ„"\[])/g, teile = [], start = 0, m;
+    while ((m = grenze.exec(text))) { teile.push(text.slice(start, m.index + m[0].length)); start = m.index + m[0].length; }
+    if (start < text.length) teile.push(text.slice(start));
+    return teile;
+  }
+  // Absätze → je Absatz eine Liste von Abschnitten (Text); 1–3 Sätze, möglichst gleich groß
+  function leseAbsaetze(teile) {
     var absaetze = [];
     teile.forEach(function (t, i) {
-      if (t.absatz || i === 0) absaetze.push(woerterHtml(t.text));
-      else absaetze[absaetze.length - 1] += ' ' + woerterHtml(t.text);
+      if (t.absatz || i === 0) absaetze.push(t.text);
+      else absaetze[absaetze.length - 1] += ' ' + t.text;
     });
-    return absaetze.map(function (a) { return '<p>' + a + '</p>'; }).join('');
+    return absaetze.map(function (a) {
+      var s = saetze(a), k = Math.ceil(s.length / 3), basis = Math.floor(s.length / k), mehr = s.length % k, aus = [], pos = 0;
+      for (var i = 0; i < k; i++) {
+        var n = basis + (i < mehr ? 1 : 0);
+        aus.push(s.slice(pos, pos + n).join('').replace(/\s+$/, ''));
+        pos += n;
+      }
+      return aus;
+    });
   }
+  function leseAnzahl(teile) { return leseAbsaetze(teile).reduce(function (n, a) { return n + a.length; }, 0); }
+  // Welcher Text kann in dieser Phase vorgelesen werden? (Abschnitt vor der Abstimmung bzw. „Christin erzählt weiter“)
+  function leseTeile(s, ph) {
+    if (s.art !== 'station') return null;
+    if (ph === 'frage') return abschnitte(s.id, 'frage');
+    if (ph === 'aufloesung' && abschnitte(s.id, 'aufloesung').length) return abschnitte(s.id, 'aufloesung');
+    return null;
+  }
+
   // Stationen durchnummerieren (mit den zusätzlichen Situationen) und deren Text bereitlegen
   var EXTRA = {};
   (function () {
@@ -231,7 +264,7 @@
     if (!s) return;
     var schluessel = stand.sitzung + '|' + stand.schritt + '|' + stand.stufe + '|' + (stand.gruppe || '');
     zeigeMitglieder();
-    if (schluessel === gezeichnet && !erzwingen) return;   // nichts Neues – Eingaben nicht zerstören
+    if (schluessel === gezeichnet && !erzwingen) { zeigeLesen(); return; }   // nichts Neues – Eingaben nicht zerstören
     if (schluessel !== gezeichnet) sendeEntwurf();         // weitergeschaltet: vergessenen Text nicht verlieren
     var gleicherSchritt = gezeichnet.split('|').slice(0, 2).join('|') === stand.sitzung + '|' + stand.schritt;
     gezeichnet = schluessel;
@@ -254,6 +287,34 @@
     leereWortauswahl();
     markiereGeparkte();
     if (!gleicherSchritt) window.scrollTo(0, 0);
+    zeigeLesen();
+  }
+
+  // ---------- Vorlesen: den Abschnitt markieren, der gerade gelesen wird ----------
+  var leseIch = document.createElement('div');
+  leseIch.className = 'f-lesen-ich';
+  leseIch.setAttribute('role', 'status');
+  leseIch.hidden = true;
+  leseIch.textContent = H.leseDran;
+  document.body.appendChild(leseIch);
+  var letzteLesung = '';
+  function zeigeLesen() {
+    var l = stand && stand.lesen, s = schritt(), ph = s ? aktuellePhase() : null, box = null;
+    if (l && s && leseTeile(s, ph)) box = ph === 'aufloesung' ? inhalt.querySelector('.f-aufloesung .f-falltext') : inhalt.querySelector(':scope > .f-falltext');
+    Array.prototype.forEach.call(inhalt.querySelectorAll('.f-lese'), function (e) {
+      var k = Number(e.getAttribute('data-lese')), drin = !!box && box.contains(e);
+      e.classList.toggle('f-lesen-an', drin && k === l.abschnitt);
+      e.classList.toggle('f-lesen-vorbei', drin && k < l.abschnitt);
+    });
+    var ich = !!(box && l.ich);
+    leseIch.hidden = !ich;
+    var neu = box ? stand.sitzung + '|' + stand.schritt + '|' + stand.stufe + '|' + l.abschnitt + '|' + ich : '';
+    if (neu && neu !== letzteLesung) {     // neuer Abschnitt: dorthin scrollen; wer dran ist, spürt es (falls möglich)
+      var el = box.querySelector('.f-lesen-an');
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      if (ich && navigator.vibrate) { try { navigator.vibrate(200); } catch (e) { /* egal */ } }
+    }
+    letzteLesung = neu;
   }
 
   function fragenHtml(s) {

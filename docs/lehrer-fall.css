@@ -222,3 +222,19 @@ body.z-dunkel .z-steuer { background: #0F1C20; border-top-color: #22363C; }
 .z-einschaetzung { background: var(--gruen-hell); border-color: var(--gruen); }
 .z-einschaetzung .z-auf-kopf { color: var(--gruen); }
 .z-einschaetzung p { margin: 0 0 6px; }
+
+/* Vorlesen: Lesezeile über dem Text, markierter Abschnitt, Name der Person */
+.z-lesezeile { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 10px; }
+.z-lese-knopf { font: inherit; font-size: 18px; font-weight: 700; padding: 6px 16px; border-radius: 999px; border: 2px solid var(--petrol);
+  background: #fff; color: var(--dunkelpetrol); cursor: pointer; }
+.z-lese-knopf:hover, .z-lese-knopf:focus-visible { background: var(--hellblau); }
+.z-lese-knopf.z-lese-haupt { background: var(--dunkelpetrol); color: #fff; border-color: var(--dunkelpetrol); }
+.z-lese-wer { font-size: clamp(20px, 1.8vw, 26px); color: var(--dunkelpetrol); }
+.z-lesen-an { background: #FFE97A; box-shadow: 0 0 0 5px #FFE97A; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.z-lesen-vorbei { color: #7A8A8E; }
+.z-leser-marke { display: inline-block; padding: 1px 12px; border-radius: 999px; background: var(--dunkelpetrol); color: #fff;
+  font-size: .62em; font-weight: 700; vertical-align: .15em; white-space: nowrap; }
+body.z-liest .z-handy-auftrag { position: static; box-shadow: none; }
+/* beim Vorlesen bleibt die Lesezeile (Name + Knöpfe) oben sichtbar, auch wenn der Text gescrollt wird */
+body.z-liest .z-lesezeile { position: sticky; top: 0; z-index: 6; padding: 8px 0; background: #fff; box-shadow: 0 6px 10px -8px rgba(0,0,0,.25); }
+body.z-liest .z-aufloesung .z-lesezeile { background: var(--bernstein-hell); }

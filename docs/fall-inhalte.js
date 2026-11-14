@@ -330,6 +330,7 @@ var FALL = {
     keineAntwort: 'Sie haben nicht abgestimmt.',
     christinErzaehlt: 'Christin erzählt weiter:',
     einschaetzung: 'Einschätzung:',
+    leseDran: '📢 Sie sind dran: Lesen Sie den gelben Abschnitt laut vor.',
     senden: 'Senden',
     bisher: 'Den Fall bis hier noch einmal lesen',
     keineVerbindung: 'Keine Verbindung – es wird weiter versucht …',
