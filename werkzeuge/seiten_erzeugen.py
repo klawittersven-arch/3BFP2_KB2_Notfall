@@ -10,7 +10,16 @@ ABS = {"ab1": "AB 1 – Menschen im Notfall", "ab2": "AB 2 – Psychologische Er
        "kb2w1": "TB 2 neu · Woche 1 – Psychosoziale Unterstützung · Gesprächshemmer",
        "kb2w2": "TB 2 neu · Woche 2 – Schweigepflicht · Schlechte Nachrichten (SPIKES)",
        "kb2w3": "TB 2 neu · Woche 3 – Rollenspiele: Notfall begleiten · Angehörigengespräch mit Feedback",
-       "kb2w4": "TB 2 neu · Woche 4 – Belastung der Helfenden und Supervision · Wiederholung im Examensstil"}
+       "kb2w4": "TB 2 neu · Woche 4 – Belastung der Helfenden und Supervision · Wiederholung im Examensstil",
+       "kb2w5": "TB 2 neu · Wiederholung 11.01. – TB2-Challenge (alle Wochen)"}
+# Wochen-Challenge je Woche (freigeschaltet, wenn alle Übungen der Woche geschafft sind) und TB2-Challenge (kb2w5, offen)
+CHALLENGES = {
+    "kb2w1": ("Wochen-Challenge: Woche 1", "Woche 1 – Psychosoziale Unterstützung · Gesprächshemmer", "kb2w1", 15),
+    "kb2w2": ("Wochen-Challenge: Woche 2", "Woche 2 – Schweigepflicht · SPIKES", "kb2w2", 15),
+    "kb2w3": ("Wochen-Challenge: Woche 3", "Woche 3 – Begleiten · Feedback", "kb2w3", 15),
+    "kb2w4": ("Wochen-Challenge: Woche 4", "Woche 4 – Hilfe nach dem Notfall · Wiederholung", "kb2w4", 15),
+    "kb2w5": ("TB2-Challenge: alle Wochen", "Wiederholung vor der Klassenarbeit", "kb2w1 kb2w2 kb2w3 kb2w4", 20),
+}
 KLASSEN = {"k1": ("3BFP2/1", "3bfp2-1"), "k2": ("3BFP2/2", "3bfp2-2")}
 
 VORLAGE = """<!DOCTYPE html>
@@ -70,10 +79,15 @@ LEHRER = """<!DOCTYPE html>
 <footer class="l-fuss" id="l-fuss"></footer>
 <script src="einstellungen.js"></script>
 <script src="inhalte.js"></script>
+<script src="qr.js"></script>
 <script src="lehrer.js"></script>
 </body>
 </html>
 """
+
+# Challenge-Seite: dieselbe Übungstechnik (app.js) im Challenge-Modus
+CHALLENGE = VORLAGE.replace('<body data-uebung="{id}">',
+    '<body data-modus="challenge" data-raum="{raum}" data-quellen="{quellen}" data-anzahl="{anzahl}" data-titel="{titel}" data-untertitel="{untertitel}">')
 
 FALL_LEHRER = """<!DOCTYPE html>
 <html lang="de">
@@ -109,8 +123,11 @@ for kk, (kname, kdatei) in KLASSEN.items():
         datei = f"lehrer-{kdatei}-{ab}.html"
         (DOCS / datei).write_text(LEHRER.replace("{raum}", f"{kk}-{ab}").replace("{titel}", f"{kname} · {titel}"), encoding="utf-8")
         lehrerseiten.append(datei)
+for raum, (titel, untertitel, quellen, anzahl) in CHALLENGES.items():
+    (DOCS / f"challenge-{raum}.html").write_text(CHALLENGE.replace("{raum}", raum).replace("{quellen}", quellen)
+        .replace("{anzahl}", str(anzahl)).replace("{titel}", titel).replace("{untertitel}", untertitel), encoding="utf-8")
 for kk, (kname, kdatei) in KLASSEN.items():
     datei = f"lehrer-{kdatei}-fall.html"
     (DOCS / datei).write_text(FALL_LEHRER.replace("{raum}", f"{kk}-fall").replace("{titel}", kname), encoding="utf-8")
     lehrerseiten.append(datei)
-print("ok:", ", ".join(IDS), "+ Lehrerseiten", ", ".join(lehrerseiten))
+print("ok:", ", ".join(IDS), "+ Challenges", ", ".join(CHALLENGES), "+ Lehrerseiten", ", ".join(lehrerseiten))

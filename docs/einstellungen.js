@@ -29,13 +29,19 @@ var EINSTELLUNGEN = {
   // rund 22 500 Anfragen in 45 Minuten – im kostenlosen Cloudflare-Tarif sind 100 000 pro Tag frei).
   fallAbfrageSekunden: 3,
 
-  // Gegen Durchklicken:
-  // Nach einer falschen Antwort sind die Knöpfe dieser Karte so viele Sekunden gesperrt
-  // (der Tipp soll gelesen werden). 0 = keine Sperre.
-  sperreNachFehlerSekunden: 5,
-  // Wer so viele falsche Antworten innerhalb so vieler Sekunden gibt, muss die Übung neu beginnen.
-  // Die Lehrerseite zeigt das als ↺ beim Namen. fehler: 0 = ausgeschaltet.
-  zuSchnell: { fehler: 3, sekunden: 10 },
+  // Gegen Durchklicken (Kartenstapel, seit 26.11.2026 – wie in der ILS-App):
+  // herzen: so viele Fehler pro Durchgang; ist das letzte Herz weg, kommt eine Lesepause und die Übung
+  // beginnt neu (mit neu gemischten Karten). Die Lehrerseite zeigt das als ↺ beim Namen. 0 = ohne Herzen.
+  herzen: 3,
+  // So viele Karten hintereinander beim ersten Versuch richtig geben ein Herz zurück (0 = nie).
+  herzZurueckNach: 5,
+  // Lesepause in Sekunden, wenn alle Herzen weg sind.
+  leerePauseSekunden: 20,
+  // Lesezeit: Wer unmöglich schnell tippt, bekommt eine Warnung (zählt nicht); wer schnell und falsch
+  // tippt, verliert ein Herz und bekommt eine Warnung. Nach 3 Warnungen kurze Lesepause (Sekunden).
+  // Richtige Antworten zählen immer. false = ausgeschaltet.
+  lesezeit: true,
+  langsamPauseSekunden: 15,
 
   // Namen mit diesen Wortteilen werden abgelehnt (nur Kleinbuchstaben).
   sperrwoerter: [

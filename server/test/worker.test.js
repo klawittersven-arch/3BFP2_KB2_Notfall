@@ -354,5 +354,51 @@ pruefe(gz.gruppe === undefined, 'Gruppen: „Liste leeren“ löscht die Gruppen
 r = await get(envF, '/fall/unbekannt?raum=k2-fall');
 pruefe(r.status === 404, 'Fall: unbekannte Aktion → 404');
 
+// ---------- Sterne und Wochen-Challenge (seit 26.11.2026) ----------
+const envC = umgebung();
+r = await post(envC, '/fortschritt', eintrag({ raum: 'k2-kb2w1', uebung: 'kb2ab03', geloest: 10, gesamt: 10, erster: 9, falsch: ['2-F'], sterne: 2 }));
+let cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+pruefe(r.status === 204 && cs.eintraege[0].uebungen.kb2ab03.sterne === 2, 'Sterne werden gespeichert');
+r = await post(envC, '/fortschritt', eintrag({ raum: 'k2-kb2w1', uebung: 'kb2ab02', sterne: 4 }));
+pruefe(r.status === 400, 'Sterne über 3 → 400');
+pruefe(Array.isArray(cs.challenge) && cs.challenge.length === 0, 'Stand enthält leere Bestenliste');
+const ch = (o = {}) => Object.assign({ raum: 'k2-kb2w1', geraet: 'a'.repeat(32), name: 'Lena K.', richtig: 12, gesamt: 15, dauer: 180 }, o);
+r = await post(envC, '/challenge', ch());
+cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+// 100 × 12 + 500 × 12/15 × (1 − 180/600) = 1200 + 280 = 1480
+pruefe(r.status === 204 && cs.challenge.length === 1 && cs.challenge[0].punkte === 1480 && cs.challenge[0].name === 'Lena K.', 'Challenge: Punkte vom Server berechnet (1480): ' + JSON.stringify(cs.challenge));
+pruefe(!JSON.stringify(cs.challenge).includes('a'.repeat(32)), 'Challenge: keine Geräte-Kennung in der Bestenliste');
+await post(envC, '/challenge', ch({ richtig: 9, dauer: 100 }));
+cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+pruefe(cs.challenge[0].punkte === 1480 && cs.challenge[0].runden === 2, 'Challenge: schlechtere Runde ersetzt die Bestleistung nicht');
+await post(envC, '/challenge', ch({ geraet: 'b'.repeat(32), name: 'Tim B.', richtig: 15, dauer: 60 }));
+cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+pruefe(cs.challenge[0].name === 'Tim B.' && cs.challenge[0].punkte === 1950 && cs.challenge.length === 2, 'Challenge: Bestenliste sortiert (Tim 1950 vor Lena)');
+for (const [t, d] of [['zu schnell', ch({ dauer: 10 })], ['richtig > gesamt', ch({ richtig: 16 })], ['Name', ch({ name: '<b>' })], ['Raum', ch({ raum: 'k2-xyz' })]]) {
+  r = await post(envC, '/challenge', d);
+  pruefe(r.status === 400, 'Challenge ungültig: ' + t);
+}
+r = await post(envC, '/challenge-entfernen', { raum: 'k2-kb2w1', id: cs.challenge[1].id });
+cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+pruefe(r.status === 204 && cs.challenge.length === 1 && cs.challenge[0].name === 'Tim B.', 'Challenge: einen Namen entfernen');
+await post(envC, '/leeren', { raum: 'k2-kb2w1' });
+cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+pruefe(cs.eintraege.length === 0 && cs.challenge.length === 1, '„Liste leeren“ (neue Stunde) lässt die Bestenliste stehen');
+r = await post(envC, '/challenge-leeren', { raum: 'k2-kb2w1' });
+cs = await (await get(envC, '/stand?raum=k2-kb2w1')).json();
+pruefe(r.status === 204 && cs.challenge.length === 0, 'Bestenliste leeren');
+await post(envC, '/challenge', ch({ raum: 'k1-kb1w5' }));
+cs = await (await get(envC, '/stand?raum=k1-kb1w5')).json();
+pruefe(cs.challenge.length === 1, 'TB2-Challenge im Raum k1-kb1w5 (Wiederholung 11.01.)');
+// Aufbewahrung: Fortschritt 12 Stunden, Bestenliste 10 Tage
+const echt = Date.now;
+Date.now = () => echt() + AUFBEWAHRUNG_MS + 60000;
+cs = await (await get(envC, '/stand?raum=k1-kb1w5')).json();
+pruefe(cs.challenge.length === 1, 'Bestenliste übersteht 12 Stunden');
+Date.now = () => echt() + 11 * 24 * 60 * 60 * 1000;
+cs = await (await get(envC, '/stand?raum=k1-kb1w5')).json();
+pruefe(cs.challenge.length === 0, 'Bestenliste nach 10 Tagen gelöscht');
+Date.now = echt;
+
 console.log(`${ok} Prüfungen bestanden, ${nok} fehlgeschlagen`);
 process.exit(nok ? 1 : 0);

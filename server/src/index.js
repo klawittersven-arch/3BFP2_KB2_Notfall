@@ -4,6 +4,9 @@
 //   POST /spiel         (Handy)          {raum, geraet, punkte}  Bestleistung im Belohnungsspiel
 //   POST /entfernen     {raum, id}       (Lehrerseite: einen Namen entfernen)
 //   POST /leeren        {raum}           (Lehrerseite: neue Stunde)
+//   POST /challenge     (Handy)          {raum, geraet, name, richtig, gesamt, dauer}  Wochen-Challenge (Punkte rechnet der Server)
+//   POST /challenge-entfernen {raum, id} · POST /challenge-leeren {raum}   (Lehrerseite: Bestenliste)
+//   GET  /stand liefert zusätzlich challenge: [{id, name, punkte, richtig, gesamt, dauer, runden}] (bis zu 10 Tage)
 // Raum = Klasse + Arbeitsblatt, z. B. k2-ab1 (k1 = 3BFP2/1, k2 = 3BFP2/2).
 // Auf Wunsch ohne Lehrer-Kennwort: Die Lehrerseiten sind über ihre Adresse erreichbar.
 // Pro Raum gibt es ein Durable Object, das die Daten hält.
@@ -19,7 +22,10 @@
 //   POST /fall/gruppen  {raum, zuordnung: {kurzId: gruppe}, ersetzen?}  (Lehrerseite: Perspektiven-Gruppen)
 //   GET  /fall/zustand?raum=…&geraet=…  liefert dem Handy zusätzlich seine Gruppe und deren Namen
 
-import { pruefeEintrag, pruefeRaum, pruefeSpiel, aufraeumen, eintragen, spielEintragen, stand, entfernen } from './logik.js';
+import {
+  pruefeEintrag, pruefeRaum, pruefeSpiel, aufraeumen, eintragen, spielEintragen, stand, entfernen,
+  pruefeChallenge, challengeEintragen, challengeAufraeumen, challengeStand, challengeEntfernen
+} from './logik.js';
 import {
   pruefeFallRaum, pruefeId, pruefeAntwort, pruefeText, pruefeSteuerung, pruefeKb, DURCHGAENGE,
   leererFall, fallAufraeumen, fallLeeren, antwortEintragen, textEintragen, textEntfernen, begriffEntfernen, textKb,
@@ -80,6 +86,24 @@ export default {
       if (p.fehler) return antwort(400, { fehler: p.fehler });
       const r = await anRaum(env, p.eintrag.raum, 'spiel', p.eintrag);
       return r.status === 200 ? antwort(204) : antwort(404, { fehler: 'nicht auf der Liste' });
+    }
+
+    if (request.method === 'POST' && url.pathname === '/challenge') {
+      const d = await leseJson(request);
+      const p = pruefeChallenge(d);
+      if (p.fehler) return antwort(400, { fehler: p.fehler });
+      const r = await anRaum(env, p.eintrag.raum, 'challenge', p.eintrag);
+      return antwort(r.status === 200 ? 204 : 429);
+    }
+
+    if (request.method === 'POST' && (url.pathname === '/challenge-leeren' || url.pathname === '/challenge-entfernen')) {
+      const d = await leseJson(request);
+      if (!d || !pruefeRaum(d.raum)) return antwort(400, { fehler: 'raum' });
+      if (url.pathname === '/challenge-entfernen' && (typeof d.id !== 'string' || !/^[a-z0-9]{4,16}$/.test(d.id))) {
+        return antwort(400, { fehler: 'id' });
+      }
+      await anRaum(env, d.raum, url.pathname.slice(1), { id: d.id });
+      return antwort(204);
     }
 
     if (request.method === 'GET' && url.pathname === '/stand') {
@@ -157,6 +181,7 @@ export class Raum {
     this.state = state;
     this.env = env;
     this.daten = null;
+    this.challenge = null; // Wochen-Challenge: beste Ergebnisse je Handy (bis zu 10 Tage)
     this.fall = null;     // Fall-Einführung: Steuerung, Namen, Antworten, Texte (12 Stunden)
     this.archiv = null;   // Fall-Einführung: gesicherte Ergebnisse ohne Namen (dauerhaft)
   }
@@ -176,7 +201,9 @@ export class Raum {
     const jetzt = Date.now();
     if (aktion.startsWith('fall-')) return this.fallAktion(aktion.slice(5), nutzlast, jetzt);
     const daten = await this.lade();
+    if (this.challenge === null) this.challenge = (await this.state.storage.get('challenge')) || {};
     let geaendert = aufraeumen(daten, jetzt);
+    let chGeaendert = challengeAufraeumen(this.challenge, jetzt);
     let status = 200;
     let ergebnis = {};
 
@@ -187,6 +214,14 @@ export class Raum {
       if (spielEintragen(daten, nutzlast, jetzt)) geaendert = true; else status = 404;
     } else if (aktion === 'stand') {
       ergebnis = stand(daten, jetzt);
+      ergebnis.challenge = challengeStand(this.challenge);
+    } else if (aktion === 'challenge') {
+      if (challengeEintragen(this.challenge, nutzlast, jetzt, () => crypto.randomUUID().replace(/-/g, '').slice(0, 10))) chGeaendert = true; else status = 429;
+    } else if (aktion === 'challenge-entfernen') {
+      if (challengeEntfernen(this.challenge, nutzlast.id)) chGeaendert = true;
+    } else if (aktion === 'challenge-leeren') {
+      this.challenge = {};
+      chGeaendert = true;
     } else if (aktion === 'entfernen') {
       if (entfernen(daten, nutzlast.id)) geaendert = true;
     } else if (aktion === 'leeren') {
@@ -196,6 +231,7 @@ export class Raum {
       status = 404;
     }
     if (geaendert) await this.sichere();
+    if (chGeaendert) await this.state.storage.put('challenge', this.challenge);
     return new Response(JSON.stringify(ergebnis), { status, headers: { 'Content-Type': 'application/json' } });
   }
 
