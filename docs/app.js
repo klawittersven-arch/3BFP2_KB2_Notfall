@@ -115,6 +115,46 @@
   var neustarts = Math.min(99, Math.max(0, Number(gespeichert(NEUSTARTS)) || 0));
   function gesperrt(z) { return !z.geloest && z.sperreBis && Date.now() < z.sperreBis; }
 
+  // ---------- Reihenfolge der Karten ----------
+  // Jede/r bekommt die Karten in einer eigenen, zufälligen Reihenfolge – so entsteht kein erkennbares
+  // Antwortmuster (z. B. immer im Wechsel). Die Reihenfolge bleibt beim Neuladen gleich und wird bei
+  // „Noch einmal üben“ neu gemischt. Intern bleibt jede Karte über ihre Nummer aus inhalte.js erkennbar.
+  var REIHENFOLGE = SPEICHER + '-reihenfolge';
+  function zufallsZahl(n) { // 0 … n-1
+    try { var a = new Uint32Array(1); window.crypto.getRandomValues(a); return a[0] % n; } catch (e) { return Math.floor(Math.random() * n); }
+  }
+  // Auffällige Folgen vermeiden: streng periodisch (z. B. F-H-F-H …) oder nach Antwortknöpfen sortiert
+  function auffaellig(r) {
+    var kz = U.knoepfe.map(function (b) { return b.kuerzel; });
+    var f = r.map(function (i) { return richtigeListe(U.karten[i])[0]; });
+    var p = kz.length, periodisch = f.length > p, sortiert = true, verschieden = false;
+    for (var i = 1; i < f.length; i++) {
+      if (i >= p && f[i] !== f[i - p]) periodisch = false;
+      if (kz.indexOf(f[i]) < kz.indexOf(f[i - 1])) sortiert = false;
+      if (f[i] !== f[0]) verschieden = true;
+    }
+    return verschieden && (periodisch || sortiert);
+  }
+  function mische() {
+    var r, versuche = 0;
+    do {
+      r = U.karten.map(function (k, i) { return i; });
+      for (var i = r.length - 1; i > 0; i--) { var j = zufallsZahl(i + 1), t = r[i]; r[i] = r[j]; r[j] = t; }
+    } while (auffaellig(r) && ++versuche < 50);
+    return r;
+  }
+  function gueltigeReihenfolge(r) {
+    if (!Array.isArray(r) || r.length !== U.karten.length) return false;
+    var gesehen = {};
+    return r.every(function (i) {
+      if (typeof i !== 'number' || i < 0 || i >= U.karten.length || gesehen[i]) return false;
+      gesehen[i] = true;
+      return true;
+    });
+  }
+  var reihenfolge = lade(REIHENFOLGE);
+  if (!gueltigeReihenfolge(reihenfolge)) { reihenfolge = mische(); speichere(REIHENFOLGE, reihenfolge); }
+
   // ---------- Seite aufbauen ----------
   document.title = U.titel + ' – ' + A.kopfzeile;
   document.getElementById('kopfzeile').textContent = A.kopfzeile + ' · ' + U.ab;
@@ -157,21 +197,32 @@
   U.karten.forEach(function (k, i) {
     var el = document.createElement('section');
     el.className = 'karte';
+    el.setAttribute('data-index', i);
     el.setAttribute('aria-labelledby', 'k' + i + '-text');
     var knoepfe = U.knoepfe.map(function (b) {
       return '<button type="button" class="antwort" data-kuerzel="' + esc(b.kuerzel) + '">' +
         '<span class="symbol" aria-hidden="true"></span><span class="beschriftung">' + esc(b.text) + '</span></button>';
     }).join('');
     el.innerHTML =
-      '<p class="karte-text" id="k' + i + '-text"><span class="nummer">' + esc(k.nummer) + '</span>' + fmt(k.text) + '</p>' +
-      '<div class="knoepfe knoepfe-' + U.knoepfe.length + (zweiMalZwei ? ' knoepfe-2x2' : (lang ? ' knoepfe-lang' : '')) + '" role="group" aria-label="Antwort zu Karte ' + esc(k.nummer) + '">' + knoepfe + '</div>' +
+      '<p class="karte-text" id="k' + i + '-text"><span class="nummer"></span>' + fmt(k.text) + '</p>' +
+      '<div class="knoepfe knoepfe-' + U.knoepfe.length + (zweiMalZwei ? ' knoepfe-2x2' : (lang ? ' knoepfe-lang' : '')) + '" role="group">' + knoepfe + '</div>' +
       '<div class="rueckmeldung" role="status" aria-live="polite"></div>';
-    kartenBox.appendChild(el);
     kartenEl.push(el);
     Array.prototype.forEach.call(el.querySelectorAll('.antwort'), function (btn) {
       btn.addEventListener('click', function () { antworte(i, btn.getAttribute('data-kuerzel')); });
     });
   });
+
+  // Karten in der aktuellen Reihenfolge anzeigen und von oben nach unten durchnummerieren
+  function ordne() {
+    reihenfolge.forEach(function (i, pos) {
+      var el = kartenEl[i];
+      el.querySelector('.nummer').textContent = pos + 1;
+      el.querySelector('.knoepfe').setAttribute('aria-label', 'Antwort zu Karte ' + (pos + 1));
+      kartenBox.appendChild(el);
+    });
+  }
+  ordne();
 
   // ---------- Antworten ----------
   function antworte(i, kuerzel) {
@@ -308,6 +359,9 @@
     document.getElementById('zu-schnell').hidden = true;
     zustand = leererZustand();
     speichere(SPEICHER, zustand);
+    reihenfolge = mische();
+    speichere(REIHENFOLGE, reihenfolge);
+    ordne();
     var l = lokal();
     if (l) {
       var geloest = lade(GELOEST, l) || {};

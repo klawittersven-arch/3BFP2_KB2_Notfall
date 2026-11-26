@@ -5,6 +5,7 @@
  * Teil B: mit Fortschrittsanzeige – Namenseingabe mit Klassenwahl, Senden des Fortschritts (nachgebildeter Server).
  * Teil C: Lehrerseiten je Klasse – Anzeige der Namen und Zahlen, Besprechen, Entfernen, Leeren.
  * Teil D: Schutz gegen Durchklicken – Sperre nach Fehler, Neustart bei zu schnellen Fehlern, ↺ auf der Lehrerseite.
+ * Teil A2: zufällige Reihenfolge der Karten – je Handy anders, beim Neuladen gleich, bei „Noch einmal üben“ neu, nie im Wechsel/sortiert.
  * Teil E: Belohnungsspiel nach Übung ab3a – Freischaltung, Spiel, Bestleistung auf der Lehrerseite neben dem Namen.
  * In Teil A–C sind Sperre und Neustart ausgeschaltet (sonst würden die schnellen Testklicks sie auslösen). */
 const { chromium } = require('playwright');
@@ -25,6 +26,18 @@ function einstellungen(text, server, schutz) {
       .replace(/zuSchnell: \{ fehler: \d+/, 'zuSchnell: { fehler: 0');
   }
   return text;
+}
+
+// Auffällige Antwortfolge (wie in docs/app.js): streng periodisch oder nach Antwortknöpfen sortiert
+function auffaellig(f, kz) {
+  const p = kz.length;
+  let periodisch = f.length > p, sortiert = true, verschieden = false;
+  for (let i = 1; i < f.length; i++) {
+    if (i >= p && f[i] !== f[i - p]) periodisch = false;
+    if (kz.indexOf(f[i]) < kz.indexOf(f[i - 1])) sortiert = false;
+    if (f[i] !== f[0]) verschieden = true;
+  }
+  return verschieden && (periodisch || sortiert);
 }
 
 function webserver() {
@@ -126,12 +139,12 @@ function fortschrittsServer() {
 
       const k0 = U.karten[0];
       const falsch0 = U.knoepfe.map(b => b.kuerzel).find(k => ![].concat(k0.richtig).includes(k));
-      await karten.nth(0).locator(`button[data-kuerzel="${falsch0}"]`).click();
-      pruefe((await karten.nth(0).locator('.rueckmeldung').innerText()).includes('Tipp'), `${id}: Tipp nach falscher Antwort`);
+      await page.locator(`.karte[data-index="${0}"]`).locator(`button[data-kuerzel="${falsch0}"]`).click();
+      pruefe((await page.locator(`.karte[data-index="${0}"]`).locator('.rueckmeldung').innerText()).includes('Tipp'), `${id}: Tipp nach falscher Antwort`);
 
       for (let i = 0; i < U.karten.length; i++) {
         const r = [].concat(U.karten[i].richtig)[0];
-        await karten.nth(i).locator(`button[data-kuerzel="${r}"]`).click();
+        await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${r}"]`).click();
       }
       pruefe(await bereich.isVisible(), `${id}: Zusammenfassung sichtbar`);
       pruefe((await bereich.innerText()).includes('Das Wichtigste in Kürze'), `${id}: Zusammenfassung erscheint (bei 1 Fehler)`);
@@ -146,13 +159,13 @@ function fortschrittsServer() {
       if (mehrfach >= 0) {
         await page.click('#noch-einmal');
         const zweite = U.karten[mehrfach].richtig[1];
-        await karten.nth(mehrfach).locator(`button[data-kuerzel="${zweite}"]`).click();
-        pruefe(await karten.nth(mehrfach).locator('.ist-richtig').count() === 1 &&
-          (await karten.nth(mehrfach).locator('.rueckmeldung').innerText()).includes(U.karten[mehrfach].erklaerung[zweite].replace(/\*\*/g, '').slice(0, 20)),
+        await page.locator(`.karte[data-index="${mehrfach}"]`).locator(`button[data-kuerzel="${zweite}"]`).click();
+        pruefe(await page.locator(`.karte[data-index="${mehrfach}"]`).locator('.ist-richtig').count() === 1 &&
+          (await page.locator(`.karte[data-index="${mehrfach}"]`).locator('.rueckmeldung').innerText()).includes(U.karten[mehrfach].erklaerung[zweite].replace(/\*\*/g, '').slice(0, 20)),
           `${id}: zweite richtige Antwort bei Karte ${U.karten[mehrfach].nummer} mit eigener Erklärung`);
         for (let i = 0; i < U.karten.length; i++) {
           if (i === mehrfach) continue;
-          await karten.nth(i).locator(`button[data-kuerzel="${[].concat(U.karten[i].richtig)[0]}"]`).click();
+          await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${[].concat(U.karten[i].richtig)[0]}"]`).click();
         }
       }
       await page.reload();
@@ -164,10 +177,10 @@ function fortschrittsServer() {
         const richtige = [].concat(U.karten[i].richtig);
         for (const b of U.knoepfe.map(x => x.kuerzel)) {
           if (richtige.includes(b)) continue;
-          const btn = karten.nth(i).locator(`button[data-kuerzel="${b}"]`);
+          const btn = page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${b}"]`);
           if (await btn.isEnabled()) await btn.click();
         }
-        await karten.nth(i).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
+        await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
       }
       pruefe((await bereich.innerText()).includes('nicht einfach durchklicken'), `${id}: Durchklicken erkannt`);
       pruefe(await page.locator('a[href]').count() === 0, `${id}: keine Links zu anderen Seiten`);
@@ -191,6 +204,45 @@ function fortschrittsServer() {
     await page.goto(basis + 'lehrer-3bfp2-2-ab1.html');
     pruefe((await page.locator('#l-inhalt').innerText()).includes('Noch nicht eingerichtet'), 'Lehrerseite ohne Server: Hinweis zur Einrichtung');
     pruefe(fehler.length === 0, 'Teil A: keine Konsolenfehler / fremden Anfragen: ' + fehler.join(' | '));
+    await ctx.close();
+  }
+
+  /* ---------------- Teil A2: zufällige Reihenfolge der Karten ---------------- */
+  {
+    const ctx = await browser.newContext({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
+    await ctx.route('**/einstellungen.js', async route => {
+      const antwort = await route.fetch();
+      await route.fulfill({ response: antwort, body: einstellungen(await antwort.text(), '', false) });
+    });
+    const page = await ctx.newPage();
+    const fehler = [];
+    beobachte(page, fehler);
+    const lies = () => page.evaluate(() => [...document.querySelectorAll('.karte')].map(e => ({ i: Number(e.dataset.index), nr: e.querySelector('.nummer').textContent })));
+    for (const id of IDS) {
+      const U = I[id], n = U.karten.length, kz = U.knoepfe.map(b => b.kuerzel);
+      const folgen = new Set();
+      let gueltig = true, nummern = true, unauffaellig = true;
+      for (let v = 0; v < 8; v++) {
+        await page.goto(basis + id + '.html');
+        await page.evaluate(() => sessionStorage.clear());
+        await page.reload();
+        const r = await lies(), idx = r.map(x => x.i);
+        if ([...idx].sort((x, y) => x - y).join() !== [...Array(n).keys()].join()) gueltig = false;
+        if (r.some((x, pos) => x.nr !== String(pos + 1))) nummern = false;
+        if (auffaellig(idx.map(i => [].concat(U.karten[i].richtig)[0]), kz)) unauffaellig = false;
+        folgen.add(idx.join());
+      }
+      pruefe(gueltig && nummern, `${id}: jede Karte genau einmal, Nummern 1–${n} von oben nach unten`);
+      pruefe(unauffaellig, `${id}: keine Antwortfolge im Wechsel oder sortiert`);
+      pruefe(folgen.size >= 2, `${id}: Reihenfolge zufällig (${folgen.size} verschiedene bei 8 Aufrufen)`);
+      const vorher = (await lies()).map(x => x.i).join();
+      await page.reload();
+      pruefe((await lies()).map(x => x.i).join() === vorher, `${id}: Reihenfolge bleibt beim Neuladen gleich`);
+      let neu = false;
+      for (let v = 0; v < 5 && !neu; v++) { await page.click('#noch-einmal'); neu = (await lies()).map(x => x.i).join() !== vorher; }
+      pruefe(neu, `${id}: „Noch einmal üben“ mischt neu`);
+    }
+    pruefe(fehler.length === 0, 'Teil A2: keine Konsolenfehler / fremden Anfragen: ' + fehler.join(' | '));
     await ctx.close();
   }
 
@@ -236,8 +288,8 @@ function fortschrittsServer() {
     const U = I.ab1a;
     const karten = page.locator('.karte');
     const falsch0 = U.knoepfe.map(b => b.kuerzel).find(k => ![].concat(U.karten[1].richtig).includes(k));
-    await karten.nth(1).locator(`button[data-kuerzel="${falsch0}"]`).click();
-    for (let i = 0; i < 6; i++) await karten.nth(i).locator(`button[data-kuerzel="${[].concat(U.karten[i].richtig)[0]}"]`).click();
+    await page.locator(`.karte[data-index="${1}"]`).locator(`button[data-kuerzel="${falsch0}"]`).click();
+    for (let i = 0; i < 6; i++) await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${[].concat(U.karten[i].richtig)[0]}"]`).click();
     await page.waitForTimeout(200);
     const letzter = fs1.posts[fs1.posts.length - 1];
     pruefe(letzter.geloest === 6 && letzter.raum === 'k2-ab1' && letzter.uebung === 'ab1a' && letzter.gesamt === U.karten.length, 'B: Fortschritt 6/12 gesendet');
@@ -247,7 +299,7 @@ function fortschrittsServer() {
     await page.goto(basis + 'ab2c.html');
     pruefe(await page.locator('#name-bereich').isHidden() && (await page.locator('#name-zeile').innerText()).includes('Lena K.'), 'B: Name und Klasse bleiben gespeichert');
     for (let i = 0; i < I.ab2c.karten.length; i++) {
-      await page.locator('.karte').nth(i).locator(`button[data-kuerzel="${[].concat(I.ab2c.karten[i].richtig)[0]}"]`).click();
+      await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${[].concat(I.ab2c.karten[i].richtig)[0]}"]`).click();
     }
     await page.waitForTimeout(200);
     const ab2 = fs1.posts[fs1.posts.length - 1];
@@ -258,7 +310,7 @@ function fortschrittsServer() {
     pruefe(await page.locator('#name-bereich').isVisible() && await page.locator('input[name=klasse][value=k2]').isChecked(), 'B: Ändern zeigt die bisherige Klasse');
     await anmelden(page, 'Anna-Lena K.', 'k1');
     pruefe((await page.locator('#name-zeile').innerText()).includes('Anna-Lena K. · 3BFP2/1'), 'B: geänderter Name und Klasse');
-    for (let i = 0; i < I.ab1b.karten.length; i++) await page.locator('.karte').nth(i).locator(`button[data-kuerzel="${[].concat(I.ab1b.karten[i].richtig)[0]}"]`).click();
+    for (let i = 0; i < I.ab1b.karten.length; i++) await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${[].concat(I.ab1b.karten[i].richtig)[0]}"]`).click();
     await page.waitForTimeout(200);
     pruefe(fs1.posts[fs1.posts.length - 1].geloest === I.ab1b.karten.length && fs1.posts[fs1.posts.length - 1].raum === 'k1-ab1', 'B: fertige Übung an neue Klasse gesendet');
     const breit = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
@@ -275,7 +327,7 @@ function fortschrittsServer() {
       await p.goto(basis + 'ab1a.html');
       await anmelden(p, n, 'k2');
       for (let i = 0; i < anzahl; i++) {
-        const k = p.locator('.karte').nth(i);
+        const k = p.locator(`.karte[data-index="${i}"]`);
         if (falsch.includes(I.ab1a.karten[i].nummer)) {
           const f = I.ab1a.knoepfe.map(b => b.kuerzel).find(x => ![].concat(I.ab1a.karten[i].richtig).includes(x));
           await k.locator(`button[data-kuerzel="${f}"]`).click();
@@ -308,7 +360,7 @@ function fortschrittsServer() {
     pruefe(pillen.some(p => p.includes('Tim B.') && p.includes('✓ 12/12')) && pillen.some(p => p.includes('Jonas W.') && p.includes('⚠ 6/12')), 'C: fertig mit Zahl der beim ersten Versuch richtigen Karten: ' + pillen.join(' | '));
     pruefe(await a.locator('.l-klick').count() === 1, 'C: Durchklicken (Jonas W.) wird markiert');
     const oft = await a.locator('.l-oft li').allInnerTexts();
-    pruefe(oft.length === 3 && oft[0].startsWith('Karte 2 · 3×'), 'C: häufigster Fehler Karte 2: ' + oft.join(' | '));
+    pruefe(oft.length === 3 && oft[0].startsWith('3×') && oft[0].includes('verstand nicht'), 'C: häufigster Fehler (Karte 2, ohne Nummer): ' + oft.join(' | '));
     await a.locator('.l-oft-knopf').first().click();
     const ansicht = page.locator('.l-besprechen');
     pruefe(await ansicht.isVisible(), 'C: Besprechen-Ansicht öffnet sich');
@@ -370,16 +422,16 @@ function fortschrittsServer() {
     const falschK = i => U.knoepfe.map(b => b.kuerzel).find(k => ![].concat(U.karten[i].richtig).includes(k));
     const richtigK = i => [].concat(U.karten[i].richtig)[0];
     // Sperre nach einer falschen Antwort
-    await karten.nth(0).locator(`button[data-kuerzel="${falschK(0)}"]`).click();
-    const r0 = karten.nth(0).locator(`button[data-kuerzel="${richtigK(0)}"]`);
+    await page.locator(`.karte[data-index="${0}"]`).locator(`button[data-kuerzel="${falschK(0)}"]`).click();
+    const r0 = page.locator(`.karte[data-index="${0}"]`).locator(`button[data-kuerzel="${richtigK(0)}"]`);
     pruefe(await r0.isDisabled(), 'D: nach falscher Antwort sind die Knöpfe gesperrt');
-    pruefe((await karten.nth(0).locator('.sperre').innerText()).includes('weiter in'), 'D: Countdown „weiter in … s“ sichtbar');
+    pruefe((await page.locator(`.karte[data-index="${0}"]`).locator('.sperre').innerText()).includes('weiter in'), 'D: Countdown „weiter in … s“ sichtbar');
     await page.screenshot({ path: path.join(__dirname, 'handy-sperre.png') });
     await page.waitForTimeout(5400);
-    pruefe(await r0.isEnabled() && await karten.nth(0).locator('.sperre').count() === 0, 'D: nach 5 s wieder freigegeben');
+    pruefe(await r0.isEnabled() && await page.locator(`.karte[data-index="${0}"]`).locator('.sperre').count() === 0, 'D: nach 5 s wieder freigegeben');
     // Zwei weitere schnelle Fehler (insgesamt 3 in 10 s) → Neustart
-    await karten.nth(1).locator(`button[data-kuerzel="${falschK(1)}"]`).click();
-    await karten.nth(2).locator(`button[data-kuerzel="${falschK(2)}"]`).click();
+    await page.locator(`.karte[data-index="${1}"]`).locator(`button[data-kuerzel="${falschK(1)}"]`).click();
+    await page.locator(`.karte[data-index="${2}"]`).locator(`button[data-kuerzel="${falschK(2)}"]`).click();
     await page.waitForTimeout(300);
     pruefe(await page.locator('#zu-schnell').isVisible() && (await page.locator('#zu-schnell').innerText()).includes('Zu schnell'), 'D: Hinweis „Zu schnell geklickt!“');
     pruefe((await page.locator('#fortschritt-text').innerText()).startsWith('0 von') && await page.locator('.ist-falsch').count() === 0, 'D: Übung beginnt von vorn');
@@ -387,14 +439,14 @@ function fortschrittsServer() {
     const letzter = fs1.posts[fs1.posts.length - 1];
     pruefe(letzter.neu === 1 && letzter.geloest === 0 && letzter.name === 'Ben D.', 'D: Neustart wird gesendet (neu = 1)');
     // Eine richtige Antwort blendet den Hinweis aus; der Zähler bleibt
-    await karten.nth(0).locator(`button[data-kuerzel="${richtigK(0)}"]`).click();
+    await page.locator(`.karte[data-index="${0}"]`).locator(`button[data-kuerzel="${richtigK(0)}"]`).click();
     pruefe(await page.locator('#zu-schnell').isHidden(), 'D: Hinweis verschwindet nach richtiger Antwort');
     await page.reload();
-    await karten.nth(1).locator(`button[data-kuerzel="${richtigK(1)}"]`).click();
+    await page.locator(`.karte[data-index="${1}"]`).locator(`button[data-kuerzel="${richtigK(1)}"]`).click();
     await page.waitForTimeout(200);
     pruefe(fs1.posts[fs1.posts.length - 1].neu === 1, 'D: Zähler bleibt nach Neuladen erhalten');
     // Ein einzelner Fehler mit Pause löst keinen Neustart aus
-    await karten.nth(2).locator(`button[data-kuerzel="${falschK(2)}"]`).click();
+    await page.locator(`.karte[data-index="${2}"]`).locator(`button[data-kuerzel="${falschK(2)}"]`).click();
     pruefe(await page.locator('#zu-schnell').isHidden() && (await page.locator('#fortschritt-text').innerText()).startsWith('2 von'), 'D: einzelner Fehler → kein Neustart');
     pruefe(fehler.length === 0, 'Teil D: keine Konsolenfehler: ' + fehler.join(' | '));
     await ctx.close();
@@ -419,11 +471,11 @@ function fortschrittsServer() {
         if (mitFehler) {
           for (const b of U.knoepfe.map(x => x.kuerzel)) {
             if (richtige.includes(b)) continue;
-            const btn = karten.nth(i).locator(`button[data-kuerzel="${b}"]`);
+            const btn = page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${b}"]`);
             if (await btn.isEnabled()) await btn.click();
           }
         }
-        await karten.nth(i).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
+        await page.locator(`.karte[data-index="${i}"]`).locator(`button[data-kuerzel="${richtige[0]}"]`).click();
       }
     };
     const ctx = await kontextMitServer({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });

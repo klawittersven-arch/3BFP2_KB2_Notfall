@@ -101,6 +101,7 @@
           '<button type="button" class="l-weg" data-id="' + esc(z.p.id) + '" data-name="' + esc(z.p.name) + '" aria-label="' + esc(z.p.name) + ' entfernen">×</button></li>';
       }).join('');
       // Welche Karten waren beim ersten Versuch am häufigsten falsch – und welche Antwort wurde gewählt?
+      // (Ohne Kartennummer: Jedes Handy zeigt die Karten in einer anderen Reihenfolge.)
       var zaehler = {};
       zeilen.forEach(function (z) {
         if (!z.u || !z.u.falsch) return;
@@ -120,7 +121,7 @@
         liste.slice(0, 3).map(function (o, i) {
           var karte = U.karten.filter(function (k) { return k.nummer === o.nr; })[0];
           return '<li><button type="button" class="l-oft-knopf" data-uebung="' + uid + '" data-index="' + i + '">' +
-            '<strong>Karte ' + o.nr + ' · ' + o.anzahl + '×</strong> ' + esc(kurz(karte ? karte.text : '', 90)) + '</button></li>';
+            '<strong>' + o.anzahl + '×</strong> ' + esc(kurz(karte ? karte.text : '', 90)) + '</button></li>';
         }).join('') + '</ol>' : '';
       var proz = function (x) { return gesamt ? (100 * x / gesamt) : 0; };
       return '<section class="l-karte" data-uebung="' + uid + '">' +
@@ -180,7 +181,7 @@
     var frage = gewaehlt.length === 1 ? 'Was spricht für „' + gewaehlt[0].text + '“ – und was dagegen?' :
       'Was spricht für die gewählten Antworten – und was dagegen?';
     var erklaerung = typeof k.erklaerung === 'object' ? (k.erklaerung[richtige[0]] || '') : (k.erklaerung || '');
-    ansicht.innerHTML = '<div class="l-b-kopf"><span>' + esc(U.titel) + ' · Karte ' + o.nr + ' · beim ersten Versuch ' +
+    ansicht.innerHTML = '<div class="l-b-kopf"><span>' + esc(U.titel) + ' · beim ersten Versuch ' +
       o.anzahl + '× falsch</span><button type="button" class="l-knopf l-zweit" id="l-b-zu">Schließen</button></div>' +
       '<p class="l-b-aussage">' + fmt(k.text) + '</p>' +
       '<div class="l-b-knoepfe">' + knoepfe + '</div>' +
