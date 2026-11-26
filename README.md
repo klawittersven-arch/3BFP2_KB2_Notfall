@@ -206,16 +206,34 @@ Lernfragen aus SW 6 („Können Sie sie jetzt beantworten?“).
 - Beim ersten Öffnen geben die SuS **Vorname + Anfangsbuchstaben des Nachnamens** ein („Lena K.“; aus „Lena Kraus“
   wird automatisch „Lena K.“) und wählen ihre **Klasse** (3BFP2/1 oder 3BFP2/2). Das Handy merkt sich beides
   für alle Übungen; „ändern“ ist jederzeit möglich.
-- Karten mit Aussagen, darunter die Antwortknöpfe. **Richtig:** grün mit ✓ und Erklärung. **Falsch:** orange mit ✗ und
-  Tipp – die Lösung wird nie verraten. Manche Karten haben zwei richtige Antworten (wie im Erwartungshorizont der KA).
+- **Kartenstapel:** Es ist immer nur **eine Karte** zu sehen („3 von 10“). Die Reihenfolge ist auf jedem Handy anders
+  gemischt (nie im Wechsel, nie sortiert, höchstens 3 gleiche Antworten hintereinander) und bleibt beim Neuladen gleich.
+  **Richtig:** grün mit ✓ und Erklärung, dann „Weiter“. **Falsch:** orange mit ✗ und Tipp – die Lösung wird nie verraten;
+  die Knöpfe sind 1,5 Sekunden gesperrt, damit der Tipp gelesen wird. Manche Karten haben zwei richtige Antworten
+  (wie im Erwartungshorizont der KA).
+- **Schritt 2** (einige Karten): Nach der richtigen Antwort kommt eine zweite Frage – bei Richtig/Falsch die passende
+  **Begründung**, bei „Hemmer“ die **bessere Antwort**. Erst dann ist die Karte gelöst.
+- **Aufwärmen** (SPIKES, ABCDE): Vor den Karten die Schritte in die richtige Reihenfolge tippen (ohne Herzen).
+- **Herzen gegen Durchklicken:** Jede falsche Antwort kostet ein ❤️ (Standard: 3). Ist das letzte Herz weg, kommt eine
+  **Lesepause** („Lesen Sie den Infotext auf Ihrem Arbeitsblatt noch einmal“, 20 s) und die Übung **beginnt neu – mit
+  neu gemischten Karten**; die Lehrerseite zeigt dann ↺ beim Namen. **5 Karten in Folge** beim ersten Versuch richtig
+  geben ein Herz zurück (🔥-Serie).
+- **Lesezeit** (wie in der ILS-App): Wer unmöglich schnell tippt, bekommt „Langsam! Lesen Sie zuerst die ganze Karte.“ –
+  das zählt nicht. Wer schnell **und falsch** tippt, verliert ein Herz und bekommt einen Hinweis. Nach 3 Warnungen kommt eine
+  kurze Lesepause (15 s). Richtige Antworten zählen immer, der zweite Versuch nach einem Tipp wird nicht gebremst.
 - Erst wenn alle Karten gelöst sind, erscheint z. B. **„Übung 1 abgeschlossen!“** mit dem Hinweis auf die nächste Aufgabe
-  auf dem Arbeitsblatt und „Das Wichtigste in Kürze“. Wer durchklickt, bekommt „Hey, nicht einfach durchklicken!“
-  (ohne den Hinweis auf die nächste Aufgabe).
-- **Schutz gegen Durchklicken:** Nach einer falschen Antwort ist die Karte **5 Sekunden gesperrt** („Lesen Sie den
-  Tipp – weiter in 3 s“). Wer **3 falsche Antworten innerhalb von 10 Sekunden** gibt, sieht „Zu schnell geklickt!“ und
-  die Übung **beginnt von vorn**; die Lehrerseite zeigt dann ↺ beim Namen. Die Werte stehen in
-  `docs/einstellungen.js` (`sperreNachFehlerSekunden`, `zuSchnell: { fehler, sekunden }`); `0` schaltet die
-  jeweilige Funktion aus.
+  auf dem Arbeitsblatt, die **Sterne** (★★★ ohne Fehler, ★★☆ bei 1–2 Fehlern, sonst ★☆☆ – es zählt die beste Wertung)
+  und „Das Wichtigste in Kürze“. „Noch einmal üben – für mehr Sterne“ gibt es erst am Ende.
+- **Bonus-Fall** (SPIKES-Telefonat): freiwillig nach der Zusammenfassung, ohne Herzen und ohne Punkte.
+- **Wochen-Challenge:** Wer alle Übungen einer Woche geschafft hat, sieht „🏆 Zur Wochen-Challenge“ (`challenge-kb2w1.html`
+  usw.): 15 Karten aus allen Übungen der Woche, ein Versuch je Karte, 100 Punkte je richtige Karte plus Zeitbonus bis
+  500 Punkte (rechnet der Server). Die Lehrerseite der Woche zeigt die **Bestenliste** der Klasse mit „🏆 Siegerehrung“
+  (Treppchen für den Beamer), „QR-Code für alle“ (öffnet die Challenge auch ohne geschaffte Übungen) und „Bestenliste
+  leeren“. Die **TB2-Challenge** zur Wiederholung am 11.01. (`challenge-kb2w5.html`, Lehrerseite `lehrer-3bfp2-…-kb2w5.html`)
+  zieht 20 Karten aus allen vier Wochen und ist für alle offen.
+- Alle Werte stehen in `docs/einstellungen.js` (`herzen`, `herzZurueckNach`, `leerePauseSekunden`, `lesezeit`,
+  `langsamPauseSekunden`). `herzen: 0` schaltet die Herzen aus – dann gilt wieder die Mindestzahl richtiger Karten
+  beim ersten Versuch (`mindestens` in `inhalte.js`, sonst „Hey, nicht einfach durchklicken!“).
 
 ## Einrichten (einmalig, ca. 10 Minuten)
 
@@ -239,11 +257,12 @@ nur die Lehrerseite zeigt dann „Keine Verbindung zum Server“.
 ## Datenschutz
 
 - Übertragen werden nur: der eingegebene Name („Lena K.“), die Klasse, eine zufällige Geräte-Kennung, die Übung,
-  die Zahl der gelösten Karten, die Zahl der Neustarts und die Nummern der Karten, die beim ersten Versuch falsch
-  waren – beim Belohnungsspiel zusätzlich die Bestleistung (eine Zahl). Keine Anmeldung, keine Cookies, keine
-  Analyse, keine fremden Skripte.
+  die Zahl der gelösten Karten, die Zahl der Neustarts, die Sterne und die Nummern der Karten, die beim ersten Versuch
+  falsch waren – beim Belohnungsspiel zusätzlich die Bestleistung (eine Zahl), bei der Challenge die Zahl der richtigen
+  Karten und die Dauer (die Punkte rechnet der Server). Keine Anmeldung, keine Cookies, keine Analyse, keine fremden Skripte.
 - Die Lehrerseite zeigt Fehler nur zusammengefasst für die Klasse, nicht je Person.
-- Gelöscht wird automatisch nach 12 Stunden ohne Aktivität oder sofort mit „Liste leeren“.
+- Gelöscht wird automatisch nach 12 Stunden ohne Aktivität oder sofort mit „Liste leeren“. Die Bestenliste der Challenge
+  (nur Name, Punkte, richtige Karten, Dauer) bleibt für die Siegerehrung bis zu 10 Tage – oder bis „Bestenliste leeren“.
 - Fall-Einführung: zusätzlich die gewählten Antworten und die geschriebenen Texte (Perspektiven, Begriffsparkplatz).
   Der Beamer zeigt Antworten nur zusammengezählt und Texte ohne Namen. „Ergebnis sichern“ speichert nur Zahlen und Texte
   ohne Namen.
@@ -266,13 +285,14 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
 
 ## Tests
 
-- `node tests/uebungen.test.js` prüft mit Playwright alle Übungen in Handygröße (360 px), Namenseingabe mit
-  Klassenwahl, Senden des Fortschritts, Schutz gegen Durchklicken, die Lehrerseiten je Klasse und das Belohnungsspiel
-  (Freischaltung, Lauf, Bestleistung neben dem Namen) – mit nachgebildetem Server.
+- `node tests/uebungen.test.js` prüft mit Playwright alle Übungen in Handygröße (360 px) als Kartenstapel (Aufwärmen,
+  Tipp, Sperre, Schritt 2, Sterne, Bonus-Fall, Reihenfolge), Herzen mit Lesepause und Neustart, Serie, Lesezeit,
+  Namenseingabe mit Klassenwahl, Senden des Fortschritts, die Lehrerseiten je Klasse, das Belohnungsspiel und die
+  Wochen-/TB2-Challenge mit Bestenliste, Siegerehrung und QR-Code – mit nachgebildetem Server.
 - `node tests/fall.test.js` prüft die Fall-Einführung: Falltext unverändert (Prüfsumme), Ablauf mit Beamer und zwei Handys
   mit dem echten Worker (Kaltstart, Vorstellung, Ampel, Auflösen, Zurückspulen, Perspektiven mit KB, Begriffsparkplatz, Sichern, SW 13 mit Vergleich).
 - `cd server && node test/worker.test.js` prüft den Worker (Eingabeprüfung, Klassen-Räume, Entfernen, Leeren,
-  Löschen nach 12 Stunden, Obergrenzen, Bestleistung im Belohnungsspiel).
+  Löschen nach 12 Stunden, Obergrenzen, Bestleistung im Belohnungsspiel, Sterne, Challenge-Punkte und Bestenliste).
 
 ## Dateien
 

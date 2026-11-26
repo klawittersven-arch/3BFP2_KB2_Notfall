@@ -13,6 +13,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -177,3 +178,75 @@ a { color: var(--petrol); }
 .belohnung { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; background: #FFF6D6; border: 3px solid #F2B600; }
 .belohnung p { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: var(--dunkelpetrol); }
 .belohnung .knopf { display: block; width: 100%; text-align: center; font-size: 20px; }
+
+/* ==========================================================================
+   Kartenstapel mit Herzen (seit 26.11.2026) und Challenge
+   ========================================================================== */
+.herzen { display: inline-flex; align-items: center; gap: 2px; font-size: 19px; white-space: nowrap; }
+#fortschritt-text { white-space: nowrap; }
+.fortschritt-spur { min-width: 36px; }
+.herz-weg { opacity: .55; }
+.serie, .uhr { margin-left: 6px; padding: 1px 8px; border-radius: 12px; background: #FFF2D9; color: var(--bernstein); font-size: 15px; font-weight: 700; }
+.uhr { background: var(--hellblau); color: var(--dunkelpetrol); font-variant-numeric: tabular-nums; }
+.meldung { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; font-weight: 700; }
+.meldung-warnung { background: var(--bernstein-hell); border: 2px solid var(--bernstein-rand); color: var(--bernstein); }
+.meldung-gut { background: var(--gruen-hell); border: 2px solid var(--gruen); color: var(--gruen); }
+
+.karte-kopf { margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #3D5257; }
+.karte-kopf .nummer { margin-right: 4px; }
+.weiter-knopf { width: 100%; margin-top: 12px; font-size: 19px; }
+.schritt2 { margin-top: 12px; padding-top: 10px; border-top: 2px dashed var(--rand); }
+.schritt2-frage { margin: 0 0 8px; font-weight: 700; color: var(--dunkelpetrol); }
+.optionen { display: grid; gap: 8px; grid-template-columns: 1fr; }
+.antwort.option { justify-content: flex-start; text-align: left; font-weight: 600; padding: 10px 12px; }
+.antwort.option .beschriftung { flex: 1; }
+
+/* Erster Schritt richtig – jetzt der zweite */
+.s1-ok { margin: 10px 0 0; font-weight: 700; color: var(--gruen); }
+
+/* Lesepause und „keine Herzen mehr“ */
+.pause { padding: 20px 16px; border-radius: 12px; text-align: center; background: var(--bernstein-hell); border: 3px solid var(--bernstein-rand); }
+.pause h2 { margin: 0 0 8px; font-size: 22px; color: var(--bernstein); }
+.pause p { margin: 0 0 8px; }
+.pause-symbol { font-size: 44px; line-height: 1; }
+.pause-zeit { font-size: 22px; font-weight: 800; color: var(--dunkelpetrol); font-variant-numeric: tabular-nums; }
+
+/* Aufwärmen: Reihenfolge antippen */
+.reihe-fertig { margin: 0 0 10px; padding-left: 28px; }
+.reihe-fertig li { margin: 4px 0; padding: 6px 10px; border-radius: 8px; background: var(--gruen-hell); color: var(--gruen); font-weight: 700; }
+.reihe-auswahl { display: grid; gap: 8px; grid-template-columns: 1fr; }
+.reihe-teil { justify-content: flex-start; text-align: left; padding: 10px 12px; }
+.wackeln { animation: wackeln .35s; border-color: var(--bernstein-rand); background: var(--bernstein-hell); }
+@keyframes wackeln { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* Sterne, Bonus-Fall, Wochen-Challenge am Ende */
+.sterne-box { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; background: #FFF9E6; border: 3px solid #F2B600; text-align: center; }
+.sterne-titel { margin: 0; font-weight: 700; color: var(--dunkelpetrol); }
+.sterne { margin: 2px 0; font-size: 40px; line-height: 1.1; color: #E0A100; letter-spacing: 4px; }
+.sterne-text, .sterne-best { margin: 0; font-weight: 600; }
+.sterne-best { font-size: 15px; color: #3D5257; }
+.bonus-box, .challenge-box { margin: 16px 0 0; padding: 14px 16px; border-radius: 12px; }
+.bonus-box { background: #F3EEFB; border: 3px solid #7B5EA7; }
+.bonus-box .knopf { width: 100%; background: #6A4C97; border-color: #6A4C97; font-size: 19px; }
+.bonus-box .hinweis-klein { margin: 6px 0 0; }
+.bonus-fertig { margin: 0 0 8px; font-weight: 800; color: var(--gruen); }
+.bonus-einleitung { margin: 0 0 10px; padding: 8px 10px; border-left: 5px solid #7B5EA7; background: #fff; font-style: italic; }
+.challenge-box { background: #FFF6D6; border: 3px solid #F2B600; }
+.challenge-box p { margin: 0 0 8px; }
+.challenge-titel { font-size: 19px; font-weight: 800; color: var(--dunkelpetrol); }
+.challenge-box .knopf { width: 100%; font-size: 19px; }
+
+/* Challenge */
+.ch-liste { list-style: none; margin: 0 0 16px; padding: 0; font-size: 18px; }
+.ch-liste li { margin: 6px 0; }
+.ch-start { width: 100%; font-size: 20px; min-height: 56px; margin: 8px 0; }
+.ch-best { margin: 6px 0; font-weight: 700; color: var(--dunkelpetrol); }
+.ch-thema { font-weight: 600; color: var(--petrol); }
+.ch-ergebnis { padding: 18px 16px; border-radius: 12px; text-align: center; background: #FFF6D6; border: 3px solid #F2B600; }
+.ch-ergebnis p { margin: 0 0 6px; }
+.ch-punkte { font-size: 34px; font-weight: 800; color: var(--dunkelpetrol); }
+.ch-fehler-titel { margin: 20px 0 8px; font-size: 20px; color: var(--dunkelpetrol); }
+.ch-loesung .karte-text { margin-bottom: 6px; }
+.ch-loesung p { margin: 0 0 4px; }
+.ch-richtig { font-weight: 700; color: var(--gruen); }
+.ch-alle { font-weight: 700; color: var(--gruen); }
