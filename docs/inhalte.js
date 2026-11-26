@@ -843,5 +843,88 @@ var INHALTE = {
       'Ehrlich bleiben: „Das weiß ich nicht. Die Ärztin oder der Arzt kann Ihnen das sagen.“',
       'Im Stress vergisst man viel: Telefonnummer und Namen aufschreiben.'
     ]
+  },
+  kb2ab08: {
+    ab: 'Belastung der Helfenden und Supervision',
+    raum: 'kb2w4',
+    titel: 'Übung: Welche Hilfe passt?',
+    anweisung: 'Nach einem Notfall: Welches **Unterstützungsangebot** passt am besten?',
+    knoepfe: [
+      { kuerzel: 'SF', text: 'Selbstfürsorge' },
+      { kuerzel: 'NB', text: 'Nachbesprechung im Team' },
+      { kuerzel: 'KB', text: 'kollegiale Beratung' },
+      { kuerzel: 'SV', text: 'Supervision' },
+      { kuerzel: 'PH', text: 'professionelle Hilfe' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Die Angebote',
+      punkte: [
+        '**Selbstfürsorge:** erste Tage – reden, Pausen, schlafen, bewegen',
+        '**Nachbesprechung:** bald nach dem Notfall, mit Leitung oder Praxisanleitung, ohne Schuldzuweisung',
+        '**Kollegiale Beratung:** Kolleginnen beraten sich gegenseitig nach festen Schritten, ohne Supervisorin',
+        '**Supervision:** Supervisorin von außen, regelmäßig, vertraulich',
+        '**Professionelle Hilfe:** Ärztin, Psychotherapie – bei Warnzeichen'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Am Abend nach dem Notfall telefoniert Aylin lange mit ihrer besten Freundin und geht früh schlafen.', richtig: 'SF',
+        erklaerung: '**Selbstfürsorge:** mit vertrauten Menschen reden und sich ausruhen – das hilft in den ersten Tagen.', tipp: 'Wer hilft hier – Profis oder sie selbst?' },
+      { nummer: 2, text: 'Am nächsten Morgen setzt sich die Wohnbereichsleitung mit allen Beteiligten zusammen: Was ist passiert? Wie geht es euch?', richtig: 'NB',
+        erklaerung: '**Nachbesprechung im Team:** bald nach dem Notfall, alle Beteiligten, ohne Schuldzuweisung.', tipp: 'Wann findet das statt – und wer ist dabei?' },
+      { nummer: 3, text: 'Einmal im Monat kommt Herr Bauer, ein Supervisor von außen, und bespricht mit dem Team belastende Situationen.', richtig: 'SV',
+        erklaerung: '**Supervision:** regelmäßig, mit einer Person von außen.', tipp: 'Gehört Herr Bauer zum Team?' },
+      { nummer: 4, text: 'Vier Kolleginnen treffen sich. Eine erzählt ihren Fall, die anderen geben nach festen Schritten Ideen – ohne Leitung von außen.', richtig: 'KB',
+        erklaerung: '**Kollegiale Beratung (Intervision):** gegenseitig, nach festen Schritten, ohne Supervisor.', tipp: 'Wer leitet das Gespräch?' },
+      { nummer: 5, text: 'Tom hat sechs Wochen nach dem Notfall noch jede Nacht Albträume und kann sich kaum konzentrieren.', richtig: 'PH',
+        erklaerung: '**Professionelle Hilfe:** Warnzeichen – länger als vier Wochen. Ärztin oder Psychotherapie, ggf. über die Berufsgenossenschaft.', tipp: 'Wie lange dauert es schon?' },
+      { nummer: 6, text: 'Nach dem Dienst geht Sara eine Stunde spazieren und kocht danach in Ruhe.', richtig: 'SF',
+        erklaerung: '**Selbstfürsorge:** Bewegung und Alltag helfen dem Körper, Stress abzubauen.', tipp: 'Was tut sie für sich selbst?' },
+      { nummer: 7, text: 'Ein Pfleger trinkt seit dem Notfall jeden Abend Alkohol, um nicht mehr daran zu denken.', richtig: 'PH',
+        erklaerung: '**Professionelle Hilfe:** Alkohol zum Vergessen ist ein Warnzeichen.', tipp: 'Ist das noch normal?' },
+      { nummer: 8, text: 'Das Team trifft sich alle zwei Monate mit Frau Dr. Weiß von außen, um über die Zusammenarbeit und schwierige Einsätze zu sprechen.', richtig: 'SV',
+        erklaerung: '**Supervision:** regelmäßig, begleitet von außen, vertraulich.', tipp: 'Kommt die Leitung des Gesprächs von außen?' },
+      { nummer: 9, text: 'Direkt nach dem Einsatz sprechen die Praxisanleiterin und die beiden Auszubildenden in Ruhe darüber, was gut lief.', richtig: 'NB',
+        erklaerung: '**Nachbesprechung:** zeitnah, Ablauf klären, Gefühle aussprechen.', tipp: 'Direkt danach – mit wem?' },
+      { nummer: 10, text: 'Drei Auszubildende beraten sich gegenseitig nach festen Schritten zu Christins Fall.', richtig: 'KB',
+        erklaerung: '**Kollegiale Beratung:** Gleichrangige beraten sich nach einer festen Struktur.', tipp: 'Sind alle gleichrangig?' }
+    ],
+    merksatz: 'Nach einem Notfall sind Schlafprobleme, Bilder im Kopf und Schuldgefühle **normal** (akute Belastungsreaktion, meist weniger nach **vier Wochen**). Hilfe: **Selbstfürsorge**, **Nachbesprechung im Team**, **kollegiale Beratung**, **Supervision** (von außen, regelmäßig, vertraulich). **Warnzeichen** (länger als vier Wochen, schlimmer, Alkohol, Rückzug): **professionelle Hilfe**.',
+    danach: 'Prüfen Sie jetzt noch einmal Aufgabe 2 auf dem Arbeitsblatt!'
+  },
+  kb2ab09: {
+    ab: 'Wiederholung im Examensstil',
+    raum: 'kb2w4',
+    titel: 'Übung: Richtig oder falsch?',
+    anweisung: 'Zehn Aussagen zur **Kommunikation im Notfall**. Stimmt die Aussage?',
+    knoepfe: [
+      { kuerzel: 'R', text: 'richtig' },
+      { kuerzel: 'F', text: 'falsch' }
+    ],
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Zur psychosozialen Unterstützung gehört, sich der betroffenen Person vorzustellen.', richtig: 'R',
+        erklaerung: '**Richtig:** sich vorstellen, nicht allein lassen, Zuspruch, abschirmen, Körperkontakt wenn gewünscht, zuhören, Hilfe anbieten.', tipp: 'Was tun Sie als Erstes, wenn Sie zu einem Menschen im Notfall kommen?' },
+      { nummer: 2, text: '„Das wird schon wieder“ beruhigt am besten – auch wenn man es nicht weiß.', richtig: 'F',
+        erklaerung: '**Falsch:** Herunterspielen ist ein Gesprächshemmer und unehrlich.', tipp: 'Ist das ehrlich?' },
+      { nummer: 3, text: 'Die Nachbarin darf erfahren, wie es dem Patienten geht, wenn sie freundlich fragt.', richtig: 'F',
+        erklaerung: '**Falsch:** Schweigepflicht – Auskunft nur an Berechtigte, mit Einwilligung.', tipp: 'Gehört die Nachbarin zu den Berechtigten?' },
+      { nummer: 4, text: 'Im SPIKES-Schema steht „P“ für Perception: Man fragt, was die Person schon weiß.', richtig: 'R',
+        erklaerung: '**Richtig:** erst erfragen, dann informieren.', tipp: 'Was bedeutet Perception?' },
+      { nummer: 5, text: 'Bei schlechten Nachrichten sagt man alles auf einmal, damit es schnell vorbei ist.', richtig: 'F',
+        erklaerung: '**Falsch:** in kleinen Schritten informieren, Pausen machen (Knowledge).', tipp: 'Wie viel Information verträgt ein Mensch im Schock?' },
+      { nummer: 6, text: 'Ich-Botschaften und Paraphrasieren sind Gesprächsförderer.', richtig: 'R',
+        erklaerung: '**Richtig:** z. B. „Ich sehe, dass Sie Angst haben.“ – „Sie machen sich große Sorgen.“', tipp: 'Fördern oder hemmen sie das Gespräch?' },
+      { nummer: 7, text: 'Wer nach einem Notfall schlecht schläft, ist krank und braucht sofort eine Therapie.', richtig: 'F',
+        erklaerung: '**Falsch:** In den ersten Wochen ist das eine normale akute Belastungsreaktion.', tipp: 'Wie lange ist das normal?' },
+      { nummer: 8, text: 'Supervision wird von einer Person von außen geleitet.', richtig: 'R',
+        erklaerung: '**Richtig:** externe Supervisorin, regelmäßig, vertraulich.', tipp: 'Wer leitet die Supervision?' },
+      { nummer: 9, text: 'Bei der kollegialen Beratung braucht man immer einen Supervisor.', richtig: 'F',
+        erklaerung: '**Falsch:** Kollegiale Beratung (Intervision) läuft ohne Supervisor – nach festen Schritten.', tipp: 'Wer berät wen?' },
+      { nummer: 10, text: 'Medizinische Fragen der Angehörigen gibt die Pflegekraft an die Ärztin weiter.', richtig: 'R',
+        erklaerung: '**Richtig:** Diagnosen und Prognosen erklärt die Ärztin.', tipp: 'Wer darf Diagnosen erklären?' }
+    ],
+    merksatz: '**Psychosoziale Unterstützung:** vorstellen, nicht allein lassen, Zuspruch, abschirmen, zuhören, Hilfe anbieten. **Gesprächshemmer** vermeiden (Herunterspielen, Bewerten). **Schweigepflicht** auch gegenüber Nachbarn und Mitbewohnern. **SPIKES:** Setting – Perception – Invitation – Knowledge – Emotions – Strategy/Summary. **Nach dem Notfall:** Nachbesprechung, kollegiale Beratung, Supervision.',
+    danach: 'Prüfen Sie jetzt noch einmal Ihre Antworten auf dem Arbeitsblatt!'
   }
 };

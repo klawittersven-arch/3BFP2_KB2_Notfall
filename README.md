@@ -38,6 +38,8 @@ Die SuS starten die Übung **selbst** über den QR-Code (kein Beamer-Start nöti
 | **Woche 2:** Schlechte Nachrichten überbringen | Welcher SPIKES-Schritt? | `…/kb2ab05.html` |
 | **Woche 3:** Rollenspiel 1: Eine Notfallsituation begleiten | Welche Antwort hilft? | `…/kb2ab06.html` |
 | **Woche 3:** Rollenspiel 2: Ein Angehörigengespräch führen – mit Feedback | Gutes Feedback? | `…/kb2ab07.html` |
+| **Woche 4:** Belastung der Helfenden und Supervision | Welche Hilfe passt? | `…/kb2ab08.html` |
+| **Woche 4:** Wiederholung im Examensstil | Richtig oder falsch? | `…/kb2ab09.html` |
 
 Lehrerseiten Woche 1 (beide Übungen auf einer Seite): **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w1.html ·
 **3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w1.html
@@ -47,6 +49,8 @@ Lehrerseiten Woche 2: **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB
 
 Lehrerseiten Woche 3: **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w3.html ·
 **3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w3.html
+Lehrerseiten Woche 4: **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w4.html ·
+**3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w4.html
 
 **Gemeinsamer Worker für KB I und KB II:** Die neuen KB-I-Übungen (Repository `3BFP2-kb1-notfall`, Ordner `docs/tb2/`)
 melden an **diesen** Worker (Räume `k1-kb1w1` … `k2-kb1w4`). Dafür wurde nur das Raummuster in `server/src/logik.js`
