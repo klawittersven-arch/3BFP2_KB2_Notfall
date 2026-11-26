@@ -24,6 +24,40 @@ Die SuS gelangen **nur über die QR-Codes** zu den Übungen. Die Startseite
 |---|---|---|
 | Informationen geben in Krisen (raum `ab3`) | Übung (für die Schnellen): Hilfreich oder ungünstig? | `…/ab3a.html` |
 
+## TB 2 neu ab KW 49 (Klausur am 12.01.2027) – Woche 1
+
+Neue, kürzere Arbeitsblätter (je 45 min). Die Handy-Übungen sind nur **„Für die Schnellen“** (freiwillig) –
+das Papier allein bereitet vollständig auf die Klassenarbeit vor; der QR-Kasten darf also auch gelöscht werden.
+Die SuS starten die Übung **selbst** über den QR-Code (kein Beamer-Start nötig).
+
+| Arbeitsblatt | Übung | Adresse (QR-Code in `qr/`) |
+|---|---|---|
+| Psychosoziale Unterstützung im Notfall | Hilft das – oder nicht? | `…/kb2ab02.html` |
+| Gesprächshemmer im Notfall vermeiden | Förderer oder Hemmer? | `…/kb2ab03.html` |
+| **Woche 2:** Angehörige im Notfall informieren – Schweigepflicht | Darf ich das sagen? | `…/kb2ab04.html` |
+| **Woche 2:** Schlechte Nachrichten überbringen | Welcher SPIKES-Schritt? | `…/kb2ab05.html` |
+| **Woche 3:** Rollenspiel 1: Eine Notfallsituation begleiten | Welche Antwort hilft? | `…/kb2ab06.html` |
+| **Woche 3:** Rollenspiel 2: Ein Angehörigengespräch führen – mit Feedback | Gutes Feedback? | `…/kb2ab07.html` |
+| **Woche 4:** Belastung der Helfenden und Supervision | Welche Hilfe passt? | `…/kb2ab08.html` |
+| **Woche 4:** Wiederholung im Examensstil | Richtig oder falsch? | `…/kb2ab09.html` |
+
+Lehrerseiten Woche 1 (beide Übungen auf einer Seite): **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w1.html ·
+**3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w1.html
+
+Lehrerseiten Woche 2: **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w2.html ·
+**3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w2.html
+
+Lehrerseiten Woche 3: **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w3.html ·
+**3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w3.html
+Lehrerseiten Woche 4: **3BFP2/1:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-1-kb2w4.html ·
+**3BFP2/2:** https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/lehrer-3bfp2-2-kb2w4.html
+
+**Gemeinsamer Worker für KB I und KB II:** Die neuen KB-I-Übungen (Repository `3BFP2-kb1-notfall`, Ordner `docs/tb2/`)
+melden an **diesen** Worker (Räume `k1-kb1w1` … `k2-kb1w4`). Dafür wurde nur das Raummuster in `server/src/logik.js`
+erweitert (`k1-kb2w1` … `k2-kb2w9` und `k1-kb1w1` … `k2-kb1w9`); nach dem Zusammenführen in `main` veröffentlicht Cloudflare
+den Worker automatisch. Weitere Wochen: Übung in `inhalte.js` mit `raum: 'kb2w2'` usw. ergänzen, Kennung und Woche in
+`werkzeuge/seiten_erzeugen.py` (`IDS`, `ABS`) eintragen, Skript ausführen, `docs/sw.js` anpassen.
+
 ### Belohnungsspiel „Notfall-Run!“ (nach der Übung `ab3a`)
 
 - Wer die Übung **ehrlich löst** (nicht durchklickt), sieht unter „Das Wichtigste in Kürze“ den Kasten

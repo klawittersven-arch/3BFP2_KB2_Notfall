@@ -128,6 +128,18 @@ pruefe(letzte.status === 429, 'Obergrenze von 120 Geräten pro Raum');
 
 // Belohnungsspiel: Bestleistung neben dem Namen (Woche 4, raum ab3)
 const env4 = umgebung();
+// TB 2 neu (ab KW 49): Räume je Fach und Woche – KB I (k1-kb1w1 …) und KB II (k2-kb2w1 …) nutzen denselben Worker
+r = await post(env, '/fortschritt', eintrag({ raum: 'k2-kb2w1', uebung: 'kb2ab02', geloest: 10, gesamt: 10, erster: 9, falsch: ['6-H'] }));
+pruefe(r.status === 204, 'TB2 neu: Raum k2-kb2w1 angenommen');
+r = await post(env, '/fortschritt', eintrag({ raum: 'k1-kb1w1', uebung: 'kb1ab02', geloest: 4, gesamt: 10, erster: 4, falsch: [] }));
+pruefe(r.status === 204, 'TB2 neu: Raum k1-kb1w1 (KB I) angenommen');
+s = await (await get(env, '/stand?raum=k1-kb1w1')).json();
+pruefe(s.eintraege.length === 1 && s.eintraege[0].uebungen.kb1ab02.geloest === 4, 'TB2 neu: Stand k1-kb1w1');
+for (const falscherRaum of ['k2-kb3w1', 'k2-kb1w0', 'k2-kb2w10', 'k2-w1', 'k2-kb2']) {
+  r = await post(env, '/fortschritt', eintrag({ raum: falscherRaum }));
+  pruefe(r.status === 400, 'TB2 neu: ungültiger Raum abgelehnt: ' + falscherRaum);
+}
+
 const sp = (o = {}) => Object.assign({ raum: 'k2-ab3', geraet: 'e'.repeat(32), punkte: 420 }, o);
 r = await post(env4, '/spiel', sp());
 pruefe(r.status === 404, 'Spiel: unbekanntes Handy (nicht auf der Liste) → 404');

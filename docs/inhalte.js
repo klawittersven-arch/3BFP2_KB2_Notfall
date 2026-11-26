@@ -2,6 +2,7 @@
    INHALTE – KB II · Notfallsituationen (3BFP2, Themenblock 2)
    Woche 1: AB 1 „Menschen im Notfall“ und AB 2 „Psychologische Erste Hilfe“
    Woche 4: AB „Informationen geben in Krisen“ (raum 'ab3')
+   TB 2 neu ab KW 49, Woche 1: „Psychosoziale Unterstützung im Notfall“ und „Gesprächshemmer im Notfall vermeiden“ (raum 'kb2w1')
    ==========================================================================
 
    In dieser Datei stehen ALLE Texte der Übungen.
@@ -19,7 +20,7 @@
 
    Aufbau einer Übung:
      ab          – Titel des Arbeitsblatts (erscheint in der Kopfzeile; bewusst ohne „AB 1“/„AB 2“)
-     raum        – zu welchem Arbeitsblatt die Übung gehört ('ab1', 'ab2' oder 'ab3');
+     raum        – zu welchem Arbeitsblatt bzw. welcher Woche die Übung gehört ('ab1', 'ab2', 'ab3', 'kb2w1' …);
                    danach richtet sich die Lehrerseite für den Beamer.
      titel       – Überschrift der Übung (genau wie auf dem Arbeitsblatt)
      anweisung   – Arbeitsanweisung über den Karten
@@ -528,6 +529,274 @@ var INHALTE = {
   },
 
   /* ========================================================================
+     TB 2 NEU AB KW 49 · Woche 1 (raum 'kb2w1')
+     „Psychosoziale Unterstützung im Notfall“ und „Gesprächshemmer im Notfall vermeiden“
+     Beide Übungen sind „Für die Schnellen“ (freiwillig) – das Papier allein bereitet auf die KA vor.
+     Begriffe nach Pflegias (Bd. 2, Kap. 1.2.3; Bd. 1, S. 272, Tab. 1).
+     ======================================================================== */
+
+  kb2ab02: {
+    ab: 'Psychosoziale Unterstützung im Notfall',
+    raum: 'kb2w1',
+    titel: 'Übung: Hilft das – oder nicht?',
+    anweisung: 'Frau Maler um 11 Uhr: Sie hat Luftnot und große Angst. Christin wartet mit ihr auf die Pflegefachkraft. Hilft das, was Christin sagt oder tut?',
+    knoepfe: [
+      { kuerzel: 'H', text: 'hilft' },
+      { kuerzel: 'N', text: 'hilft nicht' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Was gehört zur psychosozialen Unterstützung?',
+      punkte: [
+        'sich vorstellen · nicht allein lassen · Zuspruch geben · vor Zuschauern abschirmen',
+        'Körperkontakt – **nur wenn gewünscht** · aktiv zuhören · Hilfsangebote machen',
+        'Pflegende selbst: tief durchatmen, nicht rennen, sicher auftreten, Hilfe nachfordern'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: '„Frau Maler, ich bin Christin, die Pflegeschülerin. Ich bleibe bei Ihnen.“', richtig: 'H',
+        erklaerung: '**Hilft:** Christin **stellt sich vor** und sagt, dass sie Frau Maler **nicht allein lässt**. Das gibt Sicherheit.',
+        tipp: 'Weiß Frau Maler jetzt, wer bei ihr ist?' },
+      { nummer: 2, text: 'Christin rennt aus dem Zimmer, um selbst die Pflegefachkraft zu suchen. Frau Maler bleibt allein.', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Frau Maler darf **nicht allein gelassen** werden. Besser: Klingel oder Notruf nutzen und im Zimmer bleiben.',
+        tipp: 'Wie fühlt sich Frau Maler, wenn sie plötzlich allein ist?' },
+      { nummer: 3, text: '„Die Pflegefachkraft ist gleich da. Ich sage Ihnen, was wir als Nächstes machen.“', richtig: 'H',
+        erklaerung: '**Hilft:** **Zuspruch** – Christin macht Mut und erklärt, was passiert. Information verringert Angst.',
+        tipp: 'Macht dieser Satz Mut?' },
+      { nummer: 4, text: 'Die Zimmertür steht offen. Besucher bleiben auf dem Flur stehen und schauen. Christin schließt die Tür.', richtig: 'H',
+        erklaerung: '**Hilft:** Christin **schirmt vor Zuschauern ab**. Neugierige Blicke sind für Betroffene unangenehm.',
+        tipp: 'Möchten Sie in so einer Lage angestarrt werden?' },
+      { nummer: 5, text: 'Christin hält Frau Malers Hand fest, obwohl Frau Maler die Hand wegzieht.', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Körperkontakt **nur, wenn gewünscht** – und respektvoll. Besser fragen: „Darf ich Ihre Hand halten?“',
+        tipp: 'Was zeigt Frau Maler, wenn sie die Hand wegzieht?' },
+      { nummer: 6, text: '„Keine Angst, Sie haben gar nichts. Sie sind nur aufgeregt.“', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Das ist nicht ehrlich und **spielt die Lage herunter**. Frau Maler hat Warnzeichen. Ehrlicher Zuspruch: „Hilfe ist unterwegs. Ich bleibe bei Ihnen.“',
+        tipp: 'Stimmt dieser Satz? Fühlt sich Frau Maler ernst genommen?' },
+      { nummer: 7, text: 'Frau Maler sagt: „Ich habe solche Angst.“ Christin: „Sie haben Angst. Ich bin da. Was spüren Sie gerade?“', richtig: 'H',
+        erklaerung: '**Hilft:** Christin **hört aktiv zu** – sie wiederholt, was Frau Maler fühlt, und fragt nach.',
+        tipp: 'Nimmt Christin die Angst ernst?' },
+      { nummer: 8, text: '„Soll ich Ihre Tochter anrufen lassen?“', richtig: 'H',
+        erklaerung: '**Hilft:** Ein **Hilfsangebot**. Frau Maler darf selbst entscheiden – das gibt ihr ein Stück Kontrolle zurück.',
+        tipp: 'Was bietet Christin hier an?' },
+      { nummer: 9, text: 'Christin atmet einmal tief durch, bevor sie ins Zimmer geht. Dann spricht sie ruhig und langsam.', richtig: 'H',
+        erklaerung: '**Hilft:** Pflegende **sammeln sich innerlich** und **strahlen Ruhe aus**. Das überträgt sich auf Frau Maler.',
+        tipp: 'Wie wirkt eine ruhige Pflegekraft auf eine ängstliche Patientin?' },
+      { nummer: 10, text: 'Christin sagt laut und hektisch: „Oh Gott, was mache ich denn jetzt?“', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Hektik und Panik übertragen sich. Angst kann die Atemnot sogar verstärken. Besser: durchatmen, **sicher auftreten**, Hilfe holen.',
+        tipp: 'Fühlt sich Frau Maler danach sicherer?' }
+    ],
+    merksatz: '**Psychosoziale Unterstützung im Notfall:** sich **vorstellen** · **nicht allein lassen** · **Zuspruch** geben · vor **Zuschauern abschirmen** · **Körperkontakt nur, wenn gewünscht** · **aktiv zuhören** · **Hilfsangebote** machen. Pflegende selbst: tief **durchatmen**, nicht rennen, **sicher auftreten**, rechtzeitig **Hilfe nachfordern**.',
+    danach: 'Prüfen Sie jetzt noch einmal Ihre Abschlussaufgabe auf dem Arbeitsblatt!'
+  },
+
+  kb2ab03: {
+    ab: 'Gesprächshemmer im Notfall vermeiden',
+    raum: 'kb2w1',
+    titel: 'Übung: Förderer oder Hemmer?',
+    anweisung: 'Christin erzählt am Tag nach dem Notfall von ihren Albträumen. Fördert die Reaktion das Gespräch – oder hemmt sie es? In der Erklärung steht der genaue Begriff.',
+    knoepfe: [
+      { kuerzel: 'F', text: 'Gesprächsförderer' },
+      { kuerzel: 'H', text: 'Gesprächshemmer' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: die Begriffe aus Pflegias',
+      punkte: [
+        '**Förderer:** Zuhören · Ich-Botschaften senden · Paraphrasieren und Respekt zeigen · Rückfragen · Fokussierung · Feedback',
+        '**Hemmer:** Unterbrechen · Du-Botschaften senden · Eigene Erfahrungen und Ratschläge in den Vordergrund stellen · Bewerten statt akzeptieren · Unkonzentriertheit · Herunterspielen'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: '„Ich merke, dass dich das sehr beschäftigt.“', richtig: 'F',
+        erklaerung: '**Förderer: Ich-Botschaft senden.** Die Kollegin spricht von sich und von dem, was sie wahrnimmt – ohne Vorwurf.', tipp: 'Spricht die Kollegin von sich oder über Christin?' },
+      { nummer: 2, text: '„Ach komm, anderen geht es viel schlechter.“', richtig: 'H',
+        erklaerung: '**Hemmer: Herunterspielen.** Christins Belastung wird klein gemacht. Sie fühlt sich nicht ernst genommen.', tipp: 'Wird Christins Gefühl ernst genommen?' },
+      { nummer: 3, text: '„Du sagst, du hast seitdem Albträume?“', richtig: 'F',
+        erklaerung: '**Förderer: Paraphrasieren und Respekt zeigen** (auch Rückfrage). Die Kollegin wiederholt mit eigenen Worten und zeigt: Ich habe dich verstanden.', tipp: 'Was macht die Kollegin mit dem, was Christin gesagt hat?' },
+      { nummer: 4, text: 'Während Christin erzählt, verdreht eine Kollegin die Augen.', richtig: 'H',
+        erklaerung: '**Hemmer: Unterbrechen** – hier ohne Worte (nonverbal). Augenverdrehen zeigt Desinteresse und Ablehnung.', tipp: 'Man kann auch ohne Worte unterbrechen.' },
+      { nummer: 5, text: '„Was war für dich am schlimmsten?“', richtig: 'F',
+        erklaerung: '**Förderer: Rückfragen.** Nachhaken bei wichtigen Aussagen zeigt Interesse und hilft Christin, weiterzuerzählen.', tipp: 'Darf Christin weitererzählen?' },
+      { nummer: 6, text: '„Du bist einfach zu empfindlich.“', richtig: 'H',
+        erklaerung: '**Hemmer: Du-Botschaft senden** (und **Bewerten statt akzeptieren**). Das klingt nach Vorwurf – Christin wird sich zurückziehen.', tipp: 'Wie fühlt sich Christin nach diesem Satz?' },
+      { nummer: 7, text: 'Der Praxisanleiter legt sein Handy weg, setzt sich zu Christin und schaut sie an.', richtig: 'F',
+        erklaerung: '**Förderer: Fokussierung.** Er ist ganz bei Christin und ihrer Aussage.', tipp: 'Wo ist seine Aufmerksamkeit?' },
+      { nummer: 8, text: '„Ich an deiner Stelle würde einfach nicht mehr daran denken.“', richtig: 'H',
+        erklaerung: '**Hemmer: Eigene Erfahrungen und Ratschläge in den Vordergrund stellen.** Lösungen sollen aus der Person selbst kommen, nicht von außen.', tipp: 'Wessen Lösung steht hier im Vordergrund?' },
+      { nummer: 9, text: 'Zu Frau Maler um 11 Uhr: „Ich sehe, dass Sie sehr schnell atmen. Ich bleibe bei Ihnen.“', richtig: 'F',
+        erklaerung: '**Förderer: Feedback** (wertschätzend rückmelden, was man wahrnimmt) und Ich-Botschaft.', tipp: 'Sagt Christin, was sie wahrnimmt?' },
+      { nummer: 10, text: 'Während Christin erzählt, telefoniert die Stationsleitung nebenbei.', richtig: 'H',
+        erklaerung: '**Hemmer: Unkonzentriertheit.** Nebenbei andere Dinge erledigen zeigt: Du bist mir nicht wichtig.', tipp: 'Ist die Stationsleitung ganz bei Christin?' }
+    ],
+    merksatz: '**Gesprächsförderer:** Zuhören · Ich-Botschaften · Paraphrasieren und Respekt zeigen · Rückfragen · Fokussierung · Feedback. **Gesprächshemmer:** Unterbrechen · Du-Botschaften · Eigene Erfahrungen und Ratschläge in den Vordergrund stellen · Bewerten statt akzeptieren · Unkonzentriertheit · Herunterspielen. Nach einem Notfall sind Menschen verletzlich – Hemmer verstärken Angst, Scham und Schuldgefühle.',
+    danach: 'Prüfen Sie jetzt noch einmal Ihre Sätze in Aufgabe 2 auf dem Arbeitsblatt: Welche Förderer haben Sie genutzt?'
+  },
+  /* ========================================================================
+     TB 2 neu · Woche 2 · Angehörige im Notfall informieren – Schweigepflicht
+     ======================================================================== */
+  kb2ab04: {
+    ab: 'Angehörige im Notfall informieren – Schweigepflicht',
+    raum: 'kb2w2',
+    titel: 'Übung: Darf ich das sagen?',
+    anweisung: 'Jemand möchte etwas über eine Bewohnerin oder einen Bewohner wissen. Ist die Auskunft **erlaubt** oder **nicht erlaubt**?',
+    knoepfe: [
+      { kuerzel: 'J', text: 'Auskunft erlaubt' },
+      { kuerzel: 'N', text: 'nicht erlaubt' }
+    ],
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Der Notarzt fragt nach den Vorerkrankungen und Medikamenten.', richtig: 'J',
+        erklaerung: '**Erlaubt:** Der Notarzt ist an der Behandlung beteiligt und braucht die Informationen.', tipp: 'Ist die Person an der Behandlung beteiligt?' },
+      { nummer: 2, text: 'Eine Mitbewohnerin fragt, warum Frau Maler ins Krankenhaus gekommen ist.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Mitbewohner sind nicht beteiligt. Freundlich bleiben, aber nichts sagen und nichts andeuten.', tipp: 'Gilt die Schweigepflicht auch gegenüber Mitbewohnern?' },
+      { nummer: 3, text: 'Die Tochter ruft an. In der Dokumentation ist sie als Bevollmächtigte eingetragen. Sie rufen unter der Nummer aus der Akte zurück.', richtig: 'J',
+        erklaerung: '**Erlaubt:** Die Bevollmächtigte vertritt die Bewohnerin. Durch den Rückruf wissen Sie sicher, wer am Telefon ist.', tipp: 'Wer vertritt die Bewohnerin?' },
+      { nummer: 4, text: 'Der Nachbar eines Bewohners fragt im Garten nach dessen Diagnose.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Nachbarn und Bekannte bekommen keine Auskunft.', tipp: 'Hat der Bewohner zugestimmt?' },
+      { nummer: 5, text: 'Eine Kollegin aus einem anderen Wohnbereich fragt in der Pause neugierig nach dem Notfall.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Die Schweigepflicht gilt auch gegenüber Kolleginnen, die nicht an der Pflege beteiligt sind.', tipp: 'Ist die Kollegin an der Pflege beteiligt?' },
+      { nummer: 6, text: 'Ein wacher, orientierter Bewohner sagt: „Sie dürfen meiner Frau alles sagen.“ Seine Frau fragt nach.', richtig: 'J',
+        erklaerung: '**Erlaubt:** Der Bewohner hat Sie von der Schweigepflicht entbunden. Das wird dokumentiert – am besten schriftlich.', tipp: 'Wer darf von der Schweigepflicht entbinden?' },
+      { nummer: 7, text: 'Ein Mann ruft an: „Ich bin der Sohn.“ Er steht nicht in der Dokumentation, die Bewohnerin ist bewusstlos.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Keine Entbindung, und Sie wissen nicht sicher, wer anruft. Auch Kinder brauchen die Zustimmung.', tipp: 'Steht er in der Dokumentation?' },
+      { nummer: 8, text: 'Der Ehemann einer Bewohnerin fragt. Eine Zustimmung ist nicht dokumentiert.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Sogar Ehepartner brauchen die Zustimmung. Fragen Sie die Bewohnerin selbst, wenn sie entscheiden kann.', tipp: 'Gilt die Schweigepflicht auch gegenüber dem Ehepartner?' },
+      { nummer: 9, text: 'Im Bus erzählen Sie einer Freundin vom Notfall – mit dem Namen der Bewohnerin.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Nicht in der Öffentlichkeit über Bewohner sprechen (Datenschutz, Schweigepflicht).', tipp: 'Wer hört im Bus alles mit?' },
+      { nummer: 10, text: 'Eine Bewohnerin ist gestorben. Ihre Freundin fragt nach der Todesursache.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Die Schweigepflicht gilt **auch nach dem Tod**.', tipp: 'Endet die Schweigepflicht mit dem Tod?' }
+    ],
+    merksatz: 'Die **Schweigepflicht** (§ 203 StGB) gilt gegenüber **allen, die nicht beteiligt sind** – auch gegenüber **Angehörigen**, **Ehepartnern**, **Mitbewohnern** und **nicht beteiligten Kolleginnen**, und **auch nach dem Tod**. Auskunft bekommen **Beteiligte** (Notarzt, Klinik), **Bevollmächtigte/Betreuer** und Personen, für die die Person die **Schweigepflicht aufgehoben** hat. Am Telefon im Zweifel **zurückrufen**.',
+    danach: 'Prüfen Sie jetzt noch einmal Aufgabe 1 auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
+     TB 2 neu · Woche 2 · Schlechte Nachrichten überbringen (SPIKES)
+     ======================================================================== */
+  kb2ab05: {
+    ab: 'Schlechte Nachrichten überbringen',
+    raum: 'kb2w2',
+    titel: 'Übung: Welcher SPIKES-Schritt?',
+    anweisung: 'Sätze und Handlungen aus Telefonaten mit Angehörigen. Zu welchem Schritt des **SPIKES-Schemas** gehören sie? (Setting = Rahmen · Perception = Wissensstand · Invitation = Einladung · Knowledge = Wissen · Emotions = Gefühle · Strategy and Summary = Plan und Zusammenfassung)',
+    knoepfe: [
+      { kuerzel: 'SET', text: 'S – Setting' },
+      { kuerzel: 'P', text: 'P – Perception' },
+      { kuerzel: 'I', text: 'I – Invitation' },
+      { kuerzel: 'K', text: 'K – Knowledge' },
+      { kuerzel: 'E', text: 'E – Emotions' },
+      { kuerzel: 'STR', text: 'S – Strategy' }
+    ],
+    mindestens: 7,
+    karten: [
+      { nummer: 1, text: 'Sie gehen für das Telefonat in einen ruhigen Raum und legen die Akte bereit.', richtig: 'SET',
+        erklaerung: '**Setting:** Den Rahmen vorbereiten – ruhig, ungestört, Unterlagen bereit.', tipp: 'Passiert das vor oder während der Nachricht?' },
+      { nummer: 2, text: '„Haben Sie gerade einen Moment Zeit zum Sprechen?“', richtig: 'SET',
+        erklaerung: '**Setting:** Klären, ob die Person gerade sprechen kann.', tipp: 'Geht es schon um die Nachricht?' },
+      { nummer: 3, text: '„Was hat man Ihnen heute schon erzählt?“', richtig: 'P',
+        erklaerung: '**Perception:** Erfragen, was die Person schon weiß.', tipp: 'Sie fragen nach dem Wissen der Angehörigen.' },
+      { nummer: 4, text: '„Ich muss Ihnen leider etwas Ernstes sagen.“', richtig: 'I',
+        erklaerung: '**Invitation:** Vorwarnen – die Person kann sich innerlich vorbereiten.', tipp: 'Kommt die Nachricht schon – oder wird sie angekündigt?' },
+      { nummer: 5, text: '„Möchten Sie, dass ich Ihnen alles genau erkläre?“', richtig: 'I',
+        erklaerung: '**Invitation:** Klären, wie viel die Person wissen möchte.', tipp: 'Sie fragen nach dem Wunsch, informiert zu werden.' },
+      { nummer: 6, text: '„Ihr Vater ist heute Morgen im Bad gestürzt. Er ist jetzt im Krankenhaus.“', richtig: 'K',
+        erklaerung: '**Knowledge:** Die Nachricht in kleinen Schritten und mit einfachen Worten.', tipp: 'Hier kommt die eigentliche Information.' },
+      { nummer: 7, text: 'Sie machen eine Pause und fragen: „Konnten Sie mir folgen?“', richtig: 'K',
+        erklaerung: '**Knowledge:** Pausen machen und prüfen, ob alles verstanden wurde.', tipp: 'Geht es um das Verstehen der Information?' },
+      { nummer: 8, text: '„Das ist ein großer Schreck für Sie.“', richtig: 'E',
+        erklaerung: '**Emotions:** Das Gefühl wahrnehmen und ansprechen.', tipp: 'Worum geht es: Fakten oder Gefühle?' },
+      { nummer: 9, text: 'Die Tochter weint. Sie sagen nichts und warten.', richtig: 'E',
+        erklaerung: '**Emotions:** Schweigen und Weinen aushalten.', tipp: 'Was braucht die Tochter gerade?' },
+      { nummer: 10, text: '„Ich gebe Ihnen die Nummer der Station und rufe Sie heute Abend noch einmal an.“', richtig: 'STR',
+        erklaerung: '**Strategy and Summary:** nächste Schritte, Ansprechperson, Rückruf.', tipp: 'Wie geht es nach dem Gespräch weiter?' }
+    ],
+    merksatz: '**SPIKES:** **S**etting – Rahmen vorbereiten, vorstellen, Zeit klären · **P**erception – was weiß die Person schon? · **I**nvitation – vorwarnen, wie viel möchte sie wissen? · **K**nowledge – in kleinen Schritten, einfache, eindeutige Worte, Pausen · **E**motions – Gefühle ansprechen, Schweigen aushalten · **S**trategy and Summary – zusammenfassen, nächste Schritte, Rückruf, dokumentieren.',
+    danach: 'Prüfen Sie jetzt noch einmal Aufgabe 1 auf dem Arbeitsblatt!'
+  },
+  /* ========================================================================
+     TB 2 neu · Woche 3 · Rollenspiel 1: eine Notfallsituation begleiten
+     ======================================================================== */
+  kb2ab06: {
+    ab: 'Rollenspiel 1: Eine Notfallsituation begleiten',
+    raum: 'kb2w3',
+    titel: 'Übung: Welche Antwort hilft?',
+    anweisung: 'Lesen Sie die Situation und die beiden Antworten. Welche Antwort **unterstützt** die Person besser?',
+    knoepfe: [
+      { kuerzel: 'A', text: 'Antwort A' },
+      { kuerzel: 'B', text: 'Antwort B' }
+    ],
+    mindestens: 6,
+    karten: [
+      { nummer: 1, text: 'Herr Brandt liegt nach einem Sturz auf dem Boden: „Ist mein Bein gebrochen?“ **A:** „Ach was, das wird schon wieder.“ **B:** „Das kann ich noch nicht sagen. Der Rettungsdienst kommt gleich und schaut es sich an. Ich bleibe bei Ihnen.“', richtig: 'B',
+        erklaerung: '**B:** ehrlich, Zuspruch, nicht allein lassen. A spielt herunter (Gesprächshemmer).', tipp: 'Welche Antwort ist ehrlich?' },
+      { nummer: 2, text: 'Frau Hoffmann hat Atemnot: „Lassen Sie mich nicht allein!“ **A:** „Ich bleibe hier bei Ihnen. Darf ich Ihre Hand halten?“ **B:** „Ich hole schnell noch die Decke, bin gleich zurück.“', richtig: 'A',
+        erklaerung: '**A:** nicht allein lassen, Körperkontakt anbieten – wenn gewünscht.', tipp: 'Was hat sie sich gewünscht?' },
+      { nummer: 3, text: 'Mitbewohner stehen im Flur und schauen zu. **A:** Sie bitten eine Kollegin, die Mitbewohner freundlich in den Aufenthaltsraum zu begleiten. **B:** Sie lassen die Mitbewohner zuschauen, dann wissen sie Bescheid.', richtig: 'A',
+        erklaerung: '**A:** vor Zuschauern abschirmen – das schützt die Würde.', tipp: 'Möchten Sie in so einer Lage angestarrt werden?' },
+      { nummer: 4, text: 'Frau Klein weint: „War ich schuld? Ich habe ihr den Kuchen gegeben!“ **A:** „Sie machen sich große Vorwürfe. Erzählen Sie mir, was passiert ist.“ **B:** „Jetzt beruhigen Sie sich erst mal.“', richtig: 'A',
+        erklaerung: '**A:** Paraphrasieren und aktiv zuhören. B bewertet statt zu akzeptieren.', tipp: 'Welche Antwort nimmt ihre Gefühle ernst?' },
+      { nummer: 5, text: 'Ein Bewohner nach einem Sturz, Sie kommen ins Zimmer. **A:** „Was ist denn hier los?“ **B:** „Herr Brandt, ich bin Lea, Pflegeschülerin. Ich helfe Ihnen.“', richtig: 'B',
+        erklaerung: '**B:** sich vorstellen – so weiß er, wer bei ihm ist.', tipp: 'Weiß er, wer Sie sind?' },
+      { nummer: 6, text: 'Herr Brandt: „Meine Tochter weiß nichts!“ **A:** „Darum kümmern wir uns später.“ **B:** „Wir rufen Ihre Tochter an. Soll ich ihr etwas ausrichten?“', richtig: 'B',
+        erklaerung: '**B:** ein Hilfsangebot macht ihm Sorgen leichter.', tipp: 'Welche Antwort ist ein Hilfsangebot?' },
+      { nummer: 7, text: 'Frau Hoffmann fragt ängstlich: „Was passiert jetzt mit mir?“ **A:** „Die Ärztin kommt gleich. Sie hört Sie ab und entscheidet, wie es weitergeht.“ **B:** „Das weiß ich auch nicht.“', richtig: 'A',
+        erklaerung: '**A:** Zuspruch geben und sagen, was als Nächstes kommt.', tipp: 'Welche Antwort gibt Sicherheit?' },
+      { nummer: 8, text: 'Frau Klein zittert und will sofort in die Klinik fahren. **A:** „Fahren Sie lieber gleich los.“ **B:** „Sie sind gerade sehr aufgeregt. Sollen wir jemanden anrufen, der Sie fährt?“', richtig: 'B',
+        erklaerung: '**B:** Gefühl ansprechen und ein Hilfsangebot machen – sie ist zu aufgeregt zum Fahren.', tipp: 'Kann sie jetzt sicher Auto fahren?' }
+    ],
+    merksatz: 'Psychosoziale Unterstützung im Notfall: **sich vorstellen**, **nicht allein lassen**, **Zuspruch geben** und ehrlich informieren, **vor Zuschauern abschirmen**, **Körperkontakt, wenn gewünscht**, **aktiv zuhören**, **Hilfsangebote machen**. Nicht herunterspielen, nicht bewerten.',
+    danach: 'Jetzt geht es weiter mit dem Rollenspiel auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
+     TB 2 neu · Woche 3 · Rollenspiel 2: ein Angehörigengespräch führen – mit Feedback
+     ======================================================================== */
+  kb2ab07: {
+    ab: 'Rollenspiel 2: Ein Angehörigengespräch führen – mit Feedback',
+    raum: 'kb2w3',
+    titel: 'Übung: Gutes Feedback?',
+    anweisung: 'Nach einem Rollenspiel gibt die Beobachterin Feedback. Hält sich das Feedback an die **Regeln**?',
+    knoepfe: [
+      { kuerzel: 'J', text: 'ja, gutes Feedback' },
+      { kuerzel: 'N', text: 'nein, Regel verletzt' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Die Regeln',
+      punkte: [
+        'mit dem **Positiven** beginnen',
+        '**konkret** und **beschreibend**, nicht bewertend',
+        '**Ich-Form**, nicht „man“',
+        'auf das **Verhalten**, nicht auf die Person',
+        '**nicht zu viel** auf einmal'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: '„Mir hat gefallen, dass du dich zuerst vorgestellt hast.“', richtig: 'J',
+        erklaerung: '**Gut:** beginnt positiv, konkret, Ich-Form.', tipp: 'Positiv und konkret?' },
+      { nummer: 2, text: '„Das war schlecht.“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** nicht konkret, bewertend. Was genau war schlecht?', tipp: 'Weiß die Person, was sie ändern soll?' },
+      { nummer: 3, text: '„Du bist einfach ein unsicherer Mensch.“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** greift die Person an, nicht das Verhalten.', tipp: 'Geht es um ein Verhalten oder um die ganze Person?' },
+      { nummer: 4, text: '„Als die Tochter geweint hat, hast du gleich weitergeredet. Ich hätte mir gewünscht, dass du kurz wartest.“', richtig: 'J',
+        erklaerung: '**Gut:** beschreibt konkret, Ich-Form, regt zur Veränderung an.', tipp: 'Beschreibt das ein Verhalten?' },
+      { nummer: 5, text: '„Man hätte auch mal nachfragen können, was sie schon weiß.“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** „man“ statt Ich-Form. Besser: „Mir ist aufgefallen, dass du nicht gefragt hast, …“', tipp: 'Wer spricht hier?' },
+      { nummer: 6, text: '„Mir ist aufgefallen, dass du ruhig und langsam gesprochen hast. Das hat mir gut gefallen.“', richtig: 'J',
+        erklaerung: '**Gut:** konkret und positiv.', tipp: 'Ist das konkret?' },
+      { nummer: 7, text: '„Erstens zu schnell, zweitens zu leise, drittens keine Pause, viertens kein Blickkontakt, fünftens …“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** zu viel auf einmal, kein positiver Anfang.', tipp: 'Kann man sich so viel auf einmal merken?' },
+      { nummer: 8, text: '„Ich habe gehört, dass du gesagt hast: ‚Das wird schon wieder.‘ Für mich klang das wie Herunterspielen.“', richtig: 'J',
+        erklaerung: '**Gut:** beschreibt genau, was gesagt wurde, und sagt in Ich-Form, wie es wirkte.', tipp: 'Beschreibt sie, was sie gehört hat?' },
+      { nummer: 9, text: 'Die Pflegekraft antwortet auf das Feedback: „Ja, aber die Tochter hat doch so viel geredet, da konnte ich nicht …“', richtig: 'N',
+        erklaerung: '**Regel verletzt (Feedback annehmen):** nicht rechtfertigen – zuhören und danken.', tipp: 'Wie nimmt man Feedback an?' },
+      { nummer: 10, text: 'Die Pflegekraft hört zu und sagt: „Danke, darauf achte ich nächstes Mal.“', richtig: 'J',
+        erklaerung: '**Gut:** zuhören, nicht rechtfertigen, sich bedanken.', tipp: 'Rechtfertigt sie sich?' }
+    ],
+    merksatz: '**Feedback geben:** mit dem **Positiven** beginnen, **konkret** und **beschreibend**, in der **Ich-Form**, auf das **Verhalten** bezogen, **nicht zu viel** auf einmal. **Feedback annehmen:** **zuhören**, ausreden lassen, **nicht rechtfertigen**, **danken**, später nachdenken.',
+    danach: 'Jetzt geht es weiter mit dem Rollenspiel auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
      BELOHNUNGSSPIEL „Notfall-Run!“ (spiel.html) – Endless Runner aus „Diabetes Run!“, neu gestaltet für Notfallsituationen
      ======================================================================== */
 
@@ -574,5 +843,88 @@ var INHALTE = {
       'Ehrlich bleiben: „Das weiß ich nicht. Die Ärztin oder der Arzt kann Ihnen das sagen.“',
       'Im Stress vergisst man viel: Telefonnummer und Namen aufschreiben.'
     ]
+  },
+  kb2ab08: {
+    ab: 'Belastung der Helfenden und Supervision',
+    raum: 'kb2w4',
+    titel: 'Übung: Welche Hilfe passt?',
+    anweisung: 'Nach einem Notfall: Welches **Unterstützungsangebot** passt am besten?',
+    knoepfe: [
+      { kuerzel: 'SF', text: 'Selbstfürsorge' },
+      { kuerzel: 'NB', text: 'Nachbesprechung im Team' },
+      { kuerzel: 'KB', text: 'kollegiale Beratung' },
+      { kuerzel: 'SV', text: 'Supervision' },
+      { kuerzel: 'PH', text: 'professionelle Hilfe' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Die Angebote',
+      punkte: [
+        '**Selbstfürsorge:** erste Tage – reden, Pausen, schlafen, bewegen',
+        '**Nachbesprechung:** bald nach dem Notfall, mit Leitung oder Praxisanleitung, ohne Schuldzuweisung',
+        '**Kollegiale Beratung:** Kolleginnen beraten sich gegenseitig nach festen Schritten, ohne Supervisorin',
+        '**Supervision:** Supervisorin von außen, regelmäßig, vertraulich',
+        '**Professionelle Hilfe:** Ärztin, Psychotherapie – bei Warnzeichen'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Am Abend nach dem Notfall telefoniert Aylin lange mit ihrer besten Freundin und geht früh schlafen.', richtig: 'SF',
+        erklaerung: '**Selbstfürsorge:** mit vertrauten Menschen reden und sich ausruhen – das hilft in den ersten Tagen.', tipp: 'Wer hilft hier – Profis oder sie selbst?' },
+      { nummer: 2, text: 'Am nächsten Morgen setzt sich die Wohnbereichsleitung mit allen Beteiligten zusammen: Was ist passiert? Wie geht es euch?', richtig: 'NB',
+        erklaerung: '**Nachbesprechung im Team:** bald nach dem Notfall, alle Beteiligten, ohne Schuldzuweisung.', tipp: 'Wann findet das statt – und wer ist dabei?' },
+      { nummer: 3, text: 'Einmal im Monat kommt Herr Bauer, ein Supervisor von außen, und bespricht mit dem Team belastende Situationen.', richtig: 'SV',
+        erklaerung: '**Supervision:** regelmäßig, mit einer Person von außen.', tipp: 'Gehört Herr Bauer zum Team?' },
+      { nummer: 4, text: 'Vier Kolleginnen treffen sich. Eine erzählt ihren Fall, die anderen geben nach festen Schritten Ideen – ohne Leitung von außen.', richtig: 'KB',
+        erklaerung: '**Kollegiale Beratung (Intervision):** gegenseitig, nach festen Schritten, ohne Supervisor.', tipp: 'Wer leitet das Gespräch?' },
+      { nummer: 5, text: 'Tom hat sechs Wochen nach dem Notfall noch jede Nacht Albträume und kann sich kaum konzentrieren.', richtig: 'PH',
+        erklaerung: '**Professionelle Hilfe:** Warnzeichen – länger als vier Wochen. Ärztin oder Psychotherapie, ggf. über die Berufsgenossenschaft.', tipp: 'Wie lange dauert es schon?' },
+      { nummer: 6, text: 'Nach dem Dienst geht Sara eine Stunde spazieren und kocht danach in Ruhe.', richtig: 'SF',
+        erklaerung: '**Selbstfürsorge:** Bewegung und Alltag helfen dem Körper, Stress abzubauen.', tipp: 'Was tut sie für sich selbst?' },
+      { nummer: 7, text: 'Ein Pfleger trinkt seit dem Notfall jeden Abend Alkohol, um nicht mehr daran zu denken.', richtig: 'PH',
+        erklaerung: '**Professionelle Hilfe:** Alkohol zum Vergessen ist ein Warnzeichen.', tipp: 'Ist das noch normal?' },
+      { nummer: 8, text: 'Das Team trifft sich alle zwei Monate mit Frau Dr. Weiß von außen, um über die Zusammenarbeit und schwierige Einsätze zu sprechen.', richtig: 'SV',
+        erklaerung: '**Supervision:** regelmäßig, begleitet von außen, vertraulich.', tipp: 'Kommt die Leitung des Gesprächs von außen?' },
+      { nummer: 9, text: 'Direkt nach dem Einsatz sprechen die Praxisanleiterin und die beiden Auszubildenden in Ruhe darüber, was gut lief.', richtig: 'NB',
+        erklaerung: '**Nachbesprechung:** zeitnah, Ablauf klären, Gefühle aussprechen.', tipp: 'Direkt danach – mit wem?' },
+      { nummer: 10, text: 'Drei Auszubildende beraten sich gegenseitig nach festen Schritten zu Christins Fall.', richtig: 'KB',
+        erklaerung: '**Kollegiale Beratung:** Gleichrangige beraten sich nach einer festen Struktur.', tipp: 'Sind alle gleichrangig?' }
+    ],
+    merksatz: 'Nach einem Notfall sind Schlafprobleme, Bilder im Kopf und Schuldgefühle **normal** (akute Belastungsreaktion, meist weniger nach **vier Wochen**). Hilfe: **Selbstfürsorge**, **Nachbesprechung im Team**, **kollegiale Beratung**, **Supervision** (von außen, regelmäßig, vertraulich). **Warnzeichen** (länger als vier Wochen, schlimmer, Alkohol, Rückzug): **professionelle Hilfe**.',
+    danach: 'Prüfen Sie jetzt noch einmal Aufgabe 2 auf dem Arbeitsblatt!'
+  },
+  kb2ab09: {
+    ab: 'Wiederholung im Examensstil',
+    raum: 'kb2w4',
+    titel: 'Übung: Richtig oder falsch?',
+    anweisung: 'Zehn Aussagen zur **Kommunikation im Notfall**. Stimmt die Aussage?',
+    knoepfe: [
+      { kuerzel: 'R', text: 'richtig' },
+      { kuerzel: 'F', text: 'falsch' }
+    ],
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Zur psychosozialen Unterstützung gehört, sich der betroffenen Person vorzustellen.', richtig: 'R',
+        erklaerung: '**Richtig:** sich vorstellen, nicht allein lassen, Zuspruch, abschirmen, Körperkontakt wenn gewünscht, zuhören, Hilfe anbieten.', tipp: 'Was tun Sie als Erstes, wenn Sie zu einem Menschen im Notfall kommen?' },
+      { nummer: 2, text: '„Das wird schon wieder“ beruhigt am besten – auch wenn man es nicht weiß.', richtig: 'F',
+        erklaerung: '**Falsch:** Herunterspielen ist ein Gesprächshemmer und unehrlich.', tipp: 'Ist das ehrlich?' },
+      { nummer: 3, text: 'Die Nachbarin darf erfahren, wie es dem Patienten geht, wenn sie freundlich fragt.', richtig: 'F',
+        erklaerung: '**Falsch:** Schweigepflicht – Auskunft nur an Berechtigte, mit Einwilligung.', tipp: 'Gehört die Nachbarin zu den Berechtigten?' },
+      { nummer: 4, text: 'Im SPIKES-Schema steht „P“ für Perception: Man fragt, was die Person schon weiß.', richtig: 'R',
+        erklaerung: '**Richtig:** erst erfragen, dann informieren.', tipp: 'Was bedeutet Perception?' },
+      { nummer: 5, text: 'Bei schlechten Nachrichten sagt man alles auf einmal, damit es schnell vorbei ist.', richtig: 'F',
+        erklaerung: '**Falsch:** in kleinen Schritten informieren, Pausen machen (Knowledge).', tipp: 'Wie viel Information verträgt ein Mensch im Schock?' },
+      { nummer: 6, text: 'Ich-Botschaften und Paraphrasieren sind Gesprächsförderer.', richtig: 'R',
+        erklaerung: '**Richtig:** z. B. „Ich sehe, dass Sie Angst haben.“ – „Sie machen sich große Sorgen.“', tipp: 'Fördern oder hemmen sie das Gespräch?' },
+      { nummer: 7, text: 'Wer nach einem Notfall schlecht schläft, ist krank und braucht sofort eine Therapie.', richtig: 'F',
+        erklaerung: '**Falsch:** In den ersten Wochen ist das eine normale akute Belastungsreaktion.', tipp: 'Wie lange ist das normal?' },
+      { nummer: 8, text: 'Supervision wird von einer Person von außen geleitet.', richtig: 'R',
+        erklaerung: '**Richtig:** externe Supervisorin, regelmäßig, vertraulich.', tipp: 'Wer leitet die Supervision?' },
+      { nummer: 9, text: 'Bei der kollegialen Beratung braucht man immer einen Supervisor.', richtig: 'F',
+        erklaerung: '**Falsch:** Kollegiale Beratung (Intervision) läuft ohne Supervisor – nach festen Schritten.', tipp: 'Wer berät wen?' },
+      { nummer: 10, text: 'Medizinische Fragen der Angehörigen gibt die Pflegekraft an die Ärztin weiter.', richtig: 'R',
+        erklaerung: '**Richtig:** Diagnosen und Prognosen erklärt die Ärztin.', tipp: 'Wer darf Diagnosen erklären?' }
+    ],
+    merksatz: '**Psychosoziale Unterstützung:** vorstellen, nicht allein lassen, Zuspruch, abschirmen, zuhören, Hilfe anbieten. **Gesprächshemmer** vermeiden (Herunterspielen, Bewerten). **Schweigepflicht** auch gegenüber Nachbarn und Mitbewohnern. **SPIKES:** Setting – Perception – Invitation – Knowledge – Emotions – Strategy/Summary. **Nach dem Notfall:** Nachbesprechung, kollegiale Beratung, Supervision.',
+    danach: 'Prüfen Sie jetzt noch einmal Ihre Antworten auf dem Arbeitsblatt!'
   }
 };
