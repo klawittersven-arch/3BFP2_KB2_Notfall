@@ -712,6 +712,89 @@ var INHALTE = {
     merksatz: '**SPIKES:** **S**etting – Rahmen vorbereiten, vorstellen, Zeit klären · **P**erception – was weiß die Person schon? · **I**nvitation – vorwarnen, wie viel möchte sie wissen? · **K**nowledge – in kleinen Schritten, einfache, eindeutige Worte, Pausen · **E**motions – Gefühle ansprechen, Schweigen aushalten · **S**trategy and Summary – zusammenfassen, nächste Schritte, Rückruf, dokumentieren.',
     danach: 'Prüfen Sie jetzt noch einmal Aufgabe 1 auf dem Arbeitsblatt!'
   },
+  /* ========================================================================
+     TB 2 neu · Woche 3 · Rollenspiel 1: eine Notfallsituation begleiten
+     ======================================================================== */
+  kb2ab06: {
+    ab: 'Rollenspiel 1: Eine Notfallsituation begleiten',
+    raum: 'kb2w3',
+    titel: 'Übung: Welche Antwort hilft?',
+    anweisung: 'Lesen Sie die Situation und die beiden Antworten. Welche Antwort **unterstützt** die Person besser?',
+    knoepfe: [
+      { kuerzel: 'A', text: 'Antwort A' },
+      { kuerzel: 'B', text: 'Antwort B' }
+    ],
+    mindestens: 6,
+    karten: [
+      { nummer: 1, text: 'Herr Brandt liegt nach einem Sturz auf dem Boden: „Ist mein Bein gebrochen?“ **A:** „Ach was, das wird schon wieder.“ **B:** „Das kann ich noch nicht sagen. Der Rettungsdienst kommt gleich und schaut es sich an. Ich bleibe bei Ihnen.“', richtig: 'B',
+        erklaerung: '**B:** ehrlich, Zuspruch, nicht allein lassen. A spielt herunter (Gesprächshemmer).', tipp: 'Welche Antwort ist ehrlich?' },
+      { nummer: 2, text: 'Frau Hoffmann hat Atemnot: „Lassen Sie mich nicht allein!“ **A:** „Ich bleibe hier bei Ihnen. Darf ich Ihre Hand halten?“ **B:** „Ich hole schnell noch die Decke, bin gleich zurück.“', richtig: 'A',
+        erklaerung: '**A:** nicht allein lassen, Körperkontakt anbieten – wenn gewünscht.', tipp: 'Was hat sie sich gewünscht?' },
+      { nummer: 3, text: 'Mitbewohner stehen im Flur und schauen zu. **A:** Sie bitten eine Kollegin, die Mitbewohner freundlich in den Aufenthaltsraum zu begleiten. **B:** Sie lassen die Mitbewohner zuschauen, dann wissen sie Bescheid.', richtig: 'A',
+        erklaerung: '**A:** vor Zuschauern abschirmen – das schützt die Würde.', tipp: 'Möchten Sie in so einer Lage angestarrt werden?' },
+      { nummer: 4, text: 'Frau Klein weint: „War ich schuld? Ich habe ihr den Kuchen gegeben!“ **A:** „Sie machen sich große Vorwürfe. Erzählen Sie mir, was passiert ist.“ **B:** „Jetzt beruhigen Sie sich erst mal.“', richtig: 'A',
+        erklaerung: '**A:** Paraphrasieren und aktiv zuhören. B bewertet statt zu akzeptieren.', tipp: 'Welche Antwort nimmt ihre Gefühle ernst?' },
+      { nummer: 5, text: 'Ein Bewohner nach einem Sturz, Sie kommen ins Zimmer. **A:** „Was ist denn hier los?“ **B:** „Herr Brandt, ich bin Lea, Pflegeschülerin. Ich helfe Ihnen.“', richtig: 'B',
+        erklaerung: '**B:** sich vorstellen – so weiß er, wer bei ihm ist.', tipp: 'Weiß er, wer Sie sind?' },
+      { nummer: 6, text: 'Herr Brandt: „Meine Tochter weiß nichts!“ **A:** „Darum kümmern wir uns später.“ **B:** „Wir rufen Ihre Tochter an. Soll ich ihr etwas ausrichten?“', richtig: 'B',
+        erklaerung: '**B:** ein Hilfsangebot macht ihm Sorgen leichter.', tipp: 'Welche Antwort ist ein Hilfsangebot?' },
+      { nummer: 7, text: 'Frau Hoffmann fragt ängstlich: „Was passiert jetzt mit mir?“ **A:** „Die Ärztin kommt gleich. Sie hört Sie ab und entscheidet, wie es weitergeht.“ **B:** „Das weiß ich auch nicht.“', richtig: 'A',
+        erklaerung: '**A:** Zuspruch geben und sagen, was als Nächstes kommt.', tipp: 'Welche Antwort gibt Sicherheit?' },
+      { nummer: 8, text: 'Frau Klein zittert und will sofort in die Klinik fahren. **A:** „Fahren Sie lieber gleich los.“ **B:** „Sie sind gerade sehr aufgeregt. Sollen wir jemanden anrufen, der Sie fährt?“', richtig: 'B',
+        erklaerung: '**B:** Gefühl ansprechen und ein Hilfsangebot machen – sie ist zu aufgeregt zum Fahren.', tipp: 'Kann sie jetzt sicher Auto fahren?' }
+    ],
+    merksatz: 'Psychosoziale Unterstützung im Notfall: **sich vorstellen**, **nicht allein lassen**, **Zuspruch geben** und ehrlich informieren, **vor Zuschauern abschirmen**, **Körperkontakt, wenn gewünscht**, **aktiv zuhören**, **Hilfsangebote machen**. Nicht herunterspielen, nicht bewerten.',
+    danach: 'Jetzt geht es weiter mit dem Rollenspiel auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
+     TB 2 neu · Woche 3 · Rollenspiel 2: ein Angehörigengespräch führen – mit Feedback
+     ======================================================================== */
+  kb2ab07: {
+    ab: 'Rollenspiel 2: Ein Angehörigengespräch führen – mit Feedback',
+    raum: 'kb2w3',
+    titel: 'Übung: Gutes Feedback?',
+    anweisung: 'Nach einem Rollenspiel gibt die Beobachterin Feedback. Hält sich das Feedback an die **Regeln**?',
+    knoepfe: [
+      { kuerzel: 'J', text: 'ja, gutes Feedback' },
+      { kuerzel: 'N', text: 'nein, Regel verletzt' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Die Regeln',
+      punkte: [
+        'mit dem **Positiven** beginnen',
+        '**konkret** und **beschreibend**, nicht bewertend',
+        '**Ich-Form**, nicht „man“',
+        'auf das **Verhalten**, nicht auf die Person',
+        '**nicht zu viel** auf einmal'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: '„Mir hat gefallen, dass du dich zuerst vorgestellt hast.“', richtig: 'J',
+        erklaerung: '**Gut:** beginnt positiv, konkret, Ich-Form.', tipp: 'Positiv und konkret?' },
+      { nummer: 2, text: '„Das war schlecht.“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** nicht konkret, bewertend. Was genau war schlecht?', tipp: 'Weiß die Person, was sie ändern soll?' },
+      { nummer: 3, text: '„Du bist einfach ein unsicherer Mensch.“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** greift die Person an, nicht das Verhalten.', tipp: 'Geht es um ein Verhalten oder um die ganze Person?' },
+      { nummer: 4, text: '„Als die Tochter geweint hat, hast du gleich weitergeredet. Ich hätte mir gewünscht, dass du kurz wartest.“', richtig: 'J',
+        erklaerung: '**Gut:** beschreibt konkret, Ich-Form, regt zur Veränderung an.', tipp: 'Beschreibt das ein Verhalten?' },
+      { nummer: 5, text: '„Man hätte auch mal nachfragen können, was sie schon weiß.“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** „man“ statt Ich-Form. Besser: „Mir ist aufgefallen, dass du nicht gefragt hast, …“', tipp: 'Wer spricht hier?' },
+      { nummer: 6, text: '„Mir ist aufgefallen, dass du ruhig und langsam gesprochen hast. Das hat mir gut gefallen.“', richtig: 'J',
+        erklaerung: '**Gut:** konkret und positiv.', tipp: 'Ist das konkret?' },
+      { nummer: 7, text: '„Erstens zu schnell, zweitens zu leise, drittens keine Pause, viertens kein Blickkontakt, fünftens …“', richtig: 'N',
+        erklaerung: '**Regel verletzt:** zu viel auf einmal, kein positiver Anfang.', tipp: 'Kann man sich so viel auf einmal merken?' },
+      { nummer: 8, text: '„Ich habe gehört, dass du gesagt hast: ‚Das wird schon wieder.‘ Für mich klang das wie Herunterspielen.“', richtig: 'J',
+        erklaerung: '**Gut:** beschreibt genau, was gesagt wurde, und sagt in Ich-Form, wie es wirkte.', tipp: 'Beschreibt sie, was sie gehört hat?' },
+      { nummer: 9, text: 'Die Pflegekraft antwortet auf das Feedback: „Ja, aber die Tochter hat doch so viel geredet, da konnte ich nicht …“', richtig: 'N',
+        erklaerung: '**Regel verletzt (Feedback annehmen):** nicht rechtfertigen – zuhören und danken.', tipp: 'Wie nimmt man Feedback an?' },
+      { nummer: 10, text: 'Die Pflegekraft hört zu und sagt: „Danke, darauf achte ich nächstes Mal.“', richtig: 'J',
+        erklaerung: '**Gut:** zuhören, nicht rechtfertigen, sich bedanken.', tipp: 'Rechtfertigt sie sich?' }
+    ],
+    merksatz: '**Feedback geben:** mit dem **Positiven** beginnen, **konkret** und **beschreibend**, in der **Ich-Form**, auf das **Verhalten** bezogen, **nicht zu viel** auf einmal. **Feedback annehmen:** **zuhören**, ausreden lassen, **nicht rechtfertigen**, **danken**, später nachdenken.',
+    danach: 'Jetzt geht es weiter mit dem Rollenspiel auf dem Arbeitsblatt!'
+  },
 
   /* ========================================================================
      BELOHNUNGSSPIEL „Notfall-Run!“ (spiel.html) – Endless Runner aus „Diabetes Run!“, neu gestaltet für Notfallsituationen
