@@ -4,9 +4,10 @@ Aufruf: python3 werkzeuge/seiten_erzeugen.py   (nur nötig, wenn eine Übung daz
 from pathlib import Path
 
 DOCS = Path(__file__).resolve().parent.parent / "docs"
-IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a"]
+IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a", "kb2ab02", "kb2ab03"]
 ABS = {"ab1": "AB 1 – Menschen im Notfall", "ab2": "AB 2 – Psychologische Erste Hilfe",
-       "ab3": "Woche 4 – Informationen geben in Krisen"}
+       "ab3": "Woche 4 – Informationen geben in Krisen",
+       "kb2w1": "TB 2 neu · Woche 1 – Psychosoziale Unterstützung · Gesprächshemmer"}
 KLASSEN = {"k1": ("3BFP2/1", "3bfp2-1"), "k2": ("3BFP2/2", "3bfp2-2")}
 
 VORLAGE = """<!DOCTYPE html>

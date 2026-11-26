@@ -2,6 +2,7 @@
    INHALTE – KB II · Notfallsituationen (3BFP2, Themenblock 2)
    Woche 1: AB 1 „Menschen im Notfall“ und AB 2 „Psychologische Erste Hilfe“
    Woche 4: AB „Informationen geben in Krisen“ (raum 'ab3')
+   TB 2 neu ab KW 49, Woche 1: „Psychosoziale Unterstützung im Notfall“ und „Gesprächshemmer im Notfall vermeiden“ (raum 'kb2w1')
    ==========================================================================
 
    In dieser Datei stehen ALLE Texte der Übungen.
@@ -19,7 +20,7 @@
 
    Aufbau einer Übung:
      ab          – Titel des Arbeitsblatts (erscheint in der Kopfzeile; bewusst ohne „AB 1“/„AB 2“)
-     raum        – zu welchem Arbeitsblatt die Übung gehört ('ab1', 'ab2' oder 'ab3');
+     raum        – zu welchem Arbeitsblatt bzw. welcher Woche die Übung gehört ('ab1', 'ab2', 'ab3', 'kb2w1' …);
                    danach richtet sich die Lehrerseite für den Beamer.
      titel       – Überschrift der Übung (genau wie auf dem Arbeitsblatt)
      anweisung   – Arbeitsanweisung über den Karten
@@ -525,6 +526,110 @@ var INHALTE = {
     ],
     merksatz: 'Informationen geben in Krisen: **dosieren** · **einfache Sprache** · **Schweigen aushalten** · **Verständnis offen prüfen** · **ehrlich bleiben** · **Wichtiges wiederholen und aufschreiben**.',
     danach: 'Prüfen Sie mit diesen Regeln noch einmal Ihre Reihenfolge in Aufgabe 2 auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
+     TB 2 NEU AB KW 49 · Woche 1 (raum 'kb2w1')
+     „Psychosoziale Unterstützung im Notfall“ und „Gesprächshemmer im Notfall vermeiden“
+     Beide Übungen sind „Für die Schnellen“ (freiwillig) – das Papier allein bereitet auf die KA vor.
+     Begriffe nach Pflegias (Bd. 2, Kap. 1.2.3; Bd. 1, S. 272, Tab. 1).
+     ======================================================================== */
+
+  kb2ab02: {
+    ab: 'Psychosoziale Unterstützung im Notfall',
+    raum: 'kb2w1',
+    titel: 'Übung: Hilft das – oder nicht?',
+    anweisung: 'Frau Maler um 11 Uhr: Sie hat Luftnot und große Angst. Christin wartet mit ihr auf die Pflegefachkraft. Hilft das, was Christin sagt oder tut?',
+    knoepfe: [
+      { kuerzel: 'H', text: 'hilft' },
+      { kuerzel: 'N', text: 'hilft nicht' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Was gehört zur psychosozialen Unterstützung?',
+      punkte: [
+        'sich vorstellen · nicht allein lassen · Zuspruch geben · vor Zuschauern abschirmen',
+        'Körperkontakt – **nur wenn gewünscht** · aktiv zuhören · Hilfsangebote machen',
+        'Pflegende selbst: tief durchatmen, nicht rennen, sicher auftreten, Hilfe nachfordern'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: '„Frau Maler, ich bin Christin, die Pflegeschülerin. Ich bleibe bei Ihnen.“', richtig: 'H',
+        erklaerung: '**Hilft:** Christin **stellt sich vor** und sagt, dass sie Frau Maler **nicht allein lässt**. Das gibt Sicherheit.',
+        tipp: 'Weiß Frau Maler jetzt, wer bei ihr ist?' },
+      { nummer: 2, text: 'Christin rennt aus dem Zimmer, um selbst die Pflegefachkraft zu suchen. Frau Maler bleibt allein.', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Frau Maler darf **nicht allein gelassen** werden. Besser: Klingel oder Notruf nutzen und im Zimmer bleiben.',
+        tipp: 'Wie fühlt sich Frau Maler, wenn sie plötzlich allein ist?' },
+      { nummer: 3, text: '„Die Pflegefachkraft ist gleich da. Ich sage Ihnen, was wir als Nächstes machen.“', richtig: 'H',
+        erklaerung: '**Hilft:** **Zuspruch** – Christin macht Mut und erklärt, was passiert. Information verringert Angst.',
+        tipp: 'Macht dieser Satz Mut?' },
+      { nummer: 4, text: 'Die Zimmertür steht offen. Besucher bleiben auf dem Flur stehen und schauen. Christin schließt die Tür.', richtig: 'H',
+        erklaerung: '**Hilft:** Christin **schirmt vor Zuschauern ab**. Neugierige Blicke sind für Betroffene unangenehm.',
+        tipp: 'Möchten Sie in so einer Lage angestarrt werden?' },
+      { nummer: 5, text: 'Christin hält Frau Malers Hand fest, obwohl Frau Maler die Hand wegzieht.', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Körperkontakt **nur, wenn gewünscht** – und respektvoll. Besser fragen: „Darf ich Ihre Hand halten?“',
+        tipp: 'Was zeigt Frau Maler, wenn sie die Hand wegzieht?' },
+      { nummer: 6, text: '„Keine Angst, Sie haben gar nichts. Sie sind nur aufgeregt.“', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Das ist nicht ehrlich und **spielt die Lage herunter**. Frau Maler hat Warnzeichen. Ehrlicher Zuspruch: „Hilfe ist unterwegs. Ich bleibe bei Ihnen.“',
+        tipp: 'Stimmt dieser Satz? Fühlt sich Frau Maler ernst genommen?' },
+      { nummer: 7, text: 'Frau Maler sagt: „Ich habe solche Angst.“ Christin: „Sie haben Angst. Ich bin da. Was spüren Sie gerade?“', richtig: 'H',
+        erklaerung: '**Hilft:** Christin **hört aktiv zu** – sie wiederholt, was Frau Maler fühlt, und fragt nach.',
+        tipp: 'Nimmt Christin die Angst ernst?' },
+      { nummer: 8, text: '„Soll ich Ihre Tochter anrufen lassen?“', richtig: 'H',
+        erklaerung: '**Hilft:** Ein **Hilfsangebot**. Frau Maler darf selbst entscheiden – das gibt ihr ein Stück Kontrolle zurück.',
+        tipp: 'Was bietet Christin hier an?' },
+      { nummer: 9, text: 'Christin atmet einmal tief durch, bevor sie ins Zimmer geht. Dann spricht sie ruhig und langsam.', richtig: 'H',
+        erklaerung: '**Hilft:** Pflegende **sammeln sich innerlich** und **strahlen Ruhe aus**. Das überträgt sich auf Frau Maler.',
+        tipp: 'Wie wirkt eine ruhige Pflegekraft auf eine ängstliche Patientin?' },
+      { nummer: 10, text: 'Christin sagt laut und hektisch: „Oh Gott, was mache ich denn jetzt?“', richtig: 'N',
+        erklaerung: '**Hilft nicht:** Hektik und Panik übertragen sich. Angst kann die Atemnot sogar verstärken. Besser: durchatmen, **sicher auftreten**, Hilfe holen.',
+        tipp: 'Fühlt sich Frau Maler danach sicherer?' }
+    ],
+    merksatz: '**Psychosoziale Unterstützung im Notfall:** sich **vorstellen** · **nicht allein lassen** · **Zuspruch** geben · vor **Zuschauern abschirmen** · **Körperkontakt nur, wenn gewünscht** · **aktiv zuhören** · **Hilfsangebote** machen. Pflegende selbst: tief **durchatmen**, nicht rennen, **sicher auftreten**, rechtzeitig **Hilfe nachfordern**.',
+    danach: 'Prüfen Sie jetzt noch einmal Ihre Abschlussaufgabe auf dem Arbeitsblatt!'
+  },
+
+  kb2ab03: {
+    ab: 'Gesprächshemmer im Notfall vermeiden',
+    raum: 'kb2w1',
+    titel: 'Übung: Förderer oder Hemmer?',
+    anweisung: 'Christin erzählt am Tag nach dem Notfall von ihren Albträumen. Fördert die Reaktion das Gespräch – oder hemmt sie es? In der Erklärung steht der genaue Begriff.',
+    knoepfe: [
+      { kuerzel: 'F', text: 'Gesprächsförderer' },
+      { kuerzel: 'H', text: 'Gesprächshemmer' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: die Begriffe aus Pflegias',
+      punkte: [
+        '**Förderer:** Zuhören · Ich-Botschaften senden · Paraphrasieren und Respekt zeigen · Rückfragen · Fokussierung · Feedback',
+        '**Hemmer:** Unterbrechen · Du-Botschaften senden · Eigene Erfahrungen und Ratschläge in den Vordergrund stellen · Bewerten statt akzeptieren · Unkonzentriertheit · Herunterspielen'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: '„Ich merke, dass dich das sehr beschäftigt.“', richtig: 'F',
+        erklaerung: '**Förderer: Ich-Botschaft senden.** Die Kollegin spricht von sich und von dem, was sie wahrnimmt – ohne Vorwurf.', tipp: 'Spricht die Kollegin von sich oder über Christin?' },
+      { nummer: 2, text: '„Ach komm, anderen geht es viel schlechter.“', richtig: 'H',
+        erklaerung: '**Hemmer: Herunterspielen.** Christins Belastung wird klein gemacht. Sie fühlt sich nicht ernst genommen.', tipp: 'Wird Christins Gefühl ernst genommen?' },
+      { nummer: 3, text: '„Du sagst, du hast seitdem Albträume?“', richtig: 'F',
+        erklaerung: '**Förderer: Paraphrasieren und Respekt zeigen** (auch Rückfrage). Die Kollegin wiederholt mit eigenen Worten und zeigt: Ich habe dich verstanden.', tipp: 'Was macht die Kollegin mit dem, was Christin gesagt hat?' },
+      { nummer: 4, text: 'Während Christin erzählt, verdreht eine Kollegin die Augen.', richtig: 'H',
+        erklaerung: '**Hemmer: Unterbrechen** – hier ohne Worte (nonverbal). Augenverdrehen zeigt Desinteresse und Ablehnung.', tipp: 'Man kann auch ohne Worte unterbrechen.' },
+      { nummer: 5, text: '„Was war für dich am schlimmsten?“', richtig: 'F',
+        erklaerung: '**Förderer: Rückfragen.** Nachhaken bei wichtigen Aussagen zeigt Interesse und hilft Christin, weiterzuerzählen.', tipp: 'Darf Christin weitererzählen?' },
+      { nummer: 6, text: '„Du bist einfach zu empfindlich.“', richtig: 'H',
+        erklaerung: '**Hemmer: Du-Botschaft senden** (und **Bewerten statt akzeptieren**). Das klingt nach Vorwurf – Christin wird sich zurückziehen.', tipp: 'Wie fühlt sich Christin nach diesem Satz?' },
+      { nummer: 7, text: 'Der Praxisanleiter legt sein Handy weg, setzt sich zu Christin und schaut sie an.', richtig: 'F',
+        erklaerung: '**Förderer: Fokussierung.** Er ist ganz bei Christin und ihrer Aussage.', tipp: 'Wo ist seine Aufmerksamkeit?' },
+      { nummer: 8, text: '„Ich an deiner Stelle würde einfach nicht mehr daran denken.“', richtig: 'H',
+        erklaerung: '**Hemmer: Eigene Erfahrungen und Ratschläge in den Vordergrund stellen.** Lösungen sollen aus der Person selbst kommen, nicht von außen.', tipp: 'Wessen Lösung steht hier im Vordergrund?' },
+      { nummer: 9, text: 'Zu Frau Maler um 11 Uhr: „Ich sehe, dass Sie sehr schnell atmen. Ich bleibe bei Ihnen.“', richtig: 'F',
+        erklaerung: '**Förderer: Feedback** (wertschätzend rückmelden, was man wahrnimmt) und Ich-Botschaft.', tipp: 'Sagt Christin, was sie wahrnimmt?' },
+      { nummer: 10, text: 'Während Christin erzählt, telefoniert die Stationsleitung nebenbei.', richtig: 'H',
+        erklaerung: '**Hemmer: Unkonzentriertheit.** Nebenbei andere Dinge erledigen zeigt: Du bist mir nicht wichtig.', tipp: 'Ist die Stationsleitung ganz bei Christin?' }
+    ],
+    merksatz: '**Gesprächsförderer:** Zuhören · Ich-Botschaften · Paraphrasieren und Respekt zeigen · Rückfragen · Fokussierung · Feedback. **Gesprächshemmer:** Unterbrechen · Du-Botschaften · Eigene Erfahrungen und Ratschläge in den Vordergrund stellen · Bewerten statt akzeptieren · Unkonzentriertheit · Herunterspielen. Nach einem Notfall sind Menschen verletzlich – Hemmer verstärken Angst, Scham und Schuldgefühle.',
+    danach: 'Prüfen Sie jetzt noch einmal Ihre Sätze in Aufgabe 2 auf dem Arbeitsblatt: Welche Förderer haben Sie genutzt?'
   },
 
   /* ========================================================================

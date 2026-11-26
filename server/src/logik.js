@@ -5,8 +5,9 @@ export const MAX_GERAETE = 120;
 export const MAX_UEBUNGEN = 12;
 export const MAX_PUNKTE = 1000000; // Belohnungsspiel: höchste mögliche Punktzahl (Schutz vor Unsinn)
 
-// Raum = Klasse + Arbeitsblatt, z. B. 'k2-ab1' (k1 = 3BFP2/1, k2 = 3BFP2/2)
-const RAUM = /^k[1-9]-ab[1-9]$/;
+// Raum = Klasse + Arbeitsblatt bzw. Woche, z. B. 'k2-ab1' (k1 = 3BFP2/1, k2 = 3BFP2/2).
+// Ab KW 49 (TB 2 neu) je Fach und Woche: 'k1-kb1w1' … 'k2-kb2w4' – auch die KB-I-Übungen (Repository 3BFP2-kb1-notfall, Ordner docs/tb2) melden hierher.
+const RAUM = /^k[1-9]-(ab[1-9]|kb[12]w[1-9])$/;
 const UEBUNG = /^[a-z0-9]{1,12}$/;
 const GERAET = /^[a-f0-9]{16,64}$/;
 const NAME = /^\p{L}[\p{L}' .-]{0,22}\p{L}\.?$/u;
