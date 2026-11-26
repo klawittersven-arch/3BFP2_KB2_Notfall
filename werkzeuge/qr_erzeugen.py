@@ -5,7 +5,7 @@ Benötigt: segno  ODER  opencv-python (cv2) – je nachdem, was installiert ist.
 from pathlib import Path
 
 BASIS = "https://klawittersven-arch.github.io/3BFP2_KB2_Notfall/"
-IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a", "kb2ab02", "kb2ab03", "fall"]  # fall = Fall-Einführung (QR-Code auf dem Beamer)
+IDS = ["ab1a", "ab1b", "ab2a", "ab2c", "ab3a", "kb2ab02", "kb2ab03", "kb2ab04", "kb2ab05", "fall"]  # fall = Fall-Einführung (QR-Code auf dem Beamer)
 QR = Path(__file__).resolve().parent.parent / "qr"
 DOCS = Path(__file__).resolve().parent.parent / "docs"
 QR.mkdir(exist_ok=True)

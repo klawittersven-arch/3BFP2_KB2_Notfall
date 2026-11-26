@@ -631,6 +631,87 @@ var INHALTE = {
     merksatz: '**Gesprächsförderer:** Zuhören · Ich-Botschaften · Paraphrasieren und Respekt zeigen · Rückfragen · Fokussierung · Feedback. **Gesprächshemmer:** Unterbrechen · Du-Botschaften · Eigene Erfahrungen und Ratschläge in den Vordergrund stellen · Bewerten statt akzeptieren · Unkonzentriertheit · Herunterspielen. Nach einem Notfall sind Menschen verletzlich – Hemmer verstärken Angst, Scham und Schuldgefühle.',
     danach: 'Prüfen Sie jetzt noch einmal Ihre Sätze in Aufgabe 2 auf dem Arbeitsblatt: Welche Förderer haben Sie genutzt?'
   },
+  /* ========================================================================
+     TB 2 neu · Woche 2 · Angehörige im Notfall informieren – Schweigepflicht
+     ======================================================================== */
+  kb2ab04: {
+    ab: 'Angehörige im Notfall informieren – Schweigepflicht',
+    raum: 'kb2w2',
+    titel: 'Übung: Darf ich das sagen?',
+    anweisung: 'Jemand möchte etwas über eine Bewohnerin oder einen Bewohner wissen. Ist die Auskunft **erlaubt** oder **nicht erlaubt**?',
+    knoepfe: [
+      { kuerzel: 'J', text: 'Auskunft erlaubt' },
+      { kuerzel: 'N', text: 'nicht erlaubt' }
+    ],
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Der Notarzt fragt nach den Vorerkrankungen und Medikamenten.', richtig: 'J',
+        erklaerung: '**Erlaubt:** Der Notarzt ist an der Behandlung beteiligt und braucht die Informationen.', tipp: 'Ist die Person an der Behandlung beteiligt?' },
+      { nummer: 2, text: 'Eine Mitbewohnerin fragt, warum Frau Maler ins Krankenhaus gekommen ist.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Mitbewohner sind nicht beteiligt. Freundlich bleiben, aber nichts sagen und nichts andeuten.', tipp: 'Gilt die Schweigepflicht auch gegenüber Mitbewohnern?' },
+      { nummer: 3, text: 'Die Tochter ruft an. In der Dokumentation ist sie als Bevollmächtigte eingetragen. Sie rufen unter der Nummer aus der Akte zurück.', richtig: 'J',
+        erklaerung: '**Erlaubt:** Die Bevollmächtigte vertritt die Bewohnerin. Durch den Rückruf wissen Sie sicher, wer am Telefon ist.', tipp: 'Wer vertritt die Bewohnerin?' },
+      { nummer: 4, text: 'Der Nachbar eines Bewohners fragt im Garten nach dessen Diagnose.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Nachbarn und Bekannte bekommen keine Auskunft.', tipp: 'Hat der Bewohner zugestimmt?' },
+      { nummer: 5, text: 'Eine Kollegin aus einem anderen Wohnbereich fragt in der Pause neugierig nach dem Notfall.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Die Schweigepflicht gilt auch gegenüber Kolleginnen, die nicht an der Pflege beteiligt sind.', tipp: 'Ist die Kollegin an der Pflege beteiligt?' },
+      { nummer: 6, text: 'Ein wacher, orientierter Bewohner sagt: „Sie dürfen meiner Frau alles sagen.“ Seine Frau fragt nach.', richtig: 'J',
+        erklaerung: '**Erlaubt:** Der Bewohner hat Sie von der Schweigepflicht entbunden. Das wird dokumentiert – am besten schriftlich.', tipp: 'Wer darf von der Schweigepflicht entbinden?' },
+      { nummer: 7, text: 'Ein Mann ruft an: „Ich bin der Sohn.“ Er steht nicht in der Dokumentation, die Bewohnerin ist bewusstlos.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Keine Entbindung, und Sie wissen nicht sicher, wer anruft. Auch Kinder brauchen die Zustimmung.', tipp: 'Steht er in der Dokumentation?' },
+      { nummer: 8, text: 'Der Ehemann einer Bewohnerin fragt. Eine Zustimmung ist nicht dokumentiert.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Sogar Ehepartner brauchen die Zustimmung. Fragen Sie die Bewohnerin selbst, wenn sie entscheiden kann.', tipp: 'Gilt die Schweigepflicht auch gegenüber dem Ehepartner?' },
+      { nummer: 9, text: 'Im Bus erzählen Sie einer Freundin vom Notfall – mit dem Namen der Bewohnerin.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Nicht in der Öffentlichkeit über Bewohner sprechen (Datenschutz, Schweigepflicht).', tipp: 'Wer hört im Bus alles mit?' },
+      { nummer: 10, text: 'Eine Bewohnerin ist gestorben. Ihre Freundin fragt nach der Todesursache.', richtig: 'N',
+        erklaerung: '**Nicht erlaubt:** Die Schweigepflicht gilt **auch nach dem Tod**.', tipp: 'Endet die Schweigepflicht mit dem Tod?' }
+    ],
+    merksatz: 'Die **Schweigepflicht** (§ 203 StGB) gilt gegenüber **allen, die nicht beteiligt sind** – auch gegenüber **Angehörigen**, **Ehepartnern**, **Mitbewohnern** und **nicht beteiligten Kolleginnen**, und **auch nach dem Tod**. Auskunft bekommen **Beteiligte** (Notarzt, Klinik), **Bevollmächtigte/Betreuer** und Personen, für die die Person die **Schweigepflicht aufgehoben** hat. Am Telefon im Zweifel **zurückrufen**.',
+    danach: 'Prüfen Sie jetzt noch einmal Aufgabe 1 auf dem Arbeitsblatt!'
+  },
+
+  /* ========================================================================
+     TB 2 neu · Woche 2 · Schlechte Nachrichten überbringen (SPIKES)
+     ======================================================================== */
+  kb2ab05: {
+    ab: 'Schlechte Nachrichten überbringen',
+    raum: 'kb2w2',
+    titel: 'Übung: Welcher SPIKES-Schritt?',
+    anweisung: 'Sätze und Handlungen aus Telefonaten mit Angehörigen. Zu welchem Schritt des **SPIKES-Schemas** gehören sie? (Setting = Rahmen · Perception = Wissensstand · Invitation = Einladung · Knowledge = Wissen · Emotions = Gefühle · Strategy and Summary = Plan und Zusammenfassung)',
+    knoepfe: [
+      { kuerzel: 'SET', text: 'S – Setting' },
+      { kuerzel: 'P', text: 'P – Perception' },
+      { kuerzel: 'I', text: 'I – Invitation' },
+      { kuerzel: 'K', text: 'K – Knowledge' },
+      { kuerzel: 'E', text: 'E – Emotions' },
+      { kuerzel: 'STR', text: 'S – Strategy' }
+    ],
+    mindestens: 7,
+    karten: [
+      { nummer: 1, text: 'Sie gehen für das Telefonat in einen ruhigen Raum und legen die Akte bereit.', richtig: 'SET',
+        erklaerung: '**Setting:** Den Rahmen vorbereiten – ruhig, ungestört, Unterlagen bereit.', tipp: 'Passiert das vor oder während der Nachricht?' },
+      { nummer: 2, text: '„Haben Sie gerade einen Moment Zeit zum Sprechen?“', richtig: 'SET',
+        erklaerung: '**Setting:** Klären, ob die Person gerade sprechen kann.', tipp: 'Geht es schon um die Nachricht?' },
+      { nummer: 3, text: '„Was hat man Ihnen heute schon erzählt?“', richtig: 'P',
+        erklaerung: '**Perception:** Erfragen, was die Person schon weiß.', tipp: 'Sie fragen nach dem Wissen der Angehörigen.' },
+      { nummer: 4, text: '„Ich muss Ihnen leider etwas Ernstes sagen.“', richtig: 'I',
+        erklaerung: '**Invitation:** Vorwarnen – die Person kann sich innerlich vorbereiten.', tipp: 'Kommt die Nachricht schon – oder wird sie angekündigt?' },
+      { nummer: 5, text: '„Möchten Sie, dass ich Ihnen alles genau erkläre?“', richtig: 'I',
+        erklaerung: '**Invitation:** Klären, wie viel die Person wissen möchte.', tipp: 'Sie fragen nach dem Wunsch, informiert zu werden.' },
+      { nummer: 6, text: '„Ihr Vater ist heute Morgen im Bad gestürzt. Er ist jetzt im Krankenhaus.“', richtig: 'K',
+        erklaerung: '**Knowledge:** Die Nachricht in kleinen Schritten und mit einfachen Worten.', tipp: 'Hier kommt die eigentliche Information.' },
+      { nummer: 7, text: 'Sie machen eine Pause und fragen: „Konnten Sie mir folgen?“', richtig: 'K',
+        erklaerung: '**Knowledge:** Pausen machen und prüfen, ob alles verstanden wurde.', tipp: 'Geht es um das Verstehen der Information?' },
+      { nummer: 8, text: '„Das ist ein großer Schreck für Sie.“', richtig: 'E',
+        erklaerung: '**Emotions:** Das Gefühl wahrnehmen und ansprechen.', tipp: 'Worum geht es: Fakten oder Gefühle?' },
+      { nummer: 9, text: 'Die Tochter weint. Sie sagen nichts und warten.', richtig: 'E',
+        erklaerung: '**Emotions:** Schweigen und Weinen aushalten.', tipp: 'Was braucht die Tochter gerade?' },
+      { nummer: 10, text: '„Ich gebe Ihnen die Nummer der Station und rufe Sie heute Abend noch einmal an.“', richtig: 'STR',
+        erklaerung: '**Strategy and Summary:** nächste Schritte, Ansprechperson, Rückruf.', tipp: 'Wie geht es nach dem Gespräch weiter?' }
+    ],
+    merksatz: '**SPIKES:** **S**etting – Rahmen vorbereiten, vorstellen, Zeit klären · **P**erception – was weiß die Person schon? · **I**nvitation – vorwarnen, wie viel möchte sie wissen? · **K**nowledge – in kleinen Schritten, einfache, eindeutige Worte, Pausen · **E**motions – Gefühle ansprechen, Schweigen aushalten · **S**trategy and Summary – zusammenfassen, nächste Schritte, Rückruf, dokumentieren.',
+    danach: 'Prüfen Sie jetzt noch einmal Aufgabe 1 auf dem Arbeitsblatt!'
+  },
 
   /* ========================================================================
      BELOHNUNGSSPIEL „Notfall-Run!“ (spiel.html) – Endless Runner aus „Diabetes Run!“, neu gestaltet für Notfallsituationen

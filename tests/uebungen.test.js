@@ -15,7 +15,7 @@ const path = require('path');
 const DOCS = path.join(__dirname, '..', 'docs');
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png' };
 const SERVER = 'https://fortschritt.test';
-const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2c', 'ab3a', 'kb2ab02', 'kb2ab03'];
+const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2c', 'ab3a', 'kb2ab02', 'kb2ab03', 'kb2ab04', 'kb2ab05'];
 
 // einstellungen.js für die Tests anpassen: Serveradresse und (optional) Schutz gegen Durchklicken ausschalten
 function einstellungen(text, server, schutz) {
