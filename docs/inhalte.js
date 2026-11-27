@@ -28,12 +28,16 @@
      knoepfe     – die Antwortknöpfe: kuerzel (intern, nur GROSSBUCHSTABEN, höchstens 6)
                    und text (auf dem Knopf)
      hilfe       – (optional) aufklappbarer Hilfe-Kasten: titel + punkte
-     mindestens  – so viele Karten müssen beim ERSTEN Versuch richtig sein,
-                   sonst gibt es statt des Merksatzes „Nicht einfach durchklicken!“
+     mindestens  – nur ohne Herzen (einstellungen.js: herzen: 0): so viele Karten müssen beim
+                   ERSTEN Versuch richtig sein, sonst gibt es statt des Merksatzes „Nicht einfach durchklicken!“
      karten      – die Aussagen (siehe unten)
      merksatz    – erscheint erst, wenn alle Karten gelöst sind („Das Wichtigste in Kürze“)
      danach      – Hinweis nach dem Lösen unter „Übung 1 abgeschlossen!“: welche Aufgabe auf dem
                    Arbeitsblatt jetzt dran ist
+     minispiel   – (optional) Minispiel zur Belohnung, wenn die Übung geschafft ist:
+                   'herzdruck' (Herzdruck-Takt), 'wespen' (Wespen-Alarm) oder 'stoerung' (Stör-Abwehr).
+                   30 Sekunden pro Runde, 3 Läufe (einstellungen.js). Höchstens ein Spiel pro Woche,
+                   denn die Lehrerseite zeigt eine Bestleistung je Person und Woche.
 
    Aufbau einer Karte:
      nummer      – die Nummer auf der Karte
@@ -61,15 +65,11 @@ var INHALTE = {
     richtigText: 'Richtig!',
     falschText: 'Noch nicht richtig – versuchen Sie es noch einmal.',
     tippVorwort: 'Tipp:',
+    // Nur wenn in einstellungen.js „herzen: 0“ steht (sonst schützen die Herzen):
     // {x} = beim ersten Versuch richtig, {y} = Anzahl Karten, {z} = nötige Mindestzahl
     durchklickenTitel: 'Hey, nicht einfach durchklicken!',
     durchklickenText: 'Beim ersten Versuch richtig: {x} von {y} – nötig sind mindestens {z}. Lesen Sie jede Karte genau und überlegen Sie, bevor Sie antworten.',
     durchklickenKnopf: 'Übung neu starten',
-    // Sperre nach einer falschen Antwort ({x} = Sekunden)
-    sperreText: 'Lesen Sie den Tipp – weiter in {x} s',
-    // Neustart, wenn in kurzer Zeit zu viele falsche Antworten kommen
-    zuSchnellTitel: 'Zu schnell geklickt!',
-    zuSchnellText: 'Sie haben in kurzer Zeit mehrere falsche Antworten gegeben. Lesen Sie jede Karte in Ruhe – die Übung beginnt von vorn.',
     // Überschrift nach dem Lösen ({x} = „Übung 1“ usw. – der Teil des Titels vor dem Doppelpunkt)
     fertigTitel: '{x} abgeschlossen!',
 
@@ -81,7 +81,7 @@ var INHALTE = {
     klasseFehler: 'Bitte wählen Sie Ihre Klasse.',
     nameKnopf: 'Los geht’s',
     nameFehler: 'Bitte so eingeben: Vorname, Leerzeichen, erster Buchstabe des Nachnamens – z. B. „Lena K.“',
-    nameDatenschutz: 'Gespeichert werden nur Ihr Name, Ihre Klasse, Ihr Fortschritt und bei welchen Karten der erste Versuch falsch war (die Lehrkraft sieht das nur zusammengefasst für die Klasse). Alles wird nach spätestens 12 Stunden automatisch gelöscht.',
+    nameDatenschutz: 'Gespeichert werden nur Ihr Name, Ihre Klasse, Ihr Fortschritt und bei welchen Karten der erste Versuch falsch war (die Lehrkraft sieht das nur zusammengefasst für die Klasse). Alles wird nach spätestens 12 Stunden automatisch gelöscht – nur Name und Punkte der Wochen-Challenge bleiben für die Siegerehrung bis zu 10 Tage.',
     nameAnzeige: 'Angemeldet als {x} · {y}',
     nameAendern: 'ändern',
 
@@ -676,6 +676,7 @@ var INHALTE = {
   kb2ab05: {
     ab: 'Schlechte Nachrichten überbringen',
     raum: 'kb2w2',
+    minispiel: 'stoerung', // Belohnung: „Stör-Abwehr“ (SPIKES – Setting)
     titel: 'Übung: Welcher SPIKES-Schritt?',
     anweisung: 'Sätze und Handlungen aus Telefonaten mit Angehörigen. Zu welchem Schritt des **SPIKES-Schemas** gehören sie? (Setting = Rahmen · Perception = Wissensstand · Invitation = Einladung · Knowledge = Wissen · Emotions = Gefühle · Strategy and Summary = Plan und Zusammenfassung)',
     knoepfe: [
@@ -928,3 +929,123 @@ var INHALTE = {
     danach: 'Prüfen Sie jetzt noch einmal Ihre Antworten auf dem Arbeitsblatt!'
   }
 };
+
+/* ==========================================================================================
+   ERWEITERUNGEN für den Kartenstapel (seit 26.11.2026) – alle neuen Texte stehen hier:
+   schritt2  = zweiter Schritt einer Karte (nach der richtigen ersten Antwort): Grund bzw. bessere Antwort wählen.
+               optionen: Liste, richtig: Nummer der richtigen Option (ab 0; die Reihenfolge mischt das Handy),
+               tipp nach einem Fehler, erklaerung erscheint nach dem Lösen unter der Erklärung der Karte.
+   aufwaermen = vor den Karten die Schritte in die richtige Reihenfolge tippen (ohne Herzen).
+   bonus     = freiwilliger Bonus-Fall nach der Zusammenfassung (ohne Herzen): je Schritt drei Möglichkeiten,
+               jede mit einer Reaktion der Person.
+   Fachlich: Pflegias Bd. 1 S. 272 (Gesprächsförderer/-hemmer), Bd. 2 S. 818, 862–863; Landeslehrplan CE 05 (SPIKES).
+   ========================================================================================== */
+(function (I) {
+  function schritt2(uid, nummer, s) { I[uid].karten.filter(function (k) { return k.nummer === nummer; })[0].schritt2 = s; }
+
+  // ---------- Förderer oder Hemmer? – nach einem Hemmer: Welche Antwort fördert das Gespräch? ----------
+  var BESSER = 'Was wäre besser gewesen? Welche Antwort **fördert** das Gespräch?';
+  schritt2('kb2ab03', 2, { frage: BESSER, richtig: 0,
+    optionen: ['„Das hat dich sehr erschreckt. Wie geht es dir jetzt damit?“',
+      '„Das passiert in der Pflege eben, daran gewöhnst du dich schon.“',
+      '„Denk einfach nicht mehr so viel an diesen Tag zurück.“'],
+    tipp: 'Welche Antwort nimmt Christins Gefühl ernst – ohne Ratschlag?',
+    erklaerung: '**Besser:** Paraphrasieren und Rückfrage – Christin darf weitererzählen.' });
+  schritt2('kb2ab03', 4, { frage: 'Was wäre besser gewesen?', richtig: 0,
+    optionen: ['Die Kollegin schaut Christin an, nickt und hört bis zum Ende zu.',
+      'Die Kollegin sagt: „Kenne ich, bei mir war es damals noch viel schlimmer.“',
+      'Die Kollegin hört zu, schreibt aber nebenbei ihre Pflegedokumentation.'],
+    tipp: 'Welche Reaktion zeigt: Ich bin ganz bei dir?',
+    erklaerung: '**Besser:** Zuhören – ganz bei Christin sein, sie ausreden lassen.' });
+  schritt2('kb2ab03', 6, { frage: BESSER, richtig: 0,
+    optionen: ['„Ich merke, dass dich der Notfall noch sehr beschäftigt.“',
+      '„Du musst lernen, mit solchen Situationen besser klarzukommen.“',
+      '„Jetzt übertreib mal nicht, so schlimm war es doch gar nicht.“'],
+    tipp: 'Wer spricht von sich – ohne Vorwurf?',
+    erklaerung: '**Besser:** Ich-Botschaft – die Kollegin sagt, was sie wahrnimmt.' });
+  schritt2('kb2ab03', 8, { frage: BESSER, richtig: 0,
+    optionen: ['„Was könnte dir in den nächsten Tagen helfen?“',
+      '„Mach einfach mehr Sport, dann schläfst du auch wieder besser.“',
+      '„Ich hatte das auch mal, das geht ganz von allein wieder vorbei.“'],
+    tipp: 'Bei welcher Antwort kommt die Lösung von Christin selbst?',
+    erklaerung: '**Besser:** Rückfrage – Christin findet selbst heraus, was ihr hilft.' });
+  schritt2('kb2ab03', 10, { frage: 'Was wäre besser gewesen?', richtig: 0,
+    optionen: ['Die Stationsleitung legt das Telefon weg und wendet sich Christin zu.',
+      'Die Stationsleitung sagt: „Erzähl ruhig weiter, ich höre dir nebenbei zu.“',
+      'Die Stationsleitung schaut beim Zuhören immer wieder auf ihre Liste.'],
+    tipp: 'Wo ist die Aufmerksamkeit ganz bei Christin?',
+    erklaerung: '**Besser:** Fokussierung – volle Aufmerksamkeit für Christin.' });
+
+  // ---------- Richtig oder falsch? (Woche 4) – nach „falsch“: Was ist richtig? ----------
+  var RICHTIG = 'Und was ist **richtig**?';
+  schritt2('kb2ab09', 2, { frage: RICHTIG, richtig: 0,
+    optionen: ['Ehrlich bleiben und das Gefühl ansprechen: „Ich sehe, Sie haben Angst.“',
+      'Schnell das Thema wechseln, damit die Person nicht anfängt zu weinen.',
+      '„Machen Sie sich keine Sorgen, das wird bestimmt alles wieder gut.“'],
+    tipp: 'Welche Antwort ist ehrlich und nimmt das Gefühl ernst?' });
+  schritt2('kb2ab09', 3, { frage: RICHTIG, richtig: 0,
+    optionen: ['Auskunft nur an Berechtigte – und nur mit Einwilligung der Person.',
+      'Auskunft an alle Menschen, die den Patienten schon lange gut kennen.',
+      'Auskunft, wenn die Nachbarin verspricht, es niemandem weiterzusagen.'],
+    tipp: 'Denken Sie an die Schweigepflicht.' });
+  schritt2('kb2ab09', 5, { frage: RICHTIG, richtig: 0,
+    optionen: ['In kleinen Schritten informieren, einfache Worte nutzen, Pausen machen.',
+      'Alles zügig vorlesen und erst ganz am Ende fragen, ob es Fragen gibt.',
+      'Möglichst viele Fachbegriffe verwenden, damit alles ganz genau ist.'],
+    tipp: 'Denken Sie an das K von SPIKES (Knowledge).' });
+  schritt2('kb2ab09', 7, { frage: RICHTIG, richtig: 0,
+    optionen: ['In den ersten Wochen ist das meist normal. Hält es an: Hilfe holen.',
+      'Schlafprobleme nach einem Notfall sind immer harmlos und gehen weg.',
+      'Wer schlecht schläft, darf bei keinem Notfall mehr mithelfen.'],
+    tipp: 'Wie lange dauert eine akute Belastungsreaktion?' });
+  schritt2('kb2ab09', 9, { frage: RICHTIG, richtig: 0,
+    optionen: ['Kolleginnen beraten sich gegenseitig nach festen Schritten, ohne Supervisor.',
+      'Die Stationsleitung leitet die kollegiale Beratung und entscheidet am Ende.',
+      'Kollegiale Beratung ist ein Einzelgespräch mit einer Psychologin von außen.'],
+    tipp: 'Wer berät wen bei der kollegialen Beratung?' });
+
+  // ---------- Welcher SPIKES-Schritt? – Aufwärmen und Bonus-Fall ----------
+  I.kb2ab05.aufwaermen = {
+    titel: 'Zum Aufwärmen: die sechs Schritte',
+    anweisung: 'Tippen Sie die Schritte für ein Gespräch mit einer schlechten Nachricht in der **richtigen Reihenfolge** an.',
+    schritte: ['Rahmen vorbereiten: ruhiger Ort, vorstellen, Zeit klären',
+      'Erfragen, was die Person schon weiß',
+      'Vorwarnen und fragen, wie viel sie wissen möchte',
+      'In kleinen Schritten informieren, einfache Worte',
+      'Auf Gefühle eingehen, Schweigen aushalten',
+      'Zusammenfassen und die nächsten Schritte planen'],
+    tipp: 'Zuerst kommt der Rahmen, am Ende die Zusammenfassung. Dazwischen: erst fragen, dann vorwarnen, dann informieren.',
+    fertig: 'Das ist **SPIKES**: **S**etting – **P**erception – **I**nvitation – **K**nowledge – **E**motions – **S**trategy and Summary.'
+  };
+  I.kb2ab05.bonus = {
+    titel: 'Das Telefonat mit Herrn Krämer',
+    einleitung: 'Frau Krämer (84) ist im Pflegeheim gestürzt und wurde ins Krankenhaus gebracht. Sie war einverstanden, dass ihr Sohn informiert wird. Sie rufen Herrn Krämer an.',
+    schritte: [
+      { text: 'Gleich rufen Sie an.', frage: 'Was tun Sie vorher?', optionen: [
+        { richtig: true, text: 'Ich gehe in einen ruhigen Raum und lege die Informationen bereit.', reaktion: 'Gut: ungestört und vorbereitet – das ist **Setting**.' },
+        { text: 'Ich rufe schnell vom Flur aus an, damit es zügig geht.', reaktion: 'Auf dem Flur hören andere mit, und Sie werden gestört. **Setting** heißt: ein ruhiger Rahmen.' },
+        { text: 'Ich schreibe Herrn Krämer lieber eine kurze Nachricht.', reaktion: 'Eine schlechte Nachricht nicht per Kurznachricht – Herr Krämer bliebe mit seinen Fragen allein.' }] },
+      { text: 'Herr Krämer meldet sich. Sie haben sich vorgestellt.', frage: 'Was sagen Sie jetzt?', optionen: [
+        { richtig: true, text: '„Hat man Sie heute schon über Ihre Mutter informiert?“', reaktion: 'Herr Krämer: „Nein, ich weiß von nichts.“ – Jetzt wissen Sie, wo Sie anfangen (**Perception**).' },
+        { text: '„Ihre Mutter ist gestürzt und liegt jetzt im Krankenhaus.“', reaktion: 'Herr Krämer erschrickt: „Was?!“ – Das war zu schnell. Erst fragen, was er schon weiß.' },
+        { text: '„Wie geht es Ihnen denn so in letzter Zeit?“', reaktion: 'Herr Krämer ist irritiert: „Warum rufen Sie an?“ Fragen Sie gezielt, was er schon weiß.' }] },
+      { text: 'Herr Krämer weiß noch nichts.', frage: 'Wie leiten Sie über?', optionen: [
+        { richtig: true, text: '„Ich muss Ihnen leider etwas Ernstes sagen.“', reaktion: 'Herr Krämer: „Oh nein … was ist passiert?“ Die Vorwarnung bereitet ihn vor (**Invitation**).' },
+        { text: '„Keine Sorge, es ist bestimmt nichts Schlimmes.“', reaktion: 'Das ist nicht ehrlich und spielt herunter. Warnen Sie ehrlich vor.' },
+        { text: '„Haben Sie Ihre Mutter in letzter Zeit besucht?“', reaktion: 'Das klingt nach Vorwurf und lenkt ab. Warnen Sie vor: Jetzt kommt etwas Ernstes.' }] },
+      { text: 'Herr Krämer wartet auf Ihre Antwort.', frage: 'Wie sagen Sie es ihm?', optionen: [
+        { richtig: true, text: '„Ihre Mutter ist heute Morgen gestürzt. Sie ist jetzt im Krankenhaus.“ Dann machen Sie eine Pause.', reaktion: 'Kurz, klar, in einfachen Worten – und eine Pause (**Knowledge**).' },
+        { text: '„Bei Ihrer Mutter besteht nach einem Sturzereignis Verdacht auf eine mediale Schenkelhalsfraktur.“', reaktion: 'Zu viele Fachwörter – und Diagnosen erklärt die Ärztin.' },
+        { text: 'Sie erzählen alles auf einmal: Sturz, Rettungsdienst, Klinik, Besuchszeiten, Wäsche.', reaktion: 'Das ist zu viel auf einmal. Informieren Sie in kleinen Schritten.' }] },
+      { text: 'Herr Krämer schweigt. Dann sagt er leise: „Ich hätte sie öfter besuchen sollen.“', frage: 'Wie reagieren Sie?', optionen: [
+        { richtig: true, text: '„Sie machen sich große Vorwürfe.“ Dann lassen Sie ihm Zeit.', reaktion: 'Sie sprechen das Gefühl an und halten das Schweigen aus (**Emotions**).' },
+        { text: '„Das hätte doch nichts geändert, machen Sie sich keine Gedanken.“', reaktion: 'Das spielt sein Gefühl herunter. Sprechen Sie das Gefühl an.' },
+        { text: '„Ja, das wäre sicher besser gewesen.“', reaktion: 'Das verstärkt seine Schuldgefühle. Sprechen Sie das Gefühl an, ohne zu bewerten.' }] },
+      { text: 'Das Gespräch geht zu Ende.', frage: 'Was sagen Sie zum Schluss?', optionen: [
+        { richtig: true, text: '„Ich fasse kurz zusammen … Hier ist die Nummer der Klinik. Ich rufe Sie heute Abend noch einmal an.“', reaktion: 'Zusammenfassen, nächste Schritte, Rückruf (**Strategy and Summary**). Danach dokumentieren Sie das Gespräch.' },
+        { text: '„Das war es von meiner Seite. Wenn noch etwas ist, können Sie sich gerne melden.“', reaktion: 'Herr Krämer bleibt mit seinen Fragen allein. Fassen Sie zusammen und planen Sie die nächsten Schritte.' },
+        { text: '„Rufen Sie morgen irgendwann bei uns an, dann weiß vielleicht schon jemand mehr.“', reaktion: 'Das ist zu unklar. Besser: konkrete nächste Schritte, Telefonnummer, ein Rückruf.' }] }
+    ],
+    schluss: 'Sie sind alle sechs Schritte von **SPIKES** gegangen: Setting – Perception – Invitation – Knowledge – Emotions – Strategy and Summary.'
+  };
+})(INHALTE);

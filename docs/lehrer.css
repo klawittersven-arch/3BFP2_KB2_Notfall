@@ -86,3 +86,39 @@ code { background: var(--hellblau); padding: 1px 5px; border-radius: 4px; }
 /* Bestleistung im Belohnungsspiel neben dem Namen */
 .l-spiel { font-weight: 700; color: #5A4A00; background: #FFF2C2; border-radius: 999px; padding: 1px 8px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .l-spiel.l-spitze { background: #F2B600; color: #1A1A1A; }
+
+/* ---------- Wochen-Challenge: Bestenliste, QR-Code, Siegerehrung ---------- */
+.l-challenge { border-color: #F2B600; background: #FFFBEB; grid-column: 1 / -1; }
+.l-ch-liste { list-style: none; margin: 8px 0; padding: 0; font-size: 22px; max-width: 820px; }
+.l-ch-zeile { display: grid; grid-template-columns: 2.2em minmax(9em, 1fr) auto minmax(8em, auto) 32px; align-items: center; gap: 10px; padding: 4px 6px; border-radius: 8px; }
+.l-ch-zeile:nth-child(-n+3) { background: #FFF2C2; font-weight: 700; }
+.l-ch-platz { text-align: right; color: #5B6B6F; }
+.l-ch-punkte { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--dunkelpetrol); }
+.l-ch-zeile .l-weg { position: static; opacity: .5; }
+.l-ch-leiste { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.l-ch-leiste .l-knopf:disabled { opacity: .45; cursor: default; }
+.l-vollbild { position: fixed; inset: 0; z-index: 60; background: #fff; overflow: auto; padding: 24px 6vw 40px; text-align: center; }
+.l-vb-zu { position: absolute; top: 16px; right: 16px; z-index: 3; }
+.l-qr-box h2 { font-size: clamp(30px, 4vw, 54px); margin: 10px 0 18px; color: var(--dunkelpetrol); }
+.l-qr svg { width: min(62vh, 80vw); height: auto; }
+.l-qr-url { font-size: 18px; color: #5B6B6F; word-break: break-all; }
+.l-qr-box p { font-size: 24px; }
+.l-vb-ehrung { background: linear-gradient(#25434B, #3F6C72); color: #fff; }
+.l-ehrung-titel { font-size: clamp(30px, 4vw, 56px); margin: 10px 0 20px; }
+.l-treppchen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 16px; height: 52vh; max-width: 1100px; margin: 0 auto; }
+.l-podest { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.l-p-name { margin: 0; font-size: clamp(26px, 3.2vw, 48px); font-weight: 800; }
+.l-p-punkte { margin: 4px 0 10px; font-size: clamp(18px, 2vw, 28px); opacity: .9; }
+.l-p-stufe { height: var(--hoehe); border-radius: 14px 14px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 12px;
+  font-size: clamp(40px, 6vw, 90px); font-weight: 900; color: #1A1A1A; animation: hoch .9s ease-out both; }
+.l-podest-1 .l-p-stufe { background: #F2B600; }
+.l-podest-2 .l-p-stufe { background: #D7DEE0; animation-delay: .25s; }
+.l-podest-3 .l-p-stufe { background: #D99A5B; animation-delay: .5s; }
+@keyframes hoch { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
+.l-weitere { max-width: 720px; margin: 24px auto 0; padding: 0; list-style: none; font-size: clamp(20px, 2vw, 28px); text-align: left; }
+.l-weitere li { display: grid; grid-template-columns: 2.5em 1fr auto; gap: 16px; padding: 4px 12px; border-bottom: 1px solid rgba(255,255,255,.25); }
+.l-w-platz { text-align: right; opacity: .85; }
+.l-konfetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+.l-konfetti i { position: absolute; top: -20px; width: 12px; height: 18px; border-radius: 3px; animation: fallen 3.2s linear infinite; }
+@keyframes fallen { to { transform: translateY(110vh) rotate(540deg); } }
+@media (prefers-reduced-motion: reduce) { .l-konfetti, .l-p-stufe { animation: none; } }
