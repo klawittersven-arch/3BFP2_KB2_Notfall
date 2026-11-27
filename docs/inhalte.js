@@ -34,6 +34,10 @@
      merksatz    – erscheint erst, wenn alle Karten gelöst sind („Das Wichtigste in Kürze“)
      danach      – Hinweis nach dem Lösen unter „Übung 1 abgeschlossen!“: welche Aufgabe auf dem
                    Arbeitsblatt jetzt dran ist
+     minispiel   – (optional) Minispiel zur Belohnung, wenn die Übung geschafft ist:
+                   'herzdruck' (Herzdruck-Takt), 'wespen' (Wespen-Alarm) oder 'stoerung' (Stör-Abwehr).
+                   30 Sekunden pro Runde, 3 Läufe (einstellungen.js). Höchstens ein Spiel pro Woche,
+                   denn die Lehrerseite zeigt eine Bestleistung je Person und Woche.
 
    Aufbau einer Karte:
      nummer      – die Nummer auf der Karte
@@ -672,6 +676,7 @@ var INHALTE = {
   kb2ab05: {
     ab: 'Schlechte Nachrichten überbringen',
     raum: 'kb2w2',
+    minispiel: 'stoerung', // Belohnung: „Stör-Abwehr“ (SPIKES – Setting)
     titel: 'Übung: Welcher SPIKES-Schritt?',
     anweisung: 'Sätze und Handlungen aus Telefonaten mit Angehörigen. Zu welchem Schritt des **SPIKES-Schemas** gehören sie? (Setting = Rahmen · Perception = Wissensstand · Invitation = Einladung · Knowledge = Wissen · Emotions = Gefühle · Strategy and Summary = Plan und Zusammenfassung)',
     knoepfe: [

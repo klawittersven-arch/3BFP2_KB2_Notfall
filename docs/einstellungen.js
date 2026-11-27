@@ -43,6 +43,11 @@ var EINSTELLUNGEN = {
   lesezeit: true,
   langsamPauseSekunden: 15,
 
+  // Minispiele zur Belohnung (seit 27.11.2026; welche Übung welches Spiel freischaltet: inhalte.js „minispiel“):
+  // so viele Sekunden dauert eine Runde (höchstens 30) und so viele Läufe gibt es pro geschaffter Übung.
+  minispielSekunden: 30,
+  minispielLaeufe: 3,
+
   // Namen mit diesen Wortteilen werden abgelehnt (nur Kleinbuchstaben).
   sperrwoerter: [
     'arsch', 'fick', 'fotze', 'hure', 'nutte', 'wichs', 'schlampe', 'bitch',

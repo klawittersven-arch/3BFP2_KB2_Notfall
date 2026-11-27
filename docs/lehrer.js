@@ -10,7 +10,11 @@
   var ab = raum.split('-')[1];                                   // z. B. 'ab1'
   var UEBUNGEN = Object.keys(INHALTE).filter(function (k) { return INHALTE[k].raum === ab; });
   // Gibt es auf diesem Arbeitsblatt eine Übung mit Belohnungsspiel? Dann steht die Bestleistung neben dem Namen.
-  var MIT_SPIEL = UEBUNGEN.some(function (k) { return INHALTE[k].belohnungsspiel; });
+  var MIT_SPIEL = UEBUNGEN.some(function (k) { return INHALTE[k].belohnungsspiel || INHALTE[k].minispiel; });
+  var SPIEL_NAMEN = { herzdruck: 'Herzdruck-Takt', wespen: 'Wespen-Alarm', stoerung: 'Stör-Abwehr' };
+  var SPIEL_NAME = UEBUNGEN.map(function (k) {
+    return INHALTE[k].minispiel ? SPIEL_NAMEN[INHALTE[k].minispiel] || INHALTE[k].minispiel : INHALTE[k].belohnungsspiel ? 'Notfall-Run!' : '';
+  }).filter(Boolean).join('“, „');
   // Wochen (kb1w1 … kb2w4) haben eine Wochen-Challenge, kb1w5/kb2w5 ist die TB2-Challenge zur Wiederholung (11.01.).
   var MIT_CHALLENGE = /^kb[12]w[1-5]$/.test(ab);
   var GESAMT_CHALLENGE = /^kb[12]w5$/.test(ab);
@@ -319,7 +323,7 @@
     fuss.innerHTML = '<button type="button" class="l-knopf l-zweit" id="l-leeren">Liste leeren (neue Stunde)</button>' +
       '<p class="l-hinweis">★★★ = fertig ohne Fehler · ★★☆ = 1–2 Fehler · ★☆☆ = geschafft (es zählt die beste Wertung) · ' +
       '6/12 = dabei · ↺ = alle Herzen verloren und neu gestartet. ' +
-      (MIT_SPIEL ? '🎮 = Bestleistung im Belohnungsspiel „Notfall-Run!“ (🏆 = höchste der Klasse). ' : '') +
+      (MIT_SPIEL ? '🎮 = Bestleistung im Belohnungsspiel „' + SPIEL_NAME + '“ (🏆 = höchste der Klasse). ' : '') +
       'Namen und Fortschritt werden nach spätestens 12 Stunden automatisch gelöscht' +
       (MIT_CHALLENGE ? ', die Bestenliste der Challenge nach 10 Tagen („Liste leeren“ lässt sie stehen).' : '.') + '</p>';
     document.getElementById('l-leeren').addEventListener('click', function () {

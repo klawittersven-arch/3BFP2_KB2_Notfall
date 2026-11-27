@@ -231,6 +231,14 @@ Lernfragen aus SW 6 („Können Sie sie jetzt beantworten?“).
   (Treppchen für den Beamer), „QR-Code für alle“ (öffnet die Challenge auch ohne geschaffte Übungen) und „Bestenliste
   leeren“. Die **TB2-Challenge** zur Wiederholung am 11.01. (`challenge-kb2w5.html`, Lehrerseite `lehrer-3bfp2-…-kb2w5.html`)
   zieht 20 Karten aus allen vier Wochen und ist für alle offen.
+- **Minispiele zur Belohnung** (seit 27.11.2026, ab Woche 2): Wer die Übung geschafft hat, darf ein kurzes Spiel spielen –
+  höchstens 30 Sekunden pro Runde, 3 Läufe pro geschaffter Übung (wer die Übung noch einmal schafft, bekommt 3 neue).
+  KB II: **📵 Stör-Abwehr** nach kb2ab05 (SPIKES – Setting: Störungen wegtippen, Gefühle der Angehörigen nicht).
+  KB I (Repository 3BFP2-kb1-notfall): **❤️ Herzdruck-Takt** nach kb1ab07 (Woche 2, Takt 100–120/min) und
+  **🐝 Wespen-Alarm** nach kb1ab08 (Woche 3, Anaphylaxie). Seite `minispiel.html?ab=<Übung>`, Gerüst `docs/minispiel.js`,
+  Spiele `docs/ms-*.js` (Texte jeweils oben), Zuordnung in `inhalte.js` (`minispiel: 'stoerung'`), Sekunden und Läufe in
+  `einstellungen.js` (`minispielSekunden`, `minispielLaeufe`). Gesendet wird nur die Bestleistung; die Lehrerseite der
+  Woche zeigt sie mit 🎮 (🏆 = höchste) neben dem Namen. Ton ist standardmäßig aus.
 - Alle Werte stehen in `docs/einstellungen.js` (`herzen`, `herzZurueckNach`, `leerePauseSekunden`, `lesezeit`,
   `langsamPauseSekunden`). `herzen: 0` schaltet die Herzen aus – dann gilt wieder die Mindestzahl richtiger Karten
   beim ersten Versuch (`mindestens` in `inhalte.js`, sonst „Hey, nicht einfach durchklicken!“).
@@ -288,7 +296,8 @@ Die Arbeitsblätter und Lösungen liegen bewusst **nicht** in diesem Repository,
 - `node tests/uebungen.test.js` prüft mit Playwright alle Übungen in Handygröße (360 px) als Kartenstapel (Aufwärmen,
   Tipp, Sperre, Schritt 2, Sterne, Bonus-Fall, Reihenfolge), Herzen mit Lesepause und Neustart, Serie, Lesezeit,
   Namenseingabe mit Klassenwahl, Senden des Fortschritts, die Lehrerseiten je Klasse, das Belohnungsspiel und die
-  Wochen-/TB2-Challenge mit Bestenliste, Siegerehrung und QR-Code – mit nachgebildetem Server.
+  Wochen-/TB2-Challenge mit Bestenliste, Siegerehrung und QR-Code sowie das Minispiel „Stör-Abwehr“ (Freischaltung,
+  3 Läufe, neue Läufe, Pause, Senden, Lehrerseite) – mit nachgebildetem Server.
 - `node tests/fall.test.js` prüft die Fall-Einführung: Falltext unverändert (Prüfsumme), Ablauf mit Beamer und zwei Handys
   mit dem echten Worker (Kaltstart, Vorstellung, Ampel, Auflösen, Zurückspulen, Perspektiven mit KB, Begriffsparkplatz, Sichern, SW 13 mit Vergleich).
 - `cd server && node test/worker.test.js` prüft den Worker (Eingabeprüfung, Klassen-Räume, Entfernen, Leeren,

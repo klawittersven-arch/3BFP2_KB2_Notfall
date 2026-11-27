@@ -71,6 +71,9 @@
     challengeTitel: 'Alle Übungen dieser Woche geschafft!',
     challengeText: 'Jetzt können Sie in der **Wochen-Challenge** Punkte sammeln – die Besten werden in der nächsten Stunde geehrt.',
     challengeKnopf: '🏆 Zur Wochen-Challenge',
+    minispielText: 'Geschafft! Zur Belohnung dürfen Sie das Minispiel „{x}“ spielen – {s} Sekunden pro Runde, {y} Läufe.',
+    minispielKnopf: '🎮 Jetzt spielen',
+    minispielTitel: { herzdruck: '❤️ Herzdruck-Takt', wespen: '🐝 Wespen-Alarm', stoerung: '📵 Stör-Abwehr' },
     chRegeln: '**{x} Karten** aus allen Übungen · **ein Versuch** je Karte · **100 Punkte** je richtige Karte · **Zeitbonus** bis 500 Punkte (je schneller, desto mehr – aber nur für richtige Antworten). Die Lösungen sehen Sie am Ende.',
     chStart: '▶ Challenge starten',
     chGesperrt: 'Die Wochen-Challenge öffnet sich, wenn Sie alle Übungen dieser Woche geschafft haben:',
@@ -556,6 +559,10 @@
     return Object.keys(INHALTE).filter(function (k) { return INHALTE[k] && INHALTE[k].karten && INHALTE[k].raum === U.raum; })
       .every(function (k) { return geloest[k]; });
   }
+  function minispielName() { // „Herzdruck-Takt“ ohne Symbol
+    var n = (t('minispielTitel') || {})[U.minispiel] || U.minispiel;
+    return String(n).replace(/^[^A-Za-zÄÖÜäöü]+/, '');
+  }
   function zeichneEnde() {
     var erster = anzahlErsterVersuch();
     var s = sterneFuer(z.fehler);
@@ -574,9 +581,14 @@
       if (!geloest[id]) { geloest[id] = Date.now(); speichere(GELOEST, geloest, l); }
       var st = lade(STERNE, l) || {};
       if (!st[id] || s > st[id]) { st[id] = s; speichere(STERNE, st, l); sende(); }
-      if (U.belohnungsspiel) { // schaltet spiel.html?ab=… für 12 Stunden frei
+      if ((U.belohnungsspiel || U.minispiel) && !z.spielFrei) {
+        // schaltet spiel.html bzw. minispiel.html?ab=… für 12 Stunden frei – einmal je geschafftem Durchgang
+        // (beim Minispiel gibt es damit neue Läufe: Wer die Übung noch einmal schafft, darf wieder spielen)
         var frei = lade(PRAEFIX + 'spiel-frei', l) || {};
-        if (!frei[id]) { frei[id] = Date.now(); speichere(PRAEFIX + 'spiel-frei', frei, l); }
+        frei[id] = Date.now();
+        speichere(PRAEFIX + 'spiel-frei', frei, l);
+        z.spielFrei = true;
+        sichern();
       }
     }
     var best = besteSterne();
@@ -598,6 +610,8 @@
         '<p class="hinweis-klein">' + esc(t('bonusHinweis')) + '</p></div>' : '') +
       (U.belohnungsspiel ? '<div class="belohnung"><p>' + esc(A.spielText) + '</p>' +
         '<a class="knopf" id="spiel-start" href="spiel.html?ab=' + encodeURIComponent(id) + '">' + esc(A.spielKnopf) + '</a></div>' : '') +
+      (U.minispiel ? '<div class="belohnung minispiel"><p>' + esc(ersetze(t('minispielText'), { x: minispielName(), s: Number(E.minispielSekunden) || 30, y: Number(E.minispielLaeufe) || 3 })) + '</p>' +
+        '<a class="knopf" id="spiel-start" href="minispiel.html?ab=' + encodeURIComponent(id) + '">' + esc(ersetze(t('minispielKnopf'), { x: minispielName() })) + '</a></div>' : '') +
       (wocheGeschafft() ? '<div class="challenge-box"><p class="challenge-titel">' + esc(t('challengeTitel')) + '</p><p>' + fmt(t('challengeText')) + '</p>' +
         '<a class="knopf" id="challenge-start" href="challenge-' + esc(U.raum) + '.html">' + esc(t('challengeKnopf')) + '</a></div>' : '');
     nochEinmal.textContent = HERZEN && s < 3 ? t('nochEinmalSterne') : A.nochEinmal;

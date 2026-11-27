@@ -11,6 +11,7 @@
  * Teil E:  Belohnungsspiel nach ab3a.
  * Teil F:  Wochen-Challenge auf dem Handy – gesperrt, Freischaltung, Lauf, Ergebnis, Senden; TB2-Challenge.
  * Teil G:  Bestenliste der Challenge auf der Lehrerseite – Siegerehrung, QR-Code, Entfernen, Leeren.
+ * Teil H:  Minispiel „Stör-Abwehr“ nach kb2ab05 – gesperrt, Freischaltung, Spielen, 3 Läufe, neue Läufe, Pause, Lehrerseite.
  * Die Lesezeit ist außer in Teil A3 ausgeschaltet (sonst würden die schnellen Testklicks Warnungen auslösen). */
 'use strict';
 const { chromium } = require('playwright');
@@ -44,6 +45,7 @@ function einstellungen(text, server, o = {}) {
     .replace(/leerePauseSekunden: [\d.]+/, `leerePauseSekunden: ${o.leer !== undefined ? o.leer : 1}`)
     .replace(/langsamPauseSekunden: [\d.]+/, `langsamPauseSekunden: ${o.langsam !== undefined ? o.langsam : 1}`);
   if (o.herzen !== undefined) text = text.replace(/herzen: \d+/, `herzen: ${o.herzen}`);
+  if (o.sekunden !== undefined) text = text.replace(/minispielSekunden: \d+/, `minispielSekunden: ${o.sekunden}`);
   return text;
 }
 
@@ -282,6 +284,7 @@ function fortschrittsServer() {
       geschafft.add(id);
       const erwartet = [];
       if (U.belohnungsspiel) erwartet.push('spiel.html?ab=' + id);
+      if (U.minispiel) erwartet.push('minispiel.html?ab=' + id);
       if (/^kb2w[1-4]$/.test(U.raum) && IDS.filter(k => I[k].raum === U.raum).every(k => geschafft.has(k))) erwartet.push('challenge-' + U.raum + '.html');
       const links = await page.locator('a[href]').evaluateAll(a => a.map(x => x.getAttribute('href')));
       pruefe(links.join() === erwartet.join(), `${id}: Links nur zu Spiel/Challenge (${links.join() || 'keine'})`);
@@ -869,6 +872,102 @@ function fortschrittsServer() {
     pruefe(await breitOk(page), 'G: kein waagerechtes Scrollen');
     pruefe(fehler.length === 0, 'Teil G: keine Konsolenfehler / fremden Anfragen: ' + fehler.join(' | '));
     await ctx.close();
+  }
+
+
+  /* ---------------- Teil H: Minispiel „Stör-Abwehr“ (Belohnung nach kb2ab05) ---------------- */
+  {
+    const ID = 'kb2ab05', U = I[ID];
+    const ctx = await kontext(HANDY, true, { sekunden: 4 });
+    const page = await ctx.newPage();
+    const fehler = [];
+    beobachte(page, fehler, SERVER);
+    const zustand = () => page.evaluate(() => window.MiniSpiel.zustand());
+    const ortKlicken = async (ort) => { const b = await page.locator(`.st-ort[data-ort="${ort}"]`).boundingBox(); await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2); };
+    const laufBeginnen = async (knopf) => { await page.click(knopf); await page.waitForFunction(() => window.MiniSpiel.zustand().modus === 'lauf', null, { timeout: 5000 }); };
+    const laufEnde = () => page.waitForFunction(() => window.MiniSpiel.zustand().modus === 'ende', null, { timeout: 12000 });
+    pruefe(U.minispiel === 'stoerung', 'H: kb2ab05 schaltet „Stör-Abwehr“ frei');
+    pruefe(IDS.filter(k => I[k].minispiel && /^kb2w1$/.test(I[k].raum)).length === 0, 'H: in Woche 1 noch kein Minispiel');
+    await page.goto(basis + 'minispiel.html?ab=' + ID);
+    pruefe((await text(page, '#ms-panel')).includes('geschafft') && await page.locator(`#ms-panel a.ms-knopf[href="${ID}.html"]`).count() === 1 && await page.locator('#knopf-los').count() === 0, 'H: ohne geschaffte Übung gesperrt, Knopf „Zur Übung“');
+    await page.goto(basis + 'minispiel.html?ab=ab1a');
+    pruefe((await text(page, '#ms-panel')).includes('gibt es nicht'), 'H: Übung ohne Minispiel → Hinweis');
+    await page.goto(basis + ID + '.html');
+    await anmelden(page, 'Nora Neu', 'k2');
+    await spiele(page, U, {});
+    pruefe((await text(page, '.belohnung.minispiel')).includes('Stör-Abwehr') && await page.locator('#spiel-start').getAttribute('href') === 'minispiel.html?ab=' + ID, 'H: nach der Übung: Kasten „Minispiel: Stör-Abwehr“');
+    await page.click('#spiel-start');
+    await page.waitForSelector('#knopf-los');
+    pruefe((await text(page, 'h1')) === 'Stör-Abwehr' && (await text(page, '#ms-panel')).includes('Nora N. · 3BFP2/2') && (await text(page, '#ms-laeufe')).includes('Noch 3 von 3'), 'H: Start mit Name, Klasse und 3 Läufen');
+    await page.screenshot({ path: path.join(__dirname, 'handy-minispiel-start.png') });
+    // Lauf 1: Störung wegtippen, Gefühl NICHT wegtippen
+    await laufBeginnen('#knopf-los');
+    pruefe(await page.locator('#ms-leiste').isVisible() && (await text(page, '#ms-leiste')).includes('❤️'), 'H: Leiste mit Zeit, Punkten und Herzen');
+    await page.evaluate(() => window.MiniSpiel.erzeuge('stoerung', { ort: 'telefon' }));
+    pruefe(await page.locator('.st-ort[data-ort="telefon"].aktiv').count() === 1, 'H: Störung „Telefon klingelt!“ erscheint');
+    await page.screenshot({ path: path.join(__dirname, 'handy-minispiel-lauf.png') });
+    await ortKlicken('telefon');
+    let z = await zustand();
+    pruefe(z.punkte >= 10 && await page.locator('.st-ort[data-ort="telefon"].aktiv').count() === 0, 'H: Störung weggetippt → Punkte: ' + z.punkte);
+    await page.evaluate(() => window.MiniSpiel.erzeuge('gefuehl'));
+    const herzVorher = (await zustand()).leben;
+    const sie = await page.locator('#st-sie').boundingBox();
+    await page.mouse.click(sie.x + sie.width / 2, sie.y + sie.height / 2);
+    pruefe((await zustand()).leben === herzVorher - 1 && (await text(page, '#ms-meldung')).includes('keine Störung'), 'H: Gefühl weggetippt → Herz weg, „Das ist keine Störung“');
+    await laufEnde();
+    await page.waitForTimeout(400);
+    const p1 = Number((await text(page, '#ergebnis-punkte')).replace(/\D/g, ''));
+    pruefe(p1 >= 10 && (await text(page, '#ms-panel')).includes('Störungen abgewehrt'), 'H: Ergebnis mit Punkten und Auswertung: ' + p1);
+    const sp = fs1.spielPosts[fs1.spielPosts.length - 1];
+    pruefe(sp && sp.raum === 'k2-kb2w2' && sp.punkte === p1 && Object.keys(sp).length === 3, 'H: nur Raum, Gerät und Bestleistung gesendet: ' + JSON.stringify(sp));
+    pruefe((await text(page, '#spiel-status')).includes('Beamer'), 'H: „Bestleistung steht auf dem Beamer“');
+    pruefe(await page.locator('#knopf-nochmal').isVisible() && (await text(page, '#knopf-nochmal')).includes('2 übrig'), 'H: „Noch einmal (2 übrig)“');
+    await page.screenshot({ path: path.join(__dirname, 'handy-minispiel-ende.png'), fullPage: true });
+    // Lauf 2: Störung verpassen → Herz weg; Pause beim Verlassen der Seite
+    await laufBeginnen('#knopf-nochmal');
+    await page.evaluate(() => window.MiniSpiel.erzeuge('stoerung', { ort: 'tuer' }));
+    await page.evaluate(() => window.dispatchEvent(new Event('pagehide')));
+    pruefe(await page.locator('#ms-pause').isVisible(), 'H: Seite verlassen → Pause');
+    await page.waitForTimeout(800);
+    await page.click('#ms-pause');
+    pruefe((await zustand()).modus === 'lauf' && await page.locator('#ms-pause').count() === 0, 'H: weiterspielen nach der Pause');
+    await page.waitForTimeout(2700);
+    pruefe((await zustand()).leben < 3, 'H: Störung verpasst → Herz weg');
+    await laufEnde();
+    // Lauf 3 – danach sind die Läufe verbraucht
+    await laufBeginnen('#knopf-nochmal');
+    await laufEnde();
+    pruefe(await page.locator('#knopf-nochmal').count() === 0 && (await text(page, '#ms-letzter')).includes('letzter Lauf'), 'H: nach 3 Läufen kein „Noch einmal“');
+    await page.reload();
+    pruefe(await page.locator('#knopf-los').count() === 0 && (await text(page, '#ms-laeufe')).includes('verbraucht'), 'H: auch nach Neuladen keine weiteren Läufe');
+    // Übung noch einmal schaffen → 3 neue Läufe
+    await page.goto(basis + ID + '.html');
+    await page.click('#noch-einmal');
+    await spiele(page, U, {});
+    await page.click('#spiel-start');
+    await page.waitForSelector('#knopf-los');
+    pruefe((await text(page, '#ms-laeufe')).includes('Noch 3 von 3'), 'H: Übung noch einmal geschafft → 3 neue Läufe');
+    await page.goto(basis + ID + '.html');
+    await page.goto(basis + 'minispiel.html?ab=' + ID);
+    pruefe((await text(page, '#ms-laeufe')).includes('Noch 3 von 3'), 'H: Neuladen der fertigen Übung schaltet nicht erneut frei (Läufe zählen weiter)');
+    pruefe(await breitOk(page), 'H: kein waagerechtes Scrollen');
+    pruefe(fehler.length === 0, 'Teil H (Handy): keine Konsolenfehler / fremden Anfragen: ' + fehler.join(' | '));
+    await ctx.close();
+    // Lehrerseite der Woche: 🎮 beim Namen, Fußzeile nennt das Spiel
+    const c2 = await kontext(BEAMER, true);
+    const p2 = await c2.newPage();
+    const f2 = [];
+    beobachte(p2, f2, SERVER);
+    await p2.goto(basis + 'lehrer-3bfp2-2-kb2w2.html');
+    await p2.waitForSelector('.l-pille');
+    const nora = p2.locator(`.l-karte[data-uebung="${ID}"] .l-pille`, { hasText: 'Nora N.' });
+    pruefe(/(🎮|🏆) \d/.test(await nora.locator('.l-spiel').innerText()), 'H: Lehrerseite zeigt die Bestleistung bei Nora N. (🏆 = höchste der Klasse): ' + await nora.locator('.l-spiel').innerText());
+    pruefe((await text(p2, '#l-fuss')).includes('Stör-Abwehr'), 'H: Fußzeile nennt „Stör-Abwehr“');
+    await p2.goto(basis + 'lehrer-3bfp2-2-kb2w1.html');
+    await p2.waitForSelector('.l-karte');
+    pruefe(!(await text(p2, '#l-fuss')).includes('Belohnungsspiel'), 'H: Woche 1 ohne Minispiel – kein Hinweis');
+    pruefe(f2.length === 0, 'Teil H (Lehrerseite): keine Konsolenfehler: ' + f2.join(' | '));
+    await c2.close();
   }
 
   await browser.close();
