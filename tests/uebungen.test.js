@@ -15,7 +15,7 @@ const path = require('path');
 const DOCS = path.join(__dirname, '..', 'docs');
 const TYPEN = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png' };
 const SERVER = 'https://fortschritt.test';
-const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2c', 'ab3a', 'kb2ab02', 'kb2ab03', 'kb2ab04', 'kb2ab05', 'kb2ab06', 'kb2ab07', 'kb2ab08', 'kb2ab09'];
+const IDS = ['ab1a', 'ab1b', 'ab2a', 'ab2c', 'ab2d', 'ab3a', 'kb2ab02', 'kb2ab03', 'kb2ab04', 'kb2ab05', 'kb2ab06', 'kb2ab07', 'kb2ab08', 'kb2ab09'];
 
 // einstellungen.js für die Tests anpassen: Serveradresse und (optional) Schutz gegen Durchklicken ausschalten
 function einstellungen(text, server, schutz) {
@@ -336,10 +336,10 @@ function fortschrittsServer() {
     await page.waitForSelector('.l-karte');
     const k1 = (await page.locator('#l-inhalt').innerText());
     pruefe(k1.includes('Anna-Lena K.') && !k1.includes('Mia S.') && !k1.includes('Tim B.'), 'C: 3BFP2/1 sieht nur ihre eigenen Namen');
-    // AB 2: zwei Übungen, keine Selbstkontrolle mehr
+    // Raum ab2: zwei Übungen zum AB „Psychologische Erste Hilfe“ + eine zum AB „Basisregeln“ (ab2d)
     await page.goto(basis + 'lehrer-3bfp2-2-ab2.html');
     await page.waitForSelector('.l-karte[data-uebung="ab2c"]');
-    pruefe(await page.locator('.l-karte').count() === 2, 'C: zwei Übungen für AB 2');
+    pruefe(await page.locator('.l-karte').count() === 3 && await page.locator('.l-karte[data-uebung="ab2d"]').count() === 1, 'C: drei Übungen im Raum ab2 (inkl. ab2d)');
     const c2 = page.locator('.l-karte[data-uebung="ab2c"]');
     pruefe((await c2.innerText()).includes('Übung 2: Antwort-Check') && (await c2.innerText()).includes('Lena K.'), 'C: AB 2 zeigt „Übung 2: Antwort-Check“ mit Namen');
     pruefe(!(await page.locator('#l-inhalt').innerText()).includes('Selbstkontrolle'), 'C: keine Selbstkontrolle auf der Lehrerseite');
