@@ -440,6 +440,73 @@ var INHALTE = {
     danach: 'Prüfen Sie mit diesen Regeln jetzt noch einmal Ihre Antworten auf beiden Arbeitsblättern!'
   },
 
+  /* AB „Psychologische Erste Hilfe: Basisregeln“ (alte Planung, Woche 2), Aufgabe 2 – Kasten SMARTPHONE.
+     Gleicher Raum wie AB „Psychologische Erste Hilfe“ (ab2), damit beide ABs auf einer Lehrerseite stehen. */
+  ab2d: {
+    ab: 'Psychologische Erste Hilfe: Basisregeln',
+    raum: 'ab2',
+    titel: 'Übung: Hilfe oder Gesprächsbremse?',
+    anweisung: 'Sätze aus Notfällen: **Hilft** der Satz? Oder welche **Gesprächsbremse** steckt darin?',
+    knoepfe: [
+      { kuerzel: 'OK', text: 'hilft' },
+      { kuerzel: 'BEF', text: 'Befehlen' },
+      { kuerzel: 'BAG', text: 'Bagatellisieren' },
+      { kuerzel: 'BESCH', text: 'Beschwichtigen' },
+      { kuerzel: 'VERM', text: 'Vermutung äußern' }
+    ],
+    hilfe: {
+      titel: 'Hilfe: Gesprächsbremsen und Basisregeln',
+      punkte: [
+        '**Befehlen:** „Reißen Sie sich zusammen!“ – setzt unter Druck, Gefühle werden „verboten“',
+        '**Bagatellisieren:** „Das ist doch nicht schlimm.“ – Not und Angst werden klein gemacht',
+        '**Beschwichtigen:** „Alles wird gut!“ – ein leeres Versprechen, niemand weiß das sicher',
+        '**Vermutung äußern:** „Das sieht nach … aus!“ – die Person hört mit und bekommt mehr Angst',
+        '**Hilft – die Basisregeln:** 1 da sein und sagen, was geschieht · 2 vor Zuschauern abschirmen · 3 vorsichtig Körperkontakt suchen · 4 sprechen und zuhören'
+      ]
+    },
+    mindestens: 8,
+    karten: [
+      { nummer: 1, text: 'Zu Herrn Weber nach dem Unfall an der Säge: „Ich bin Lena von der Pflege. Ich bleibe bei Ihnen. Der Rettungsdienst kommt.“', richtig: 'OK',
+        erklaerung: '**Hilft – Basisregel 1:** Sie stellt sich vor, bleibt da und sagt, dass Hilfe kommt. Herr Weber ist nicht allein und weiß, was passiert.',
+        tipp: 'Erfährt Herr Weber, wer da ist und was geschieht?' },
+      { nummer: 2, text: 'Eine Bewohnerin ist gestürzt und weint. Ein Kollege sagt: „Jetzt reißen Sie sich mal zusammen!“', richtig: 'BEF',
+        erklaerung: '**Befehlen:** Das setzt sie unter Druck – ihre Gefühle werden „verboten“. Sie fühlt sich nicht ernst genommen.',
+        tipp: 'Klingt der Satz wie eine Bitte oder wie ein Befehl?' },
+      { nummer: 3, text: 'Neben dem Bett sagt ein Pfleger zu seiner Kollegin: „Das sieht nach einem Herzinfarkt aus!“', richtig: 'VERM',
+        erklaerung: '**Vermutung äußern:** Der Patient hört mit und bekommt noch mehr Angst. Vermutungen zur Diagnose gehören nicht ans Bett.',
+        tipp: 'Wer hört diesen Satz mit?' },
+      { nummer: 4, text: 'Zu Herrn Weber, der stark blutet: „Alles wird gut, Sie werden sehen.“', richtig: 'BESCH',
+        erklaerung: '**Beschwichtigen:** ein leeres Versprechen. Niemand weiß das sicher. Wird es schlimmer, ist das Vertrauen weg.',
+        tipp: 'Kann die Pflegende das sicher wissen?' },
+      { nummer: 5, text: 'Zu einem Bewohner mit starken Schmerzen: „Das ist doch nicht so schlimm.“', richtig: 'BAG',
+        erklaerung: '**Bagatellisieren:** Die Schmerzen werden klein gemacht. Der Bewohner fühlt sich nicht ernst genommen.',
+        tipp: 'Werden die Schmerzen ernst genommen?' },
+      { nummer: 6, text: 'Im Flur bleiben Leute stehen und schauen. Die Pflegende sagt: „Bitte gehen Sie weiter. Wir brauchen hier Ruhe.“', richtig: 'OK',
+        erklaerung: '**Hilft – Basisregel 2:** vor Zuschauern abschirmen – freundlich, aber bestimmt. Neugierige Blicke machen Angst und Scham.',
+        tipp: 'Wen schützt die Pflegende hier?' },
+      { nummer: 7, text: 'Die Pflegende geht auf Augenhöhe und fragt: „Darf ich Ihre Hand halten?“', richtig: 'OK',
+        erklaerung: '**Hilft – Basisregel 3:** vorsichtig Körperkontakt suchen – auf Augenhöhe und vorher fragen.',
+        tipp: 'Fragt sie vorher?' },
+      { nummer: 8, text: 'Eine Patientin fragt voller Angst: „Muss ich sterben?“ Die Antwort: „Nein, ganz bestimmt nicht!“', richtig: 'BESCH',
+        erklaerung: '**Beschwichtigen:** Das ist ein Versprechen, das niemand geben kann. Ehrlich wäre z. B.: „Sie bekommen jetzt Hilfe. Ich bleibe bei Ihnen.“',
+        tipp: 'Kann man das wirklich versprechen?' },
+      { nummer: 9, text: 'Zu einer Patientin mit Atemnot: „Atmen Sie sofort ruhiger, sonst wird es noch schlimmer!“', richtig: 'BEF',
+        erklaerung: '**Befehlen** (mit Drohung): Druck macht Angst – und Angst verstärkt die Atemnot.',
+        tipp: 'Bittet die Pflegende – oder befiehlt sie?' },
+      { nummer: 10, text: 'Zu einer Bewohnerin, die nach dem Sturz zittert: „Andere haben viel Schlimmeres erlebt.“', richtig: 'BAG',
+        erklaerung: '**Bagatellisieren:** Ihre Not wird mit anderen verglichen und klein gemacht.',
+        tipp: 'Wird ihre Not ernst genommen?' },
+      { nummer: 11, text: 'Im Zimmer ruft eine Kollegin laut: „Vielleicht ist die Hüfte gebrochen!“ Die Bewohnerin hört alles.', richtig: 'VERM',
+        erklaerung: '**Vermutung äußern:** Die Bewohnerin hört alles und bekommt Angst. Vermutungen nicht laut am Bett aussprechen.',
+        tipp: 'Wer hört mit?' },
+      { nummer: 12, text: 'Die Pflegende spricht ruhig und langsam: „Wo tut es weh? Sie können auch nur nicken.“', richtig: 'OK',
+        erklaerung: '**Hilft – Basisregel 4:** sprechen und zuhören – ruhig, langsam, in kurzen Sätzen. Nicken ist leichter, wenn das Sprechen schwerfällt.',
+        tipp: 'Wie spricht die Pflegende?' }
+    ],
+    merksatz: '**Gesprächsbremsen im Notfall:** Befehlen · Bagatellisieren · Beschwichtigen (leere Versprechen) · Vermutungen äußern. **Besser – die Basisregeln:** 1 da sein und sagen, was geschieht · 2 vor Zuschauern abschirmen · 3 vorsichtig Körperkontakt suchen · 4 sprechen und zuhören.',
+    danach: 'Weiter auf dem Arbeitsblatt: Beurteilen Sie jetzt die Aussage von **Herrn Schulte** (Aufgabe 2a).'
+  },
+
   /* ========================================================================
      Woche 4 · AB „Informationen geben in Krisen“ (raum 'ab3')
      ======================================================================== */
